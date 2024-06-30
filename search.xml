@@ -220,202 +220,25 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux文件IO</title>
-    <url>/1f3f638f.html</url>
-    <content><![CDATA[<p>在Linux中，对文件进行I/O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I/O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。</p>
+    <title>Hello World</title>
+    <url>/4a17b156.html</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <span id="more"></span>
 
-<h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p>read, write, lseek, perror, strerror, truncate(截断), ftruncate(截断), fcntl(文件描述符操作)</p>
-<p>ioctl(一般用于操作特殊文件或硬件外设，后期介绍)</p>
-<p>linux中0，1，2表示标准输入、标准输出和标准错误，文件分配符fd不会取到这三个值</p>
-<p>详情可使用<code>man 2 read/write/lseek...</code>查看</p>
-<h2 id="错误返回"><a href="#错误返回" class="headerlink" title="错误返回"></a>错误返回</h2><p><code>errno</code>表示错误对应的标号需要<code>#include &lt;errno.h&gt;</code></p>
-<p><code>strerr(errno)</code>打印出错误信息</p>
-<p><code>perror()</code>直接打印</p>
-<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>多次open()和dup()复制的区别</p>
-<ol>
-<li><p>多次open()</p>
-<img src="/1f3f638f/image-20240624230432725.png" class="">
-</li>
-<li><p>dup(), dup2()复制</p>
-<img src="/1f3f638f/image-20240624230350781.png" class=""></li>
-</ol>
-<p>可以看出多次open()的fd会指向不同的文件表，不同文件表指向同一个inode节点，而dup(), dup2()指向一个文件表</p>
-<h3 id="三种实现方法"><a href="#三种实现方法" class="headerlink" title="三种实现方法"></a>三种实现方法</h3><ol>
-<li><p>同一个进程中多次调用 open 函数打开同一个文件</p>
-<img src="/1f3f638f/image-20240624231735907.png" class="" title="image-20240624231735907">
-</li>
-<li><p>不同进程中分别使用 open 函数打开同一个文件</p>
-<img src="/1f3f638f/image-20240624231752361.png" class="" title="image-20240624231752361">
-</li>
-<li><p>同一个进程中通过 dup(dup2)函数对文件描述符进行复制</p>
-<img src="/1f3f638f/image-20240624231804747.png" class="" title="image-20240624231804747"></li>
-</ol>
-<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><ol>
-<li><p><strong>O_APPEND</strong></p>
-<p>open时加入该标志</p>
-</li>
-<li><p><strong>pread()<strong>和</strong>pwrite()</strong></p>
-<p><code>man 2 pread</code>查看</p>
-</li>
-<li><p><strong>O_EXCL</strong></p>
-<p>避免创建文件出现问题</p>
-</li>
-</ol>
-<h1 id="标准IO"><a href="#标准IO" class="headerlink" title="标准IO"></a>标准IO</h1><p>标准 I/O 是对文件 I/O 进行了封装。标准 I/O 会处理很多细节，譬如分配 stdio 缓冲区、以优</p>
-<p>化的块长度执行 I/O 等，这些处理使用户不必担心如何选择使用正确的块长度。</p>
-<h2 id="常用函数-1"><a href="#常用函数-1" class="headerlink" title="常用函数"></a>常用函数</h2><p>文件：fopen, fclose, fseek, fread, fwrite</p>
-<p>错误：feof, ferror, clearerr</p>
-<p>详情使用<code>man 3 fopen/fclose...</code>来查看</p>
-<h1 id="格式化IO"><a href="#格式化IO" class="headerlink" title="格式化IO"></a>格式化IO</h1><h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：write(1, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dprintf</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：read(0, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="文件描述符和FILE指针相互转换"><a href="#文件描述符和FILE指针相互转换" class="headerlink" title="文件描述符和FILE指针相互转换"></a>文件描述符和FILE指针相互转换</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fileno</span><span class="params">(FILE *stream)</span>; <span class="comment">// FILE* -&gt; fd</span></span><br><span class="line">FILE *<span class="title function_">fdopen</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *mode)</span>; <span class="comment">// fd -&gt; FILE*</span></span><br></pre></td></tr></tbody></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></tbody></table></figure>
 
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></tbody></table></figure>
 
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></tbody></table></figure>
 
-<h1 id="IO缓冲"><a href="#IO缓冲" class="headerlink" title="IO缓冲"></a>IO缓冲</h1><img src="/1f3f638f/image-20240625115550593.png" class="" title="image-20240625115550593">
-
-<p>可以看出：文件IO比标准IO要快</p>
-<h2 id="文件IO缓冲"><a href="#文件IO缓冲" class="headerlink" title="文件IO缓冲"></a>文件IO缓冲</h2><p>刷新缓冲区：fsync, fdatasync, sync</p>
-<p><code>man 3 sync</code>查看</p>
-<p>fsync: 文件内数据和元数据</p>
-<p>fdatasync: 文件内容数据</p>
-<p>sync: 所有</p>
-<h3 id="绕过IO缓冲"><a href="#绕过IO缓冲" class="headerlink" title="绕过IO缓冲"></a>绕过IO缓冲</h3><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE <span class="comment">// 需要定义宏</span></span></span><br><span class="line">fd = open(filepath, O_WRONLY | O_DIRECT);</span><br></pre></td></tr></tbody></table></figure>
-
-<p>限制：</p>
-<ul>
-<li>应用程序中用于存放数据的缓冲区，其内存起始地址必须以块大小的整数倍进行对齐；</li>
-<li>写文件时，文件的位置偏移量必须是块大小的整数倍；</li>
-<li>写入到文件的数据大小必须是块大小的整数倍。</li>
-</ul>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 查看blocksize</span></span><br><span class="line"><span class="built_in">df</span> -h <span class="comment"># 查看根目录在哪</span></span><br><span class="line">tune2fs -l /dev/sda? | grep <span class="string">"Block size"</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>内存起始地址对齐</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> buf[<span class="number">8192</span>] __attribute__((aligned(<span class="number">4096</span>)));</span><br></pre></td></tr></tbody></table></figure>
-
-<p>写入块大小整数倍</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> ret = write(fd, buf, <span class="number">4096</span>);</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="标准IO缓冲"><a href="#标准IO缓冲" class="headerlink" title="标准IO缓冲"></a>标准IO缓冲</h2><p>对stdio缓冲设置</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuffer</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>man 3</code>查看文档</p>
-<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>使用stat，fstat, lstat查看文件（目录）属性，stat返回一个<code>struct stat</code>结构体</p>
-<p>可使用<code>man 2</code>查看，fstat可通过fd来查看属性，lstat可以看链接文件属性</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">{</span></span><br><span class="line"> <span class="type">dev_t</span> st_dev; <span class="comment">/* 文件所在设备的 ID */</span></span><br><span class="line"> <span class="type">ino_t</span> st_ino; <span class="comment">/* 文件对应 inode 节点编号 */</span></span><br><span class="line"> <span class="type">mode_t</span> st_mode; <span class="comment">/* 文件对应的模式 */</span></span><br><span class="line"> <span class="type">nlink_t</span> st_nlink; <span class="comment">/* 文件的链接数 */</span></span><br><span class="line"> <span class="type">uid_t</span> st_uid; <span class="comment">/* 文件所有者的用户 ID */</span></span><br><span class="line"> <span class="type">gid_t</span> st_gid; <span class="comment">/* 文件所有者的组 ID */</span></span><br><span class="line"> <span class="type">dev_t</span> st_rdev; <span class="comment">/* 设备号（指针对设备文件） */</span></span><br><span class="line"> <span class="type">off_t</span> st_size; <span class="comment">/* 文件大小（以字节为单位） */</span></span><br><span class="line"> <span class="type">blksize_t</span> st_blksize; <span class="comment">/* 文件内容存储的块大小 */</span></span><br><span class="line"> <span class="type">blkcnt_t</span> st_blocks; <span class="comment">/* 文件内容所占块数 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span> <span class="comment">/* 文件最后被访问的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span> <span class="comment">/* 文件内容最后被修改的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span> <span class="comment">/* 文件状态最后被改变的时间 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="归属"><a href="#归属" class="headerlink" title="归属"></a>归属</h2><p>使用chown, fchown, lchown来更改文件所属，三者区别上同</p>
-<p>PS：进程相关联ID</p>
-<img src="/1f3f638f/image-20240626092456008.png" class="">
-
-<h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p>修改时间属性utime, utimes(精度区别)</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> {</span></span><br><span class="line">	<span class="type">time_t</span> actime; <span class="comment">/* 访问时间 */</span></span><br><span class="line">	<span class="type">time_t</span> modtime; <span class="comment">/* 内容修改时间 */</span></span><br><span class="line">};</span><br><span class="line"><span class="type">int</span> <span class="title function_">utimes</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> {</span></span><br><span class="line"> <span class="type">long</span> tv_sec; <span class="comment">/* 秒 */</span></span><br><span class="line"> <span class="type">long</span> tv_usec; <span class="comment">/* 微秒 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<p>还有futimens()和 utimensat()，区别是：</p>
-<ul>
-<li>可按纳秒级精度设置时间戳。</li>
-<li>可单独设置某一时间戳。</li>
-<li>可独立将任一时间戳设置为当前时间。</li>
-</ul>
-<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>通过<code>link</code>设置硬连接，<code>symlink</code>设置软连接，<code>readlink</code>读取链接文件</p>
-<h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><p><code>unlink</code>删除文件</p>
-<p><code>man 2</code>查看</p>
-<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>存储形式</p>
-<img src="/1f3f638f/image-20240626105646448.png" class="">
-
-<p>常用操作：mkdir, rmdir, opendir, readdir, rewinddir, closedir, getcwd, chdir, fchdir</p>
-<p><code>man 2</code>查看</p>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
-      <categories>
-        <category>嵌入式Linux</category>
-      </categories>
-      <tags>
-        <tag>C</tag>
-        <tag>linux应用</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>RM装甲板识别</title>
-    <url>/158223f0.html</url>
-    <content><![CDATA[<p>在Robomaster比赛中，装甲板是机器人得分的主要目标。识别并攻击装甲板可以帮助机器人按照比赛规则得分，同时避免攻击非装甲部位，减少无效攻击和违规行为。通过装甲板识别技术，机器人可以准确地检测并定位敌方机器人，从而进行有效的瞄准和攻击。装甲板通常是对方机器人的关键部位，通过识别这些部位可以提高攻击的命中率。</p>
-<span id="more"></span>
-
-<p><strong>装甲板示例图</strong></p>
-<img src="/158223f0/test1.png" class="">
-
-<p>config.py中，is_video=0表示是图片识别反之则是视频识别</p>
-<p>is_debug=1时显示中间debug文件</p>
-<h1 id="项目管理"><a href="#项目管理" class="headerlink" title="项目管理"></a>项目管理</h1><ol>
-<li>使用语言：Python</li>
-<li>项目流程管理：git, docker</li>
-<li>训练模型使用的框架：pytorch</li>
-<li>识别基本思路：通过装甲板两边的灯条来定位装甲板，再通过数字检测再进行筛选最后得到装甲板的位置（传统识别+深度学习）</li>
-</ol>
-<p>项目目录</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">│  .gitignore</span><br><span class="line">|  Dockerfile <span class="comment"># 构建镜像</span></span><br><span class="line">|  requirements.txt <span class="comment"># 所需要的包</span></span><br><span class="line">|  test.py <span class="comment"># 测试文件</span></span><br><span class="line">│  config.py <span class="comment"># 配置</span></span><br><span class="line">│  detect.py <span class="comment"># 识别模块</span></span><br><span class="line">│  main.py <span class="comment"># 主程序入口</span></span><br><span class="line">│  readme.md <span class="comment"># 文档</span></span><br><span class="line">│  train.py <span class="comment"># 训练文件</span></span><br><span class="line">│</span><br><span class="line">├─cfg <span class="comment"># 模型文件</span></span><br><span class="line">│</span><br><span class="line">├─datasets <span class="comment"># 数据集</span></span><br><span class="line">│</span><br><span class="line">├─image <span class="comment"># readme图片</span></span><br><span class="line">│</span><br><span class="line">├─testdata 测试数据集</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="识别具体实现"><a href="#识别具体实现" class="headerlink" title="识别具体实现"></a>识别具体实现</h1><h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><p>位于config.py中，模型，是否debug，一些参数，类的定义均存在里面</p>
-<h2 id="图像预处理"><a href="#图像预处理" class="headerlink" title="图像预处理"></a>图像预处理</h2><p>通过cvtColor和threshold将图片转为二值图片，将目标从背景中分离出来。</p>
-<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">def preProcess(rgb_img):</span><br><span class="line">    gray = cv.cvtColor(rgb_img, cv.COLOR_BGR2GRAY)</span><br><span class="line">    _, binary = cv.threshold(gray, settings.binary_thres, 255, cv.THRESH_BINARY) #_是阈值 忽略</span><br><span class="line">    return binary</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="寻找灯条"><a href="#寻找灯条" class="headerlink" title="寻找灯条"></a>寻找灯条</h2><p>通过 findContours 得到轮廓</p>
-<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">contours, hierarchy = cv.findContours(binary_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>将轮廓点数小于5的排除掉</p>
-<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">for contour in contours:</span><br><span class="line">        if len(contour) &lt; 5:</span><br><span class="line">            continue</span><br></pre></td></tr></tbody></table></figure>
-
-<p>对轮廓进行外接矩形并且判定是否是灯条</p>
-<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">	r_rect = cv.minAreaRect(contour)</span><br><span class="line">        light = Light(r_rect)</span><br><span class="line"></span><br><span class="line">        if is_light(light):</span><br><span class="line"># Light的定义(一小部分)</span><br><span class="line">class Light:</span><br><span class="line">    def __init__(self, box=None):</span><br><span class="line">	self.center = box[0]</span><br><span class="line">        self.size = box[1]</span><br><span class="line">        self.angle = box[2]</span><br><span class="line"></span><br><span class="line">        points = cv.boxPoints(box)</span><br><span class="line">        points = sorted(points, key=lambda p: p[1])</span><br><span class="line"></span><br><span class="line">        self.top = (points[0] + points[1]) / 2</span><br><span class="line">        self.bottom = (points[2] + points[3]) / 2</span><br><span class="line"></span><br><span class="line">        self.length = np.linalg.norm(self.top - self.bottom)</span><br><span class="line">        self.width = np.linalg.norm(points[0] - points[1])</span><br><span class="line"></span><br><span class="line">        self.tilt_angle = atan2(abs(self.top[0] - self.bottom[0]), abs(self.top[1] - self.bottom[1]))</span><br><span class="line">        self.tilt_angle = self.tilt_angle / pi * 180</span><br><span class="line">        self.color = None</span><br></pre></td></tr></tbody></table></figure>
-
-<p>通过统计在给定轮廓内的红色和蓝色像素值的总和，来判断该区域主要的颜色是红色还是蓝色。使用 <code>cv.pointPolygonTest</code>来确保只统计轮廓内部的像素值。</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">sum_r, sum_b = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">   roi = rbg_img[rect[<span class="number">1</span>]:rect[<span class="number">1</span>]+rect[<span class="number">3</span>], rect[<span class="number">0</span>]:rect[<span class="number">0</span>]+rect[<span class="number">2</span>]]</span><br><span class="line"></span><br><span class="line">   <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(roi.shape[<span class="number">0</span>]):</span><br><span class="line">   <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(roi.shape[<span class="number">1</span>]):</span><br><span class="line">   <span class="keyword">if</span> cv.pointPolygonTest(contour, (j + rect[<span class="number">0</span>], i + rect[<span class="number">1</span>]), <span class="literal">False</span>) &gt;= <span class="number">0</span>:</span><br><span class="line">   	sum_b += roi[i, j, <span class="number">0</span>]</span><br><span class="line">   	sum_r += roi[i, j, <span class="number">2</span>]</span><br><span class="line">	light.color = <span class="string">'RED'</span> <span class="keyword">if</span> sum_r &gt; sum_b <span class="keyword">else</span> <span class="string">'BLUE'</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="配对灯条"><a href="#配对灯条" class="headerlink" title="配对灯条"></a>配对灯条</h2><p>根据 <code>detect_color</code> 选择对应颜色的灯条进行两两配对，首先筛除掉两条灯条中间包含另一个灯条的情况，然后根据两灯条的长度之比、两灯条中心的距离、配对出装甲板的倾斜角度来筛选掉条件不满足的结果，得到形状符合装甲板特征的灯条配对（数据根据官方和测量得出）。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">def <span class="title function_">containLight</span><span class="params">(light_1, light_2, lights)</span>:</span><br><span class="line">    # 获取两个光条的顶点和底点坐标</span><br><span class="line">    points = np.<span class="built_in">array</span>([light_1.top, light_1.bottom, light_2.top, light_2.bottom])</span><br><span class="line">    bounding_rect = cv.boundingRect(points)</span><br><span class="line"></span><br><span class="line">    # 遍历所有光条，检查是否有光条被包含在两个光条之间</span><br><span class="line">    <span class="keyword">for</span> test_light in lights:</span><br><span class="line">        <span class="keyword">if</span> np.array_equal(test_light.center, light_1.center) or np.array_equal(test_light.center, light_2.center):</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (cv.pointPolygonTest(points, (test_light.top[<span class="number">0</span>], test_light.top[<span class="number">1</span>]), False) &gt;= <span class="number">0</span> or</span><br><span class="line">            cv.pointPolygonTest(points, (test_light.bottom[<span class="number">0</span>], test_light.bottom[<span class="number">1</span>]), False) &gt;= <span class="number">0</span> or</span><br><span class="line">            cv.pointPolygonTest(points, (test_light.center[<span class="number">0</span>], test_light.center[<span class="number">1</span>]), False) &gt;= <span class="number">0</span>):</span><br><span class="line">            <span class="keyword">return</span> True</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> False</span><br><span class="line">def isArmor(light_1, light_2):</span><br><span class="line">    # 比较两个光条的长度比例（短边 / 长边）</span><br><span class="line">    light_length_ratio = min(light_1.length, light_2.length) / max(light_1.length, light_2.length)</span><br><span class="line">    light_ratio_ok = light_length_ratio &gt; settings.amin_light_ratio</span><br><span class="line"></span><br><span class="line">    # 计算两个光条中心的距离（以光条长度为单位）</span><br><span class="line">    avg_light_length = (light_1.length + light_2.length) / <span class="number">2</span></span><br><span class="line">    center_distance = np.linalg.norm(np.<span class="built_in">array</span>(light_1.center) - np.<span class="built_in">array</span>(light_2.center)) / avg_light_length</span><br><span class="line">    center_distance_ok = (settings.amin_small_center_distance &lt;= center_distance &lt; settings.amax_small_center_distance) or \</span><br><span class="line">                         (settings.amin_large_center_distance &lt;= center_distance &lt; settings.amax_large_center_distance)</span><br><span class="line"></span><br><span class="line">    # 计算光条中心连接线的角度</span><br><span class="line">    diff = np.<span class="built_in">array</span>(light_1.center) - np.<span class="built_in">array</span>(light_2.center)</span><br><span class="line">    angle = degrees(<span class="built_in">abs</span>(<span class="built_in">atan2</span>(diff[<span class="number">1</span>], diff[<span class="number">0</span>])))</span><br><span class="line">    angle_ok = angle &lt; settings.amax_angle</span><br><span class="line"></span><br><span class="line">    # 综合判断是否为装甲板</span><br><span class="line">    is_armor = light_ratio_ok and center_distance_ok and angle_ok</span><br><span class="line"></span><br><span class="line">    # 判断装甲板类型</span><br><span class="line">    <span class="keyword">if</span> is_armor:</span><br><span class="line">        type = <span class="string">'LARGE'</span> <span class="keyword">if</span> center_distance &gt; settings.amin_large_center_distance <span class="keyword">else</span> <span class="string">'SMALL'</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        type = <span class="string">'INVALID'</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> type</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="提取数字"><a href="#提取数字" class="headerlink" title="提取数字"></a>提取数字</h2><p>设置好roi，根据灯条的坐标获得装甲板大致的位置，然后使用透视变换截取出数字部分</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">lights_vertices = np.array([armor.left_light.bottom, armor.left_light.top,</span><br><span class="line">                                       armor.right_light.top, armor.right_light.bottom], dtype=np.float32)</span><br><span class="line">           <span class="comment"># 计算变换后图像中灯条顶部和底部的y坐标</span></span><br><span class="line">           top_light_y = (warp_height - light_length) // <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">           bottom_light_y = top_light_y + light_length</span><br><span class="line">           <span class="comment"># 根据装甲板类型确定变换后的图像宽度</span></span><br><span class="line">           warp_width = small_armor_width <span class="keyword">if</span> armor.<span class="built_in">type</span> == <span class="string">'SMALL'</span> <span class="keyword">else</span> large_armor_width</span><br><span class="line">           <span class="comment"># 设置变换后图像的目标顶点位置</span></span><br><span class="line">           target_vertices = np.array([[<span class="number">0</span>, bottom_light_y],</span><br><span class="line">                                       [<span class="number">0</span>, top_light_y],</span><br><span class="line">                                       [warp_width - <span class="number">1</span>, top_light_y],</span><br><span class="line">                                       [warp_width - <span class="number">1</span>, bottom_light_y]], dtype=np.float32)</span><br><span class="line">           <span class="comment"># 计算透视变换矩阵</span></span><br><span class="line">           rotation_matrix = cv.getPerspectiveTransform(lights_vertices, target_vertices)</span><br><span class="line">           <span class="comment"># 应用透视变换，将源图像中的装甲板区域变换到目标顶点位置</span></span><br><span class="line">           number_image = cv.warpPerspective(src, rotation_matrix, (warp_width, warp_height))</span><br><span class="line">           <span class="comment"># 从变换后的图像中提取感兴趣区域（ROI）</span></span><br><span class="line">           x_start = (warp_width - roi_size[<span class="number">0</span>]) // <span class="number">2</span></span><br><span class="line">           x_end = x_start + roi_size[<span class="number">0</span>]</span><br><span class="line">           number_image = number_image[<span class="number">0</span>:roi_size[<span class="number">1</span>], x_start:x_end]</span><br><span class="line">           <span class="comment"># 将图像转换为灰度图像</span></span><br><span class="line">           number_image = cv.cvtColor(number_image, cv.COLOR_RGB2GRAY)</span><br><span class="line">           <span class="comment"># 对灰度图像应用二值化处理</span></span><br><span class="line">           _, number_image = cv.threshold(number_image, <span class="number">0</span>, <span class="number">255</span>, cv.THRESH_BINARY | cv.THRESH_OTSU)</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="模型设计"><a href="#模型设计" class="headerlink" title="模型设计"></a>模型设计</h2><p>由于MiniPC的性能限制，只是设计了简单的mlp网络用于数字分类</p>
-<img src="/158223f0/image-20240626144621090.png" class="">
-
-<p>在训练前对训练集进行处理</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">dataset = torchvision.datasets.ImageFolder(</span><br><span class="line">    root=os.path.join(os.path.dirname(__file__), <span class="string">'datasets'</span>),</span><br><span class="line">    transform=torchvision.transforms.Compose([</span><br><span class="line">        torchvision.transforms.Grayscale(num_output_channels=<span class="number">1</span>), <span class="comment"># 灰度化</span></span><br><span class="line">        torchvision.transforms.RandomAffine(</span><br><span class="line">            degrees=(-<span class="number">5</span>, <span class="number">5</span>), translate=(<span class="number">0.08</span>, <span class="number">0.08</span>), scale=(<span class="number">0.9</span>, <span class="number">1.1</span>)), <span class="comment"># 旋转，平移，放缩</span></span><br><span class="line">        torchvision.transforms.ToTensor(),</span><br><span class="line">        torchvision.transforms.RandomErasing(</span><br><span class="line">            scale=(<span class="number">0.02</span>, <span class="number">0.02</span>))</span><br><span class="line">    ]))<span class="comment"># 擦除</span></span><br><span class="line"><span class="comment"># 用ImageFolder表示文件夹为标签名</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>数据集分为两部分（4:1）训练集和测试集</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">train_dataset, test_dataset = torch.utils.data.random_split(</span><br><span class="line">    dataset, [<span class="built_in">int</span>(<span class="built_in">len</span>(dataset) * <span class="number">0.8</span>), <span class="built_in">len</span>(dataset) - <span class="built_in">int</span>(<span class="built_in">len</span>(dataset) * <span class="number">0.8</span>)])</span><br></pre></td></tr></tbody></table></figure>
-
-<p>损失函数和优化器</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">loss_fn = nn.CrossEntropyLoss()</span><br><span class="line">optimizer = torch.optim.Adam(model.parameters(), lr=<span class="number">1e-3</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>训练评估</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> torch.no_grad():</span><br><span class="line">        correct = <span class="number">0</span></span><br><span class="line">        total = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> x, y <span class="keyword">in</span> test_loader:</span><br><span class="line">            x, y = x.to(device), y.to(device)  <span class="comment"># Move data to the device</span></span><br><span class="line">            y_pred = model(x)</span><br><span class="line">            loss = loss_fn(y_pred, y)</span><br><span class="line">            running_val_loss += loss.item()</span><br><span class="line"></span><br><span class="line">            _, predicted = torch.<span class="built_in">max</span>(y_pred.data, <span class="number">1</span>)</span><br><span class="line">            total += y.size(<span class="number">0</span>)</span><br><span class="line">            correct += (predicted == y).<span class="built_in">sum</span>().item()</span><br><span class="line">        avg_val_loss = running_val_loss / <span class="built_in">len</span>(test_loader)</span><br><span class="line">        accuracy = <span class="number">100</span> * correct / total</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f'Epoch: <span class="subst">{epoch + <span class="number">1</span>}</span>, Accuracy: <span class="subst">{accuracy}</span>%'</span>)</span><br><span class="line">        writer.add_scalar(<span class="string">'Accuracy/test'</span>, accuracy, epoch)</span><br><span class="line">        writer.add_scalar(<span class="string">'Loss/val'</span>, avg_val_loss, epoch)</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="模型部署"><a href="#模型部署" class="headerlink" title="模型部署"></a>模型部署</h2><p>使用opencv的dnn模块, softmax转换为概率，argmax转换为对应的类别（0 - 5）</p>
-<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">blob = cv.dnn.blobFromImage(image)</span><br><span class="line">self.net.setInput(blob)</span><br><span class="line">outputs = self.net.forward()</span><br><span class="line">outputs = outputs.flatten()</span><br><span class="line">exp_outputs = np.exp(outputs - np.<span class="built_in">max</span>(outputs))</span><br><span class="line">softmax_prob = exp_outputs / np.<span class="built_in">sum</span>(exp_outputs)</span><br><span class="line">confidence = np.<span class="built_in">max</span>(softmax_prob)</span><br><span class="line">label_id = np.argmax(softmax_prob)</span><br><span class="line"></span><br><span class="line">armor.confidence = confidence</span><br><span class="line">armor.number = self.class_names[label_id]</span><br><span class="line"></span><br><span class="line">armor.classification_result = <span class="string">f"<span class="subst">{armor.number}</span>: <span class="subst">{armor.confidence * <span class="number">100.0</span>:<span class="number">.1</span>f}</span>%"</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="Docker部署"><a href="#Docker部署" class="headerlink" title="Docker部署"></a>Docker部署</h1><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker build -t my-python-image .</span><br><span class="line">docker run -it \</span><br><span class="line">    --name my-python-container \</span><br><span class="line">    --<span class="built_in">env</span>=<span class="string">"DISPLAY"</span> \</span><br><span class="line">    --volume=<span class="string">"/tmp/.X11-unix:/tmp/.X11-unix:rw"</span> \</span><br><span class="line">    --volume=<span class="string">"<span class="subst">$(pwd)</span>:/app"</span> \</span><br><span class="line">    my-python-image</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
-
-<p>使用前记得</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">xhost +</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="PIP安装"><a href="#PIP安装" class="headerlink" title="PIP安装"></a>PIP安装</h1><p>如果不想使用docker部署可以使用</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">pip install -r requirements.txt</span><br></pre></td></tr></tbody></table></figure>
-
-<p>安装所需要的包</p>
-<p><strong>PS:</strong></p>
-<p>项目基础是从rm_vision改过来的纯Python版本，同时也有ROS C++版的，详见<a href="https://github.com/langou0115/RoboDetect">here</a></p>
-]]></content>
-      <categories>
-        <category>Robomaster</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>深度学习</tag>
-      </tags>
   </entry>
   <entry>
     <title>图论</title>
@@ -628,6 +451,124 @@
       </tags>
   </entry>
   <entry>
+    <title>Linux文件IO</title>
+    <url>/1f3f638f.html</url>
+    <content><![CDATA[<p>在Linux中，对文件进行I/O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I/O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。</p>
+<span id="more"></span>
+
+<h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p>read, write, lseek, perror, strerror, truncate(截断), ftruncate(截断), fcntl(文件描述符操作)</p>
+<p>ioctl(一般用于操作特殊文件或硬件外设，后期介绍)</p>
+<p>linux中0，1，2表示标准输入、标准输出和标准错误，文件分配符fd不会取到这三个值</p>
+<p>详情可使用<code>man 2 read/write/lseek...</code>查看</p>
+<h2 id="错误返回"><a href="#错误返回" class="headerlink" title="错误返回"></a>错误返回</h2><p><code>errno</code>表示错误对应的标号需要<code>#include &lt;errno.h&gt;</code></p>
+<p><code>strerr(errno)</code>打印出错误信息</p>
+<p><code>perror()</code>直接打印</p>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>多次open()和dup()复制的区别</p>
+<ol>
+<li><p>多次open()</p>
+<img src="/1f3f638f/image-20240624230432725.png" class="">
+</li>
+<li><p>dup(), dup2()复制</p>
+<img src="/1f3f638f/image-20240624230350781.png" class=""></li>
+</ol>
+<p>可以看出多次open()的fd会指向不同的文件表，不同文件表指向同一个inode节点，而dup(), dup2()指向一个文件表</p>
+<h3 id="三种实现方法"><a href="#三种实现方法" class="headerlink" title="三种实现方法"></a>三种实现方法</h3><ol>
+<li><p>同一个进程中多次调用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231735907.png" class="" title="image-20240624231735907">
+</li>
+<li><p>不同进程中分别使用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231752361.png" class="" title="image-20240624231752361">
+</li>
+<li><p>同一个进程中通过 dup(dup2)函数对文件描述符进行复制</p>
+<img src="/1f3f638f/image-20240624231804747.png" class="" title="image-20240624231804747"></li>
+</ol>
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><ol>
+<li><p><strong>O_APPEND</strong></p>
+<p>open时加入该标志</p>
+</li>
+<li><p><strong>pread()<strong>和</strong>pwrite()</strong></p>
+<p><code>man 2 pread</code>查看</p>
+</li>
+<li><p><strong>O_EXCL</strong></p>
+<p>避免创建文件出现问题</p>
+</li>
+</ol>
+<h1 id="标准IO"><a href="#标准IO" class="headerlink" title="标准IO"></a>标准IO</h1><p>标准 I/O 是对文件 I/O 进行了封装。标准 I/O 会处理很多细节，譬如分配 stdio 缓冲区、以优</p>
+<p>化的块长度执行 I/O 等，这些处理使用户不必担心如何选择使用正确的块长度。</p>
+<h2 id="常用函数-1"><a href="#常用函数-1" class="headerlink" title="常用函数"></a>常用函数</h2><p>文件：fopen, fclose, fseek, fread, fwrite</p>
+<p>错误：feof, ferror, clearerr</p>
+<p>详情使用<code>man 3 fopen/fclose...</code>来查看</p>
+<h1 id="格式化IO"><a href="#格式化IO" class="headerlink" title="格式化IO"></a>格式化IO</h1><h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：write(1, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dprintf</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：read(0, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="文件描述符和FILE指针相互转换"><a href="#文件描述符和FILE指针相互转换" class="headerlink" title="文件描述符和FILE指针相互转换"></a>文件描述符和FILE指针相互转换</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fileno</span><span class="params">(FILE *stream)</span>; <span class="comment">// FILE* -&gt; fd</span></span><br><span class="line">FILE *<span class="title function_">fdopen</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *mode)</span>; <span class="comment">// fd -&gt; FILE*</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h1 id="IO缓冲"><a href="#IO缓冲" class="headerlink" title="IO缓冲"></a>IO缓冲</h1><img src="/1f3f638f/image-20240625115550593.png" class="" title="image-20240625115550593">
+
+<p>可以看出：文件IO比标准IO要快</p>
+<h2 id="文件IO缓冲"><a href="#文件IO缓冲" class="headerlink" title="文件IO缓冲"></a>文件IO缓冲</h2><p>刷新缓冲区：fsync, fdatasync, sync</p>
+<p><code>man 3 sync</code>查看</p>
+<p>fsync: 文件内数据和元数据</p>
+<p>fdatasync: 文件内容数据</p>
+<p>sync: 所有</p>
+<h3 id="绕过IO缓冲"><a href="#绕过IO缓冲" class="headerlink" title="绕过IO缓冲"></a>绕过IO缓冲</h3><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE <span class="comment">// 需要定义宏</span></span></span><br><span class="line">fd = open(filepath, O_WRONLY | O_DIRECT);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>限制：</p>
+<ul>
+<li>应用程序中用于存放数据的缓冲区，其内存起始地址必须以块大小的整数倍进行对齐；</li>
+<li>写文件时，文件的位置偏移量必须是块大小的整数倍；</li>
+<li>写入到文件的数据大小必须是块大小的整数倍。</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 查看blocksize</span></span><br><span class="line"><span class="built_in">df</span> -h <span class="comment"># 查看根目录在哪</span></span><br><span class="line">tune2fs -l /dev/sda? | grep <span class="string">"Block size"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>内存起始地址对齐</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> buf[<span class="number">8192</span>] __attribute__((aligned(<span class="number">4096</span>)));</span><br></pre></td></tr></tbody></table></figure>
+
+<p>写入块大小整数倍</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> ret = write(fd, buf, <span class="number">4096</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="标准IO缓冲"><a href="#标准IO缓冲" class="headerlink" title="标准IO缓冲"></a>标准IO缓冲</h2><p>对stdio缓冲设置</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuffer</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>man 3</code>查看文档</p>
+<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>使用stat，fstat, lstat查看文件（目录）属性，stat返回一个<code>struct stat</code>结构体</p>
+<p>可使用<code>man 2</code>查看，fstat可通过fd来查看属性，lstat可以看链接文件属性</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">{</span></span><br><span class="line"> <span class="type">dev_t</span> st_dev; <span class="comment">/* 文件所在设备的 ID */</span></span><br><span class="line"> <span class="type">ino_t</span> st_ino; <span class="comment">/* 文件对应 inode 节点编号 */</span></span><br><span class="line"> <span class="type">mode_t</span> st_mode; <span class="comment">/* 文件对应的模式 */</span></span><br><span class="line"> <span class="type">nlink_t</span> st_nlink; <span class="comment">/* 文件的链接数 */</span></span><br><span class="line"> <span class="type">uid_t</span> st_uid; <span class="comment">/* 文件所有者的用户 ID */</span></span><br><span class="line"> <span class="type">gid_t</span> st_gid; <span class="comment">/* 文件所有者的组 ID */</span></span><br><span class="line"> <span class="type">dev_t</span> st_rdev; <span class="comment">/* 设备号（指针对设备文件） */</span></span><br><span class="line"> <span class="type">off_t</span> st_size; <span class="comment">/* 文件大小（以字节为单位） */</span></span><br><span class="line"> <span class="type">blksize_t</span> st_blksize; <span class="comment">/* 文件内容存储的块大小 */</span></span><br><span class="line"> <span class="type">blkcnt_t</span> st_blocks; <span class="comment">/* 文件内容所占块数 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span> <span class="comment">/* 文件最后被访问的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span> <span class="comment">/* 文件内容最后被修改的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span> <span class="comment">/* 文件状态最后被改变的时间 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="归属"><a href="#归属" class="headerlink" title="归属"></a>归属</h2><p>使用chown, fchown, lchown来更改文件所属，三者区别上同</p>
+<p>PS：进程相关联ID</p>
+<img src="/1f3f638f/image-20240626092456008.png" class="">
+
+<h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p>修改时间属性utime, utimes(精度区别)</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> {</span></span><br><span class="line">	<span class="type">time_t</span> actime; <span class="comment">/* 访问时间 */</span></span><br><span class="line">	<span class="type">time_t</span> modtime; <span class="comment">/* 内容修改时间 */</span></span><br><span class="line">};</span><br><span class="line"><span class="type">int</span> <span class="title function_">utimes</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> {</span></span><br><span class="line"> <span class="type">long</span> tv_sec; <span class="comment">/* 秒 */</span></span><br><span class="line"> <span class="type">long</span> tv_usec; <span class="comment">/* 微秒 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>还有futimens()和 utimensat()，区别是：</p>
+<ul>
+<li>可按纳秒级精度设置时间戳。</li>
+<li>可单独设置某一时间戳。</li>
+<li>可独立将任一时间戳设置为当前时间。</li>
+</ul>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>通过<code>link</code>设置硬连接，<code>symlink</code>设置软连接，<code>readlink</code>读取链接文件</p>
+<h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><p><code>unlink</code>删除文件</p>
+<p><code>man 2</code>查看</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>存储形式</p>
+<img src="/1f3f638f/image-20240626105646448.png" class="">
+
+<p>常用操作：mkdir, rmdir, opendir, readdir, rewinddir, closedir, getcwd, chdir, fchdir</p>
+<p><code>man 2</code>查看</p>
+]]></content>
+      <categories>
+        <category>嵌入式Linux</category>
+      </categories>
+      <tags>
+        <tag>C</tag>
+        <tag>linux应用</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>排序</title>
     <url>/a444b428.html</url>
     <content><![CDATA[<p>排序算法中的一些思想可以用于解决一些题目，例如逆序对等….</p>
@@ -648,25 +589,84 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/4a17b156.html</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+    <title>RM装甲板识别</title>
+    <url>/158223f0.html</url>
+    <content><![CDATA[<p>在Robomaster比赛中，装甲板是机器人得分的主要目标。识别并攻击装甲板可以帮助机器人按照比赛规则得分，同时避免攻击非装甲部位，减少无效攻击和违规行为。通过装甲板识别技术，机器人可以准确地检测并定位敌方机器人，从而进行有效的瞄准和攻击。装甲板通常是对方机器人的关键部位，通过识别这些部位可以提高攻击的命中率。</p>
 <span id="more"></span>
 
+<p><strong>装甲板示例图</strong></p>
+<img src="/158223f0/test1.png" class="">
 
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></tbody></table></figure>
+<p>config.py中，is_video=0表示是图片识别反之则是视频识别</p>
+<p>is_debug=1时显示中间debug文件</p>
+<h1 id="项目管理"><a href="#项目管理" class="headerlink" title="项目管理"></a>项目管理</h1><ol>
+<li>使用语言：Python</li>
+<li>项目流程管理：git, docker</li>
+<li>训练模型使用的框架：pytorch</li>
+<li>识别基本思路：通过装甲板两边的灯条来定位装甲板，再通过数字检测再进行筛选最后得到装甲板的位置（传统识别+深度学习）</li>
+</ol>
+<p>项目目录</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">│  .gitignore</span><br><span class="line">|  Dockerfile <span class="comment"># 构建镜像</span></span><br><span class="line">|  requirements.txt <span class="comment"># 所需要的包</span></span><br><span class="line">|  test.py <span class="comment"># 测试文件</span></span><br><span class="line">│  config.py <span class="comment"># 配置</span></span><br><span class="line">│  detect.py <span class="comment"># 识别模块</span></span><br><span class="line">│  main.py <span class="comment"># 主程序入口</span></span><br><span class="line">│  readme.md <span class="comment"># 文档</span></span><br><span class="line">│  train.py <span class="comment"># 训练文件</span></span><br><span class="line">│</span><br><span class="line">├─cfg <span class="comment"># 模型文件</span></span><br><span class="line">│</span><br><span class="line">├─datasets <span class="comment"># 数据集</span></span><br><span class="line">│</span><br><span class="line">├─image <span class="comment"># readme图片</span></span><br><span class="line">│</span><br><span class="line">├─testdata 测试数据集</span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></tbody></table></figure>
+<h1 id="识别具体实现"><a href="#识别具体实现" class="headerlink" title="识别具体实现"></a>识别具体实现</h1><h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><p>位于config.py中，模型，是否debug，一些参数，类的定义均存在里面</p>
+<h2 id="图像预处理"><a href="#图像预处理" class="headerlink" title="图像预处理"></a>图像预处理</h2><p>通过cvtColor和threshold将图片转为二值图片，将目标从背景中分离出来。</p>
+<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">def preProcess(rgb_img):</span><br><span class="line">    gray = cv.cvtColor(rgb_img, cv.COLOR_BGR2GRAY)</span><br><span class="line">    _, binary = cv.threshold(gray, settings.binary_thres, 255, cv.THRESH_BINARY) #_是阈值 忽略</span><br><span class="line">    return binary</span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="寻找灯条"><a href="#寻找灯条" class="headerlink" title="寻找灯条"></a>寻找灯条</h2><p>通过 findContours 得到轮廓</p>
+<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">contours, hierarchy = cv.findContours(binary_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)</span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></tbody></table></figure>
+<p>将轮廓点数小于5的排除掉</p>
+<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">for contour in contours:</span><br><span class="line">        if len(contour) &lt; 5:</span><br><span class="line">            continue</span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p>对轮廓进行外接矩形并且判定是否是灯条</p>
+<figure class="highlight python-repl"><table><tbody><tr><td class="code"><pre><span class="line">	r_rect = cv.minAreaRect(contour)</span><br><span class="line">        light = Light(r_rect)</span><br><span class="line"></span><br><span class="line">        if is_light(light):</span><br><span class="line"># Light的定义(一小部分)</span><br><span class="line">class Light:</span><br><span class="line">    def __init__(self, box=None):</span><br><span class="line">	self.center = box[0]</span><br><span class="line">        self.size = box[1]</span><br><span class="line">        self.angle = box[2]</span><br><span class="line"></span><br><span class="line">        points = cv.boxPoints(box)</span><br><span class="line">        points = sorted(points, key=lambda p: p[1])</span><br><span class="line"></span><br><span class="line">        self.top = (points[0] + points[1]) / 2</span><br><span class="line">        self.bottom = (points[2] + points[3]) / 2</span><br><span class="line"></span><br><span class="line">        self.length = np.linalg.norm(self.top - self.bottom)</span><br><span class="line">        self.width = np.linalg.norm(points[0] - points[1])</span><br><span class="line"></span><br><span class="line">        self.tilt_angle = atan2(abs(self.top[0] - self.bottom[0]), abs(self.top[1] - self.bottom[1]))</span><br><span class="line">        self.tilt_angle = self.tilt_angle / pi * 180</span><br><span class="line">        self.color = None</span><br></pre></td></tr></tbody></table></figure>
+
+<p>通过统计在给定轮廓内的红色和蓝色像素值的总和，来判断该区域主要的颜色是红色还是蓝色。使用 <code>cv.pointPolygonTest</code>来确保只统计轮廓内部的像素值。</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">sum_r, sum_b = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">   roi = rbg_img[rect[<span class="number">1</span>]:rect[<span class="number">1</span>]+rect[<span class="number">3</span>], rect[<span class="number">0</span>]:rect[<span class="number">0</span>]+rect[<span class="number">2</span>]]</span><br><span class="line"></span><br><span class="line">   <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(roi.shape[<span class="number">0</span>]):</span><br><span class="line">   <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(roi.shape[<span class="number">1</span>]):</span><br><span class="line">   <span class="keyword">if</span> cv.pointPolygonTest(contour, (j + rect[<span class="number">0</span>], i + rect[<span class="number">1</span>]), <span class="literal">False</span>) &gt;= <span class="number">0</span>:</span><br><span class="line">   	sum_b += roi[i, j, <span class="number">0</span>]</span><br><span class="line">   	sum_r += roi[i, j, <span class="number">2</span>]</span><br><span class="line">	light.color = <span class="string">'RED'</span> <span class="keyword">if</span> sum_r &gt; sum_b <span class="keyword">else</span> <span class="string">'BLUE'</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="配对灯条"><a href="#配对灯条" class="headerlink" title="配对灯条"></a>配对灯条</h2><p>根据 <code>detect_color</code> 选择对应颜色的灯条进行两两配对，首先筛除掉两条灯条中间包含另一个灯条的情况，然后根据两灯条的长度之比、两灯条中心的距离、配对出装甲板的倾斜角度来筛选掉条件不满足的结果，得到形状符合装甲板特征的灯条配对（数据根据官方和测量得出）。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">def <span class="title function_">containLight</span><span class="params">(light_1, light_2, lights)</span>:</span><br><span class="line">    # 获取两个光条的顶点和底点坐标</span><br><span class="line">    points = np.<span class="built_in">array</span>([light_1.top, light_1.bottom, light_2.top, light_2.bottom])</span><br><span class="line">    bounding_rect = cv.boundingRect(points)</span><br><span class="line"></span><br><span class="line">    # 遍历所有光条，检查是否有光条被包含在两个光条之间</span><br><span class="line">    <span class="keyword">for</span> test_light in lights:</span><br><span class="line">        <span class="keyword">if</span> np.array_equal(test_light.center, light_1.center) or np.array_equal(test_light.center, light_2.center):</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (cv.pointPolygonTest(points, (test_light.top[<span class="number">0</span>], test_light.top[<span class="number">1</span>]), False) &gt;= <span class="number">0</span> or</span><br><span class="line">            cv.pointPolygonTest(points, (test_light.bottom[<span class="number">0</span>], test_light.bottom[<span class="number">1</span>]), False) &gt;= <span class="number">0</span> or</span><br><span class="line">            cv.pointPolygonTest(points, (test_light.center[<span class="number">0</span>], test_light.center[<span class="number">1</span>]), False) &gt;= <span class="number">0</span>):</span><br><span class="line">            <span class="keyword">return</span> True</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> False</span><br><span class="line">def isArmor(light_1, light_2):</span><br><span class="line">    # 比较两个光条的长度比例（短边 / 长边）</span><br><span class="line">    light_length_ratio = min(light_1.length, light_2.length) / max(light_1.length, light_2.length)</span><br><span class="line">    light_ratio_ok = light_length_ratio &gt; settings.amin_light_ratio</span><br><span class="line"></span><br><span class="line">    # 计算两个光条中心的距离（以光条长度为单位）</span><br><span class="line">    avg_light_length = (light_1.length + light_2.length) / <span class="number">2</span></span><br><span class="line">    center_distance = np.linalg.norm(np.<span class="built_in">array</span>(light_1.center) - np.<span class="built_in">array</span>(light_2.center)) / avg_light_length</span><br><span class="line">    center_distance_ok = (settings.amin_small_center_distance &lt;= center_distance &lt; settings.amax_small_center_distance) or \</span><br><span class="line">                         (settings.amin_large_center_distance &lt;= center_distance &lt; settings.amax_large_center_distance)</span><br><span class="line"></span><br><span class="line">    # 计算光条中心连接线的角度</span><br><span class="line">    diff = np.<span class="built_in">array</span>(light_1.center) - np.<span class="built_in">array</span>(light_2.center)</span><br><span class="line">    angle = degrees(<span class="built_in">abs</span>(<span class="built_in">atan2</span>(diff[<span class="number">1</span>], diff[<span class="number">0</span>])))</span><br><span class="line">    angle_ok = angle &lt; settings.amax_angle</span><br><span class="line"></span><br><span class="line">    # 综合判断是否为装甲板</span><br><span class="line">    is_armor = light_ratio_ok and center_distance_ok and angle_ok</span><br><span class="line"></span><br><span class="line">    # 判断装甲板类型</span><br><span class="line">    <span class="keyword">if</span> is_armor:</span><br><span class="line">        type = <span class="string">'LARGE'</span> <span class="keyword">if</span> center_distance &gt; settings.amin_large_center_distance <span class="keyword">else</span> <span class="string">'SMALL'</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        type = <span class="string">'INVALID'</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> type</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="提取数字"><a href="#提取数字" class="headerlink" title="提取数字"></a>提取数字</h2><p>设置好roi，根据灯条的坐标获得装甲板大致的位置，然后使用透视变换截取出数字部分</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">lights_vertices = np.array([armor.left_light.bottom, armor.left_light.top,</span><br><span class="line">                                       armor.right_light.top, armor.right_light.bottom], dtype=np.float32)</span><br><span class="line">           <span class="comment"># 计算变换后图像中灯条顶部和底部的y坐标</span></span><br><span class="line">           top_light_y = (warp_height - light_length) // <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">           bottom_light_y = top_light_y + light_length</span><br><span class="line">           <span class="comment"># 根据装甲板类型确定变换后的图像宽度</span></span><br><span class="line">           warp_width = small_armor_width <span class="keyword">if</span> armor.<span class="built_in">type</span> == <span class="string">'SMALL'</span> <span class="keyword">else</span> large_armor_width</span><br><span class="line">           <span class="comment"># 设置变换后图像的目标顶点位置</span></span><br><span class="line">           target_vertices = np.array([[<span class="number">0</span>, bottom_light_y],</span><br><span class="line">                                       [<span class="number">0</span>, top_light_y],</span><br><span class="line">                                       [warp_width - <span class="number">1</span>, top_light_y],</span><br><span class="line">                                       [warp_width - <span class="number">1</span>, bottom_light_y]], dtype=np.float32)</span><br><span class="line">           <span class="comment"># 计算透视变换矩阵</span></span><br><span class="line">           rotation_matrix = cv.getPerspectiveTransform(lights_vertices, target_vertices)</span><br><span class="line">           <span class="comment"># 应用透视变换，将源图像中的装甲板区域变换到目标顶点位置</span></span><br><span class="line">           number_image = cv.warpPerspective(src, rotation_matrix, (warp_width, warp_height))</span><br><span class="line">           <span class="comment"># 从变换后的图像中提取感兴趣区域（ROI）</span></span><br><span class="line">           x_start = (warp_width - roi_size[<span class="number">0</span>]) // <span class="number">2</span></span><br><span class="line">           x_end = x_start + roi_size[<span class="number">0</span>]</span><br><span class="line">           number_image = number_image[<span class="number">0</span>:roi_size[<span class="number">1</span>], x_start:x_end]</span><br><span class="line">           <span class="comment"># 将图像转换为灰度图像</span></span><br><span class="line">           number_image = cv.cvtColor(number_image, cv.COLOR_RGB2GRAY)</span><br><span class="line">           <span class="comment"># 对灰度图像应用二值化处理</span></span><br><span class="line">           _, number_image = cv.threshold(number_image, <span class="number">0</span>, <span class="number">255</span>, cv.THRESH_BINARY | cv.THRESH_OTSU)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="模型设计"><a href="#模型设计" class="headerlink" title="模型设计"></a>模型设计</h2><p>由于MiniPC的性能限制，只是设计了简单的mlp网络用于数字分类</p>
+<img src="/158223f0/image-20240626144621090.png" class="">
+
+<p>在训练前对训练集进行处理</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">dataset = torchvision.datasets.ImageFolder(</span><br><span class="line">    root=os.path.join(os.path.dirname(__file__), <span class="string">'datasets'</span>),</span><br><span class="line">    transform=torchvision.transforms.Compose([</span><br><span class="line">        torchvision.transforms.Grayscale(num_output_channels=<span class="number">1</span>), <span class="comment"># 灰度化</span></span><br><span class="line">        torchvision.transforms.RandomAffine(</span><br><span class="line">            degrees=(-<span class="number">5</span>, <span class="number">5</span>), translate=(<span class="number">0.08</span>, <span class="number">0.08</span>), scale=(<span class="number">0.9</span>, <span class="number">1.1</span>)), <span class="comment"># 旋转，平移，放缩</span></span><br><span class="line">        torchvision.transforms.ToTensor(),</span><br><span class="line">        torchvision.transforms.RandomErasing(</span><br><span class="line">            scale=(<span class="number">0.02</span>, <span class="number">0.02</span>))</span><br><span class="line">    ]))<span class="comment"># 擦除</span></span><br><span class="line"><span class="comment"># 用ImageFolder表示文件夹为标签名</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>数据集分为两部分（4:1）训练集和测试集</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">train_dataset, test_dataset = torch.utils.data.random_split(</span><br><span class="line">    dataset, [<span class="built_in">int</span>(<span class="built_in">len</span>(dataset) * <span class="number">0.8</span>), <span class="built_in">len</span>(dataset) - <span class="built_in">int</span>(<span class="built_in">len</span>(dataset) * <span class="number">0.8</span>)])</span><br></pre></td></tr></tbody></table></figure>
+
+<p>损失函数和优化器</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">loss_fn = nn.CrossEntropyLoss()</span><br><span class="line">optimizer = torch.optim.Adam(model.parameters(), lr=<span class="number">1e-3</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>训练评估</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> torch.no_grad():</span><br><span class="line">        correct = <span class="number">0</span></span><br><span class="line">        total = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> x, y <span class="keyword">in</span> test_loader:</span><br><span class="line">            x, y = x.to(device), y.to(device)  <span class="comment"># Move data to the device</span></span><br><span class="line">            y_pred = model(x)</span><br><span class="line">            loss = loss_fn(y_pred, y)</span><br><span class="line">            running_val_loss += loss.item()</span><br><span class="line"></span><br><span class="line">            _, predicted = torch.<span class="built_in">max</span>(y_pred.data, <span class="number">1</span>)</span><br><span class="line">            total += y.size(<span class="number">0</span>)</span><br><span class="line">            correct += (predicted == y).<span class="built_in">sum</span>().item()</span><br><span class="line">        avg_val_loss = running_val_loss / <span class="built_in">len</span>(test_loader)</span><br><span class="line">        accuracy = <span class="number">100</span> * correct / total</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f'Epoch: <span class="subst">{epoch + <span class="number">1</span>}</span>, Accuracy: <span class="subst">{accuracy}</span>%'</span>)</span><br><span class="line">        writer.add_scalar(<span class="string">'Accuracy/test'</span>, accuracy, epoch)</span><br><span class="line">        writer.add_scalar(<span class="string">'Loss/val'</span>, avg_val_loss, epoch)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="模型部署"><a href="#模型部署" class="headerlink" title="模型部署"></a>模型部署</h2><p>使用opencv的dnn模块, softmax转换为概率，argmax转换为对应的类别（0 - 5）</p>
+<figure class="highlight python"><table><tbody><tr><td class="code"><pre><span class="line">blob = cv.dnn.blobFromImage(image)</span><br><span class="line">self.net.setInput(blob)</span><br><span class="line">outputs = self.net.forward()</span><br><span class="line">outputs = outputs.flatten()</span><br><span class="line">exp_outputs = np.exp(outputs - np.<span class="built_in">max</span>(outputs))</span><br><span class="line">softmax_prob = exp_outputs / np.<span class="built_in">sum</span>(exp_outputs)</span><br><span class="line">confidence = np.<span class="built_in">max</span>(softmax_prob)</span><br><span class="line">label_id = np.argmax(softmax_prob)</span><br><span class="line"></span><br><span class="line">armor.confidence = confidence</span><br><span class="line">armor.number = self.class_names[label_id]</span><br><span class="line"></span><br><span class="line">armor.classification_result = <span class="string">f"<span class="subst">{armor.number}</span>: <span class="subst">{armor.confidence * <span class="number">100.0</span>:<span class="number">.1</span>f}</span>%"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="Docker部署"><a href="#Docker部署" class="headerlink" title="Docker部署"></a>Docker部署</h1><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">docker build -t my-python-image .</span><br><span class="line">docker run -it \</span><br><span class="line">    --name my-python-container \</span><br><span class="line">    --<span class="built_in">env</span>=<span class="string">"DISPLAY"</span> \</span><br><span class="line">    --volume=<span class="string">"/tmp/.X11-unix:/tmp/.X11-unix:rw"</span> \</span><br><span class="line">    --volume=<span class="string">"<span class="subst">$(pwd)</span>:/app"</span> \</span><br><span class="line">    my-python-image</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>使用前记得</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">xhost +</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="PIP安装"><a href="#PIP安装" class="headerlink" title="PIP安装"></a>PIP安装</h1><p>如果不想使用docker部署可以使用</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">pip install -r requirements.txt</span><br></pre></td></tr></tbody></table></figure>
+
+<p>安装所需要的包</p>
+<p><strong>PS:</strong></p>
+<p>项目基础是从rm_vision改过来的纯Python版本，同时也有ROS C++版的，详见<a href="https://github.com/langou0115/RoboDetect">here</a></p>
 ]]></content>
+      <categories>
+        <category>Robomaster</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>深度学习</tag>
+      </tags>
   </entry>
   <entry>
     <title>树论</title>

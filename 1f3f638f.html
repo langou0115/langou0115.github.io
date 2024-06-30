@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"langou0115.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在Linux中，对文件进行I&#x2F;O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I&#x2F;O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux文件IO">
+<meta property="og:url" content="https://langou0115.github.io/1f3f638f.html">
+<meta property="og:site_name" content="Langou的窝">
+<meta property="og:description" content="在Linux中，对文件进行I&#x2F;O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I&#x2F;O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240624230432725.png">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240624230350781.png">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240624231735907.png">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240624231752361.png">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240624231804747.png">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240625115550593.png">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240626092456008.png">
+<meta property="og:image" content="https://langou0115.github.io/1f3f638f/image-20240626105646448.png">
+<meta property="article:published_time" content="2024-06-26T02:56:19.000Z">
+<meta property="article:modified_time" content="2024-06-30T13:14:14.994Z">
+<meta property="article:author" content="Langou">
+<meta property="article:tag" content="C">
+<meta property="article:tag" content="linux应用">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://langou0115.github.io/1f3f638f/image-20240624230432725.png">
+
+<link rel="canonical" href="https://langou0115.github.io/1f3f638f.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux文件IO | Langou的窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Langou的窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://langou0115.github.io/1f3f638f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Langou">
+      <meta itemprop="description" content="Talk is cheap, show me the code">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Langou的窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux文件IO
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-26 10:56:19" itemprop="dateCreated datePublished" datetime="2024-06-26T10:56:19+08:00">2024-06-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-06-30 21:14:14" itemprop="dateModified" datetime="2024-06-30T21:14:14+08:00">2024-06-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8FLinux/" itemprop="url" rel="index"><span itemprop="name">嵌入式Linux</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在Linux中，对文件进行I/O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I/O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。</p>
+<span id="more"></span>
+
+<h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p>read, write, lseek, perror, strerror, truncate(截断), ftruncate(截断), fcntl(文件描述符操作)</p>
+<p>ioctl(一般用于操作特殊文件或硬件外设，后期介绍)</p>
+<p>linux中0，1，2表示标准输入、标准输出和标准错误，文件分配符fd不会取到这三个值</p>
+<p>详情可使用<code>man 2 read/write/lseek...</code>查看</p>
+<h2 id="错误返回"><a href="#错误返回" class="headerlink" title="错误返回"></a>错误返回</h2><p><code>errno</code>表示错误对应的标号需要<code>#include &lt;errno.h&gt;</code></p>
+<p><code>strerr(errno)</code>打印出错误信息</p>
+<p><code>perror()</code>直接打印</p>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>多次open()和dup()复制的区别</p>
+<ol>
+<li><p>多次open()</p>
+<img src="/1f3f638f/image-20240624230432725.png" class="">
+</li>
+<li><p>dup(), dup2()复制</p>
+<img src="/1f3f638f/image-20240624230350781.png" class=""></li>
+</ol>
+<p>可以看出多次open()的fd会指向不同的文件表，不同文件表指向同一个inode节点，而dup(), dup2()指向一个文件表</p>
+<h3 id="三种实现方法"><a href="#三种实现方法" class="headerlink" title="三种实现方法"></a>三种实现方法</h3><ol>
+<li><p>同一个进程中多次调用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231735907.png" class="" title="image-20240624231735907">
+</li>
+<li><p>不同进程中分别使用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231752361.png" class="" title="image-20240624231752361">
+</li>
+<li><p>同一个进程中通过 dup(dup2)函数对文件描述符进行复制</p>
+<img src="/1f3f638f/image-20240624231804747.png" class="" title="image-20240624231804747"></li>
+</ol>
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><ol>
+<li><p><strong>O_APPEND</strong></p>
+<p>open时加入该标志</p>
+</li>
+<li><p><strong>pread()<strong>和</strong>pwrite()</strong></p>
+<p><code>man 2 pread</code>查看</p>
+</li>
+<li><p><strong>O_EXCL</strong></p>
+<p>避免创建文件出现问题</p>
+</li>
+</ol>
+<h1 id="标准IO"><a href="#标准IO" class="headerlink" title="标准IO"></a>标准IO</h1><p>标准 I/O 是对文件 I/O 进行了封装。标准 I/O 会处理很多细节，譬如分配 stdio 缓冲区、以优</p>
+<p>化的块长度执行 I/O 等，这些处理使用户不必担心如何选择使用正确的块长度。</p>
+<h2 id="常用函数-1"><a href="#常用函数-1" class="headerlink" title="常用函数"></a>常用函数</h2><p>文件：fopen, fclose, fseek, fread, fwrite</p>
+<p>错误：feof, ferror, clearerr</p>
+<p>详情使用<code>man 3 fopen/fclose...</code>来查看</p>
+<h1 id="格式化IO"><a href="#格式化IO" class="headerlink" title="格式化IO"></a>格式化IO</h1><h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：write(1, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dprintf</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h2><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：read(0, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="文件描述符和FILE指针相互转换"><a href="#文件描述符和FILE指针相互转换" class="headerlink" title="文件描述符和FILE指针相互转换"></a>文件描述符和FILE指针相互转换</h2><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fileno</span><span class="params">(FILE *stream)</span>; <span class="comment">// FILE* -&gt; fd</span></span><br><span class="line">FILE *<span class="title function_">fdopen</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *mode)</span>; <span class="comment">// fd -&gt; FILE*</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h1 id="IO缓冲"><a href="#IO缓冲" class="headerlink" title="IO缓冲"></a>IO缓冲</h1><img src="/1f3f638f/image-20240625115550593.png" class="" title="image-20240625115550593">
+
+<p>可以看出：文件IO比标准IO要快</p>
+<h2 id="文件IO缓冲"><a href="#文件IO缓冲" class="headerlink" title="文件IO缓冲"></a>文件IO缓冲</h2><p>刷新缓冲区：fsync, fdatasync, sync</p>
+<p><code>man 3 sync</code>查看</p>
+<p>fsync: 文件内数据和元数据</p>
+<p>fdatasync: 文件内容数据</p>
+<p>sync: 所有</p>
+<h3 id="绕过IO缓冲"><a href="#绕过IO缓冲" class="headerlink" title="绕过IO缓冲"></a>绕过IO缓冲</h3><figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE <span class="comment">// 需要定义宏</span></span></span><br><span class="line">fd = open(filepath, O_WRONLY | O_DIRECT);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>限制：</p>
+<ul>
+<li>应用程序中用于存放数据的缓冲区，其内存起始地址必须以块大小的整数倍进行对齐；</li>
+<li>写文件时，文件的位置偏移量必须是块大小的整数倍；</li>
+<li>写入到文件的数据大小必须是块大小的整数倍。</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看blocksize</span></span><br><span class="line"><span class="built_in">df</span> -h <span class="comment"># 查看根目录在哪</span></span><br><span class="line">tune2fs -l /dev/sda? | grep <span class="string">"Block size"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>内存起始地址对齐</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> buf[<span class="number">8192</span>] __attribute__((aligned(<span class="number">4096</span>)));</span><br></pre></td></tr></tbody></table></figure>
+
+<p>写入块大小整数倍</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> ret = write(fd, buf, <span class="number">4096</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="标准IO缓冲"><a href="#标准IO缓冲" class="headerlink" title="标准IO缓冲"></a>标准IO缓冲</h2><p>对stdio缓冲设置</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuffer</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>man 3</code>查看文档</p>
+<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>使用stat，fstat, lstat查看文件（目录）属性，stat返回一个<code>struct stat</code>结构体</p>
+<p>可使用<code>man 2</code>查看，fstat可通过fd来查看属性，lstat可以看链接文件属性</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">{</span></span><br><span class="line"> <span class="type">dev_t</span> st_dev; <span class="comment">/* 文件所在设备的 ID */</span></span><br><span class="line"> <span class="type">ino_t</span> st_ino; <span class="comment">/* 文件对应 inode 节点编号 */</span></span><br><span class="line"> <span class="type">mode_t</span> st_mode; <span class="comment">/* 文件对应的模式 */</span></span><br><span class="line"> <span class="type">nlink_t</span> st_nlink; <span class="comment">/* 文件的链接数 */</span></span><br><span class="line"> <span class="type">uid_t</span> st_uid; <span class="comment">/* 文件所有者的用户 ID */</span></span><br><span class="line"> <span class="type">gid_t</span> st_gid; <span class="comment">/* 文件所有者的组 ID */</span></span><br><span class="line"> <span class="type">dev_t</span> st_rdev; <span class="comment">/* 设备号（指针对设备文件） */</span></span><br><span class="line"> <span class="type">off_t</span> st_size; <span class="comment">/* 文件大小（以字节为单位） */</span></span><br><span class="line"> <span class="type">blksize_t</span> st_blksize; <span class="comment">/* 文件内容存储的块大小 */</span></span><br><span class="line"> <span class="type">blkcnt_t</span> st_blocks; <span class="comment">/* 文件内容所占块数 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span> <span class="comment">/* 文件最后被访问的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span> <span class="comment">/* 文件内容最后被修改的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span> <span class="comment">/* 文件状态最后被改变的时间 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="归属"><a href="#归属" class="headerlink" title="归属"></a>归属</h2><p>使用chown, fchown, lchown来更改文件所属，三者区别上同</p>
+<p>PS：进程相关联ID</p>
+<img src="/1f3f638f/image-20240626092456008.png" class="">
+
+<h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p>修改时间属性utime, utimes(精度区别)</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> {</span></span><br><span class="line">	<span class="type">time_t</span> actime; <span class="comment">/* 访问时间 */</span></span><br><span class="line">	<span class="type">time_t</span> modtime; <span class="comment">/* 内容修改时间 */</span></span><br><span class="line">};</span><br><span class="line"><span class="type">int</span> <span class="title function_">utimes</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> {</span></span><br><span class="line"> <span class="type">long</span> tv_sec; <span class="comment">/* 秒 */</span></span><br><span class="line"> <span class="type">long</span> tv_usec; <span class="comment">/* 微秒 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>还有futimens()和 utimensat()，区别是：</p>
+<ul>
+<li>可按纳秒级精度设置时间戳。</li>
+<li>可单独设置某一时间戳。</li>
+<li>可独立将任一时间戳设置为当前时间。</li>
+</ul>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>通过<code>link</code>设置硬连接，<code>symlink</code>设置软连接，<code>readlink</code>读取链接文件</p>
+<h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><p><code>unlink</code>删除文件</p>
+<p><code>man 2</code>查看</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>存储形式</p>
+<img src="/1f3f638f/image-20240626105646448.png" class="">
+
+<p>常用操作：mkdir, rmdir, opendir, readdir, rewinddir, closedir, getcwd, chdir, fchdir</p>
+<p><code>man 2</code>查看</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechat.jpg" alt="Langou 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Langou 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C</a>
+              <a href="/tags/linux%E5%BA%94%E7%94%A8/" rel="tag"># linux应用</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/a444b428.html" rel="prev" title="排序">
+      <i class="fa fa-chevron-left"></i> 排序
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/8c131bee.html" rel="next" title="Linux系统信息与资源">
+      Linux系统信息与资源 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6IO"><span class="nav-number">1.</span> <span class="nav-text">文件IO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">常用函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E8%BF%94%E5%9B%9E"><span class="nav-number">1.2.</span> <span class="nav-text">错误返回</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%85%B1%E4%BA%AB"><span class="nav-number">1.3.</span> <span class="nav-text">文件共享</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.1.</span> <span class="nav-text">三种实现方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C"><span class="nav-number">1.4.</span> <span class="nav-text">原子操作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%87%E5%87%86IO"><span class="nav-number">2.</span> <span class="nav-text">标准IO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0-1"><span class="nav-number">2.1.</span> <span class="nav-text">常用函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96IO"><span class="nav-number">3.</span> <span class="nav-text">格式化IO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%87%BA"><span class="nav-number">3.1.</span> <span class="nav-text">格式化输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%85%A5"><span class="nav-number">3.2.</span> <span class="nav-text">格式化输入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E5%92%8CFILE%E6%8C%87%E9%92%88%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2"><span class="nav-number">3.3.</span> <span class="nav-text">文件描述符和FILE指针相互转换</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IO%E7%BC%93%E5%86%B2"><span class="nav-number">4.</span> <span class="nav-text">IO缓冲</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6IO%E7%BC%93%E5%86%B2"><span class="nav-number">4.1.</span> <span class="nav-text">文件IO缓冲</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%95%E8%BF%87IO%E7%BC%93%E5%86%B2"><span class="nav-number">4.1.1.</span> <span class="nav-text">绕过IO缓冲</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E5%87%86IO%E7%BC%93%E5%86%B2"><span class="nav-number">4.2.</span> <span class="nav-text">标准IO缓冲</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95"><span class="nav-number">5.</span> <span class="nav-text">文件目录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%9E%E6%80%A7"><span class="nav-number">5.1.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E5%B1%9E"><span class="nav-number">5.2.</span> <span class="nav-text">归属</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4"><span class="nav-number">5.3.</span> <span class="nav-text">时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5"><span class="nav-number">5.4.</span> <span class="nav-text">链接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6"><span class="nav-number">5.4.1.</span> <span class="nav-text">删除文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">5.5.</span> <span class="nav-text">目录</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Langou"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Langou</p>
+  <div class="site-description" itemprop="description">Talk is cheap, show me the code</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/langou0115" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;langou0115" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:langou0115@foxmail.com" title="E-Mail → mailto:langou0115@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Langou</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">43k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">39 分钟</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"langou0115.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在应用程序当中，有时往往需要去获取到一些系统相关的信息，譬如时间、日期、以及其它一些系统相关信息，本章将向大家介绍如何通过 Linux 系统调用或 C 库函数获取系统信息，譬如获取系统时间、日期以及设置系统时间、日期等；除此之外，还会向大家介绍 Linux 系统下的&#x2F;proc 虚拟文件系统，包括&#x2F;proc 文件系统是什么以及如何从&#x2F;proc 文件系统中读取系统、进程有关信息。也会提及到信号相关的问">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统信息与资源">
+<meta property="og:url" content="https://langou0115.github.io/8c131bee.html">
+<meta property="og:site_name" content="Langou的窝">
+<meta property="og:description" content="在应用程序当中，有时往往需要去获取到一些系统相关的信息，譬如时间、日期、以及其它一些系统相关信息，本章将向大家介绍如何通过 Linux 系统调用或 C 库函数获取系统信息，譬如获取系统时间、日期以及设置系统时间、日期等；除此之外，还会向大家介绍 Linux 系统下的&#x2F;proc 虚拟文件系统，包括&#x2F;proc 文件系统是什么以及如何从&#x2F;proc 文件系统中读取系统、进程有关信息。也会提及到信号相关的问">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://langou0115.github.io/8c131bee/image-20240626135355304.png">
+<meta property="og:image" content="https://langou0115.github.io/8c131bee/image-20240627094516424.png">
+<meta property="article:published_time" content="2024-06-26T05:39:28.000Z">
+<meta property="article:modified_time" content="2024-06-30T12:00:11.908Z">
+<meta property="article:author" content="Langou">
+<meta property="article:tag" content="C">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://langou0115.github.io/8c131bee/image-20240626135355304.png">
+
+<link rel="canonical" href="https://langou0115.github.io/8c131bee.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux系统信息与资源 | Langou的窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Langou的窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://langou0115.github.io/8c131bee.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Langou">
+      <meta itemprop="description" content="Talk is cheap, show me the code">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Langou的窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux系统信息与资源
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-26 13:39:28" itemprop="dateCreated datePublished" datetime="2024-06-26T13:39:28+08:00">2024-06-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-06-30 20:00:11" itemprop="dateModified" datetime="2024-06-30T20:00:11+08:00">2024-06-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8FLinux/" itemprop="url" rel="index"><span itemprop="name">嵌入式Linux</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在应用程序当中，有时往往需要去获取到一些系统相关的信息，譬如时间、日期、以及其它一些系统相关信息，本章将向大家介绍如何通过 Linux 系统调用或 C 库函数获取系统信息，譬如获取系统时间、日期以及设置系统时间、日期等；除此之外，还会向大家介绍 Linux 系统下的/proc 虚拟文件系统，包括/proc 文件系统是什么以及如何从/proc 文件系统中读取系统、进程有关信息。也会提及到信号相关的问题。</p>
+<span id="more"></span>
+
+<h1 id="系统信息"><a href="#系统信息" class="headerlink" title="系统信息"></a>系统信息</h1><p>常用函数：uname, sysinfo, gethostname, sysconf</p>
+<p><code>man 2</code>查看文档</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 示例程序</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/utsname.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/sysinfo.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">{</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">utsname</span> <span class="title">os_info</span>;</span></span><br><span class="line">    <span class="type">int</span> ret = uname(&amp;os_info);</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> != ret)</span><br><span class="line">    {</span><br><span class="line">        perror(<span class="string">"uname"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"sysname: %s\n"</span>, os_info.sysname);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"nodename: %s\n"</span>, os_info.nodename);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"release: %s\n"</span>, os_info.release);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"version: %s\n"</span>, os_info.version);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"machine: %s\n"</span>, os_info.machine);</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sysinfo</span> <span class="title">sys_info</span>;</span></span><br><span class="line">    <span class="comment">/* 获取信息 */</span></span><br><span class="line">    ret = sysinfo(&amp;sys_info);</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">-1</span> == ret)</span><br><span class="line">    {</span><br><span class="line">        perror(<span class="string">"sysinfo error"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"---------------------------\n"</span>);</span><br><span class="line">    <span class="comment">/* 打印信息 */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"uptime: %ld\n"</span>, sys_info.uptime);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"totalram: %lu\n"</span>, sys_info.totalram);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"freeram: %lu\n"</span>, sys_info.freeram);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"procs: %u\n"</span>, sys_info.procs);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// gethostname</span></span><br><span class="line">    <span class="type">char</span> hostname[<span class="number">256</span>];</span><br><span class="line">    ret = gethostname(hostname, <span class="keyword">sizeof</span>(hostname));</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">-1</span> == ret)</span><br><span class="line">    {</span><br><span class="line">        perror(<span class="string">"gethostname"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"---------------------------\n"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"hostname: %s\n"</span>, hostname);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"每个用户的最大并发进程数: %ld\n"</span>, sysconf(_SC_CHILD_MAX));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"系统节拍率: %ld\n"</span>, sysconf(_SC_CLK_TCK));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"系统页大小: %ld\n"</span>, sysconf(_SC_PAGESIZE));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"最大文件数: %ld\n"</span>, sysconf(_SC_OPEN_MAX));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="时间日期"><a href="#时间日期" class="headerlink" title="时间日期"></a>时间日期</h1><p>​	<img src="/8c131bee/image-20240626135355304.png" class=""></p>
+<p>​	Linux 系统在开机启动之后首先会读取 RTC 硬件获取实时时钟作为系统时钟的初始值，之后内核便开始维护自己的系统时钟。实时时钟一般由 RTC 时钟芯片提供，RTC 芯片有相应的电池为其供电，以保证系统在关机情况下 RTC 能够继续工作、继续计时。</p>
+<p>​	内核使用 jiffies 来记录系统从启动以来的系统节拍数，全局变量 jiffies 在系统开机启动时会设置一个初始值，RTC 实时时钟会在系统开机启动时读取一次，目的是用于对系统时钟进行初始化，这里说的初始化其实指的就是对内核的 jiffies 变量进行初始化操作。</p>
+<p><strong>获取时间函数：</strong>time，gettimeofday(返回自 1970-01-01 00:00:00 +0000 (UTC)以来的时间值)</p>
+<p><strong>时间转换函数：</strong>ctime, localtime_r(均是C库函数)</p>
+<p><strong>设置时间</strong>：settimeofday</p>
+<h1 id="进程时间"><a href="#进程时间" class="headerlink" title="进程时间"></a>进程时间</h1><ol>
+<li><p>times</p>
+<p>除以<code> sysconf(_SC_CLK_TCK)</code>，返回的是用户CPU时间和内核CPU时间</p>
+</li>
+<li><p>clock</p>
+<p>C库函数，除以<code>CLOCKS_PER_SEC</code>, 返回的是总的CPU时间</p>
+</li>
+</ol>
+<h1 id="Proc"><a href="#Proc" class="headerlink" title="Proc"></a>Proc</h1><p>proc 文件系统是一个虚拟文件系统，它以文件系统的方式为应用层访问系统内核数据提供了接口，用</p>
+<p>户和应用程序可以通过 proc 文件系统得到系统信息和进程相关信息，对 proc 文件系统的读写作为与内核</p>
+<p>进行通信的一种手段。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /proc</span><br><span class="line"><span class="built_in">ls</span></span><br></pre></td></tr></tbody></table></figure>
+
+<img src="/8c131bee/image-20240627094516424.png" class="">
+
+<h1 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h1><p>不可靠信号：信号可能丢失（非实时信号）序号为1~31</p>
+<p>当排队时，不可靠信号等待是集合，当相同信号再次传来的时候就会丢弃</p>
+<h2 id="常见信号"><a href="#常见信号" class="headerlink" title="常见信号"></a>常见信号</h2><table>
+<thead>
+<tr>
+<th>信号名称</th>
+<th>编号</th>
+<th>描述</th>
+<th>系统默认操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SIGINT</td>
+<td>2</td>
+<td>终端中断符</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGQUIT</td>
+<td>3</td>
+<td>终端退出符</td>
+<td>term+core</td>
+</tr>
+<tr>
+<td>SIGILL</td>
+<td>4</td>
+<td>非法硬件指令</td>
+<td>term+core</td>
+</tr>
+<tr>
+<td>SIGABRT</td>
+<td>6</td>
+<td>异常终止（abort）</td>
+<td>term+core</td>
+</tr>
+<tr>
+<td>SIGBUS</td>
+<td>7</td>
+<td>内存访问错误</td>
+<td>term+core</td>
+</tr>
+<tr>
+<td>SIGFPE</td>
+<td>8</td>
+<td>算术异常</td>
+<td>term+core</td>
+</tr>
+<tr>
+<td>SIGKILL</td>
+<td>9</td>
+<td>终极终止信号</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGUSR1</td>
+<td>10</td>
+<td>用户自定义信号 1</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGSEGV</td>
+<td>11</td>
+<td>无效的内存引用</td>
+<td>term+core</td>
+</tr>
+<tr>
+<td>SIGUSR2</td>
+<td>12</td>
+<td>用户自定义信号 2</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGPIPE</td>
+<td>13</td>
+<td>管道关闭</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGALRM</td>
+<td>14</td>
+<td>定时器超时（alarm）</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGTERM</td>
+<td>15</td>
+<td>终止进程</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGCHLD/SIGCLD</td>
+<td>17</td>
+<td>子进程终止或停止</td>
+<td>ignore</td>
+</tr>
+<tr>
+<td>SIGCONT</td>
+<td>18</td>
+<td>使停止状态的进程继续运行</td>
+<td>cont</td>
+</tr>
+<tr>
+<td>SIGSTOP</td>
+<td>19</td>
+<td>停止进程</td>
+<td>stop</td>
+</tr>
+<tr>
+<td>SIGTSTP</td>
+<td>20</td>
+<td>终端停止符</td>
+<td>stop</td>
+</tr>
+<tr>
+<td>SIGXCPU</td>
+<td>24</td>
+<td>超过 CPU 限制</td>
+<td>term+core</td>
+</tr>
+<tr>
+<td>SIGVTALRM</td>
+<td>26</td>
+<td>虚拟定时器超时</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGWINCH</td>
+<td>28</td>
+<td>终端窗口尺寸发生变化</td>
+<td>term</td>
+</tr>
+<tr>
+<td>SIGPOLL/SIGIO</td>
+<td>29</td>
+<td>异步 I/O</td>
+<td>term/ignore</td>
+</tr>
+<tr>
+<td>SIGSYS</td>
+<td>31</td>
+<td>无效系统调用</td>
+<td>term+core</td>
+</tr>
+</tbody></table>
+<p>tips: term 表示终止进程；core 表示生成核心转储文件；ignore 表示忽略信号；cont 表示继续运行进程；stop 表示停止进程（注意停止不等于终止，而是暂停）</p>
+<p><strong>进程对信号处理：</strong>signal和sigaction函数</p>
+<p><strong>发送信号：</strong>kill和raise函数，kill发送任一进程，raise发送自身</p>
+<p><strong>定时和休眠：</strong>alarm和pause函数</p>
+<p><strong>信号集相关函数</strong></p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 初始化</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sigemptyset</span><span class="params">(<span class="type">sigset_t</span> *<span class="built_in">set</span>)</span>; <span class="comment">// 空信号集</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sigfillset</span><span class="params">(<span class="type">sigset_t</span> *<span class="built_in">set</span>)</span>; <span class="comment">// 捕获所有信号</span></span><br><span class="line"><span class="comment">// 添加信号</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sigaddset</span><span class="params">(<span class="type">sigset_t</span> *<span class="built_in">set</span>, <span class="type">int</span> signum)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sigdelset</span><span class="params">(<span class="type">sigset_t</span> *<span class="built_in">set</span>, <span class="type">int</span> signum)</span>;</span><br><span class="line"><span class="comment">// 是否在信号集中</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sigismember</span><span class="params">(<span class="type">const</span> <span class="type">sigset_t</span> *<span class="built_in">set</span>, <span class="type">int</span> signum)</span>;</span><br><span class="line"><span class="comment">// 查看是否信号是否等待并存入信号集中</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sigpending</span><span class="params">(<span class="type">sigset_t</span> *<span class="built_in">set</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="信号掩码"><a href="#信号掩码" class="headerlink" title="信号掩码"></a>信号掩码</h2><p>内核为每一个进程维护了一个信号掩码（其实就是一个信号集），即一组信号。当进程接收到一个属于信号掩码中定义的信号时，该信号将会被阻塞、无法传递给进程进行处理，那么内核会将其阻塞，直到该信号从信号掩码中移除，内核才会把该信号传递给进程从而得到处理。</p>
+<ul>
+<li>当应用程序调用 signal()或 sigaction()函数为某一个信号设置处理方式时，进程会自动将该信号添加</li>
+</ul>
+<p>到信号掩码中，这样保证了在处理一个给定的信号时，如果此信号再次发生，那么它将会被阻塞；</p>
+<p>当然对于 sigaction()而言，是否会如此，需要根据 sigaction()函数是否设置了 SA_NODEFER 标志</p>
+<p>而定；当信号处理函数结束返回后，会自动将该信号从信号掩码中移除。</p>
+<ul>
+<li>使用 sigaction()函数为信号设置处理方式时，可以额外指定一组信号，当调用信号处理函数时将该</li>
+</ul>
+<p>组信号自动添加到信号掩码中，当信号处理函数结束返回后，再将这组信号从信号掩码中移除；通</p>
+<p>过 sa_mask 参数进行设置。</p>
+<ul>
+<li>除了以上两种方式之外，还可以使用<code>sigprocmask()</code>系统调用，随时可以显式地向信号掩码中添加或</li>
+</ul>
+<p>移除信号。使用<code>man2</code>查看使用教程</p>
+<h2 id="实时信号"><a href="#实时信号" class="headerlink" title="实时信号"></a>实时信号</h2><p>可靠信号（32~64）队列处理</p>
+<p>可以在<code>/usr/include/asm-generic/signal.h</code>进行查看</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _NSIG		64</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* These should not be considered constants from userland.  */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGRTMIN	32</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> SIGRTMAX</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGRTMAX	_NSIG</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>对于可靠信号需要使用<code>sigqueue</code>来传递信号</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p><strong>忽略信号</strong></p>
+<p><code>SIG_IGN</code></p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 忽略中断信号</span></span><br><span class="line"><span class="comment">// 忽略 SIGINT 信号 (通常是 Ctrl+C)</span></span><br><span class="line">signal(SIGINT, SIG_IGN);</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>异常退出</strong></p>
+<p><code>abort</code></p>
+<p>无论阻塞或忽略 SIGABRT 信号，abort()调用均不收到影响，总会成功终止进程</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechat.jpg" alt="Langou 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Langou 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/1f3f638f.html" rel="prev" title="Linux文件IO">
+      <i class="fa fa-chevron-left"></i> Linux文件IO
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/158223f0.html" rel="next" title="RM装甲板识别">
+      RM装甲板识别 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E4%BF%A1%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">系统信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E6%97%A5%E6%9C%9F"><span class="nav-number">2.</span> <span class="nav-text">时间日期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%97%B6%E9%97%B4"><span class="nav-number">3.</span> <span class="nav-text">进程时间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Proc"><span class="nav-number">4.</span> <span class="nav-text">Proc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7"><span class="nav-number">5.</span> <span class="nav-text">信号</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E4%BF%A1%E5%8F%B7"><span class="nav-number">5.1.</span> <span class="nav-text">常见信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E6%8E%A9%E7%A0%81"><span class="nav-number">5.2.</span> <span class="nav-text">信号掩码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E6%97%B6%E4%BF%A1%E5%8F%B7"><span class="nav-number">5.3.</span> <span class="nav-text">实时信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">5.4.</span> <span class="nav-text">补充</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Langou"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Langou</p>
+  <div class="site-description" itemprop="description">Talk is cheap, show me the code</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/langou0115" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;langou0115" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:langou0115@foxmail.com" title="E-Mail → mailto:langou0115@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Langou</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">43k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">39 分钟</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>

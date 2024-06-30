@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"langou0115.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="第二难的一个…..">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图论">
+<meta property="og:url" content="https://langou0115.github.io/10f14ed7.html">
+<meta property="og:site_name" content="Langou的窝">
+<meta property="og:description" content="第二难的一个…..">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-06-26T02:26:37.000Z">
+<meta property="article:modified_time" content="2024-06-26T02:45:30.453Z">
+<meta property="article:author" content="Langou">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://langou0115.github.io/10f14ed7.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>图论 | Langou的窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Langou的窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://langou0115.github.io/10f14ed7.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Langou">
+      <meta itemprop="description" content="Talk is cheap, show me the code">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Langou的窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图论
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-06-26 10:26:37 / 修改时间：10:45:30" itemprop="dateCreated datePublished" datetime="2024-06-26T10:26:37+08:00">2024-06-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>10k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>第二难的一个…..</p>
+<span id="more"></span>
+
+<h1 id="图的遍历"><a href="#图的遍历" class="headerlink" title="图的遍历"></a>图的遍历</h1><h2 id="DFS"><a href="#DFS" class="headerlink" title="DFS"></a>DFS</h2><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/combination-sum-ii/description/">组合</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/palindrome-partitioning/description/">分割</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/subsets-ii/description/">子集</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1219">应用</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dfs(...)</span><br><span class="line">{</span><br><span class="line">    if(){</span><br><span class="line">       // 递归终止 </span><br><span class="line">    }</span><br><span class="line">    for(){</span><br><span class="line">        //遍历</span><br><span class="line">        dfs(...)</span><br><span class="line">	}</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="BFS"><a href="#BFS" class="headerlink" title="BFS"></a>BFS</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1443">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">bfs(int x, int y){</span><br><span class="line">    queue&lt;Point&gt; que;</span><br><span class="line">    Point s = Point(x, y, 0);</span><br><span class="line">    que.push(s);</span><br><span class="line">    while(!que.empty()){</span><br><span class="line">        s = que.pop();</span><br><span class="line">        // ....</span><br><span class="line">        for(...){</span><br><span class="line">            // ...</span><br><span class="line">            if(...){</span><br><span class="line">                que.push(Point(s.x, s.y, s.step+1));</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="图的储存"><a href="#图的储存" class="headerlink" title="图的储存"></a>图的储存</h1><h2 id="1-邻接矩阵"><a href="#1-邻接矩阵" class="headerlink" title="1.邻接矩阵"></a>1.邻接矩阵</h2><p><strong>过于简单….省略</strong></p>
+<h2 id="2-邻接表"><a href="#2-邻接表" class="headerlink" title="2.邻接表"></a>2.邻接表</h2><p><strong>第一种写法</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const int MAXN = ....; //最大点的数量</span><br><span class="line">vector&lt;int&gt; G[MAXN];</span><br><span class="line"></span><br><span class="line">// 存一个from-&gt;to边的实例</span><br><span class="line">cin &gt;&gt; from &gt;&gt; to;</span><br><span class="line">G[from].push_back(to);</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>第二种写法 链式前向星</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">struct Edge{</span><br><span class="line">    int to;</span><br><span class="line">    int val;</span><br><span class="line">    int next;</span><br><span class="line">} edge[MAXM];</span><br><span class="line">int head[MAXN];</span><br><span class="line"></span><br><span class="line">int cnt = 0;</span><br><span class="line">void add_edge(int from, int to, int val)</span><br><span class="line">{</span><br><span class="line">    edge[++cnt].to = to;</span><br><span class="line">    edge[cnt].val = val;</span><br><span class="line">    edge[cnt].next = head[from];</span><br><span class="line">    head[from] = cnt;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="连通问题"><a href="#连通问题" class="headerlink" title="连通问题"></a>连通问题</h1><h2 id="Tarjan求强连通分量"><a href="#Tarjan求强连通分量" class="headerlink" title="Tarjan求强连通分量"></a>Tarjan求强连通分量</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P2863">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;int&gt; G[MAXN]; // 存储好的图</span><br><span class="line"></span><br><span class="line">stack&lt;int&gt; st;</span><br><span class="line">int dfn[MAXN], low[MAXN]; // dfn为遍历到x点的时间，low表示x点可以回溯到的时间最小的起点</span><br><span class="line">int instack[MAXN];</span><br><span class="line">void tarjan(int x);</span><br><span class="line">{</span><br><span class="line">    static int tim = 1;</span><br><span class="line">    st.push(x);</span><br><span class="line">    instack[x] = 1;</span><br><span class="line">    dfn[x] = low[n] = tim++;</span><br><span class="line">    for(int i = 0; i &lt; G[x].size(); i++){</span><br><span class="line">        int j = G[x][i];</span><br><span class="line">        if(!dfn[j]){</span><br><span class="line">            tarjan(j);</span><br><span class="line">            low[x] = min(low[x], low[j]);</span><br><span class="line">        }else if(instack[j]){</span><br><span class="line">            low[x] = min(low[x], dfn[j]);</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    if(dfn[x] == low[x]){</span><br><span class="line">        int tmp;</span><br><span class="line">        do{</span><br><span class="line">            tmp = st.top(); st.pop();</span><br><span class="line">            instack[tmp] = 0;</span><br><span class="line">            // todo</span><br><span class="line">        }while(tmp != x);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="利用Tarjan进行缩点"><a href="#利用Tarjan进行缩点" class="headerlink" title="利用Tarjan进行缩点"></a>利用Tarjan进行缩点</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3387">模板</a></p>
+<p><strong>将强连通分量缩成一个点，变成有向无环图（DAG）</strong></p>
+<p><strong>template</strong></p>
+<pre class="md-fences mock-cm md-end-block" spellcheck="false" lang="c++" cid="n196" mdtype="fences"><br>int degree[MAXN]; // 有向无环图每个点的入度<br>int tb[MAXN], tb_a[MAXN], cnt = 1, times = 1;<br>// tb记录原来的点映射到新的点是什么， tb_a记录新的点所花费的时间, cnt记录新点的下标<br>void tarjan(int x)<br>{<br>	dfn[x] = low[x] = times++;<br>	instack[x] = 1;<br>	s.push(x);<br>	for(int i = 0; i &lt; G[x].size(); i++){<br>		int y = G[x][i];<br>		if(!dfn[y]){<br>			tarjan(y);<br>			low[x] = min(low[x], low[y]);<br>		}else if(instack[y]){<br>			low[x] = min(low[x], dfn[y]);<br>		}<br>	}<br>	 // 重点在此<br>	if(dfn[x] == low[x]){<br>		int tmp;<br>		do{<br>			tmp = s.top();<br>			s.pop();<br>			instack[tmp] = 0;<br>			tb[tmp] = cnt;<br>			tb_a[cnt] += a[tmp];<br>		}while(tmp != x);<br>		dp[cnt] = tb_a[cnt];<br>		cnt++;<br>	}<br>}<br><br>void build_tb()<br>{<br>	for(int i = 0; i &lt; n; i++){<br>		for(int j = 0; j &lt; G[i].size(); j++){<br>			int y = G[i][j];<br>			if(tb[i] != tb[y]){ // 映射点相同不做处理<br>				TG[tb[i]].push_back(tb[y]);<br>				indegree[tb[y]]++;<br>			}<br>		}<br>	}<br>}</pre>
+
+<h2 id="Tarjan求割点和桥"><a href="#Tarjan求割点和桥" class="headerlink" title="Tarjan求割点和桥"></a>Tarjan求割点和桥</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3388">模板割点</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1656">模板桥</a></p>
+<blockquote>
+<p><strong>ps: 无向图中不考虑儿子到父亲的边</strong></p>
+</blockquote>
+<p><strong>割点</strong>：去除后图不能连通的点</p>
+<p><strong>桥</strong>：去除后图不能连通的边</p>
+<p><strong>割点条件</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 非root点 &amp;&amp; 有儿子 &amp;&amp; low[x儿子] &gt;= dfn[x]</span><br><span class="line">2. root点 &amp;&amp; 有两个及以上的儿子</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>x-&gt;y是桥条件</strong>：</p>
+<p>low[y] &gt; dfn[x]</p>
+<p><strong>template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;int&gt; G[MAXN];</span><br><span class="line">int dfn[MAXN], low[MAXN], root, ans[MAXN], fa[MAXN]; // fa[x]为0时, x为根节点</span><br><span class="line">int times = 1;</span><br><span class="line">void tarjan(int x)</span><br><span class="line">{</span><br><span class="line">    dfn[x] = low[x] = time++;</span><br><span class="line">    int child = 0;</span><br><span class="line"></span><br><span class="line">    for(int i = 0; i &lt; G[x].size(); i++){</span><br><span class="line">        int y = G[x][i];</span><br><span class="line">        if(!dfn[y]){</span><br><span class="line">            fa[y] = x;</span><br><span class="line">            child++;</span><br><span class="line">            tarjan(y);</span><br><span class="line">            if(!fa[x] &amp;&amp; child &gt; 2) ans[x] = 1; // 割点条件一，会重复运行这一句</span><br><span class="line">            if(fa[x] &amp;&amp; low[y] &gt;= dfn[x]) ans[x] = 1; // 割点条件二，会重复运行这一句</span><br><span class="line">            if(low[y] &gt; dfn[x]) ... // 桥的条件</span><br><span class="line">            low[x] = min(low[x], low[y]);</span><br><span class="line">        }else if(fa[x] != y){</span><br><span class="line">            low[x] = min(low[x], dfn[y]);</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">for(int i = 1; i &lt;= n; i++){</span><br><span class="line">    if(!dfn[i]){</span><br><span class="line">        tarjan(i);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="最短路径"><a href="#最短路径" class="headerlink" title="最短路径"></a>最短路径</h1><h2 id="1-Dijkstra算法"><a href="#1-Dijkstra算法" class="headerlink" title="1.Dijkstra算法"></a>1.Dijkstra算法</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P4779">模板</a></p>
+<p><strong>本质还是贪心算法</strong></p>
+<p><strong>储存使用****链式前向星</strong></p>
+<p><strong>适用于****非负权边图</strong>，求最短路径</p>
+<p><strong>一定要使用****优先队列</strong>！！！！</p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int MAXN = 1e5 + 5, MAXM = 2e5 + 5;</span><br><span class="line">struct Edge{</span><br><span class="line">	int to, val, next;</span><br><span class="line">}edge[MAXM];</span><br><span class="line"></span><br><span class="line">int head[MAXN];</span><br><span class="line">int cnt = 0;</span><br><span class="line">void add_edge(int from, int to, int val)</span><br><span class="line">{</span><br><span class="line">	edge[++cnt] = {to, val, head[from]};</span><br><span class="line">	head[from] = cnt;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">struct Node{</span><br><span class="line">	int pos;</span><br><span class="line">	int d;</span><br><span class="line">	bool operator&lt;(const Node&amp; node) const{</span><br><span class="line">		return d &gt; node.d;</span><br><span class="line">	}</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line">int dis[MAXN];</span><br><span class="line">int n, m, s;</span><br><span class="line">priority_queue&lt;Node&gt; q;</span><br><span class="line">int vis[MAXN];</span><br><span class="line">void dijkstra()</span><br><span class="line">{</span><br><span class="line">	dis[s] = 0;</span><br><span class="line">	q.push({s, 0});</span><br><span class="line">	while(!q.empty()){</span><br><span class="line">		Node x = q.top();</span><br><span class="line">		q.pop();</span><br><span class="line">		if(vis[x.pos]) continue;</span><br><span class="line">		vis[x.pos] = 1;</span><br><span class="line">		int pos = x.pos;</span><br><span class="line">		for(int i = head[pos]; i; i = edge[i].next){</span><br><span class="line">			int y = edge[i].to;</span><br><span class="line">			if(dis[y] &gt; dis[pos] + edge[i].val){</span><br><span class="line">				dis[y] = dis[pos] + edge[i].val;</span><br><span class="line">				if(!vis[y]) q.push({y, dis[y]});</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;</span><br><span class="line">	memset(dis, 0x3f3f, sizeof(dis));</span><br><span class="line">	int from, to, val;</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		cin &gt;&gt; from &gt;&gt; to &gt;&gt; val;</span><br><span class="line">		add_edge(from, to, val);</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	dijkstra();</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		cout &lt;&lt; dis[i] &lt;&lt; " ";</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="2-Floyd算法"><a href="#2-Floyd算法" class="headerlink" title="2.Floyd算法"></a>2.Floyd算法</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/B3647">模板</a></p>
+<p><strong>求多源最短路径</strong></p>
+<p><strong>存储使用****邻接矩阵</strong></p>
+<p><strong>不适用图中****带负边的环</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">#define INF 1e9</span><br><span class="line">const int MAXN = 105; </span><br><span class="line">int n, m;</span><br><span class="line">int G[MAXN][MAXN];</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		for(int j = 1; j &lt;= n; j++){</span><br><span class="line">			if(i != j) G[i][j] = INF;</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	int from, to, val;</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		cin &gt;&gt; from &gt;&gt; to &gt;&gt; val;</span><br><span class="line">		G[from][to] = min(G[from][to], val);</span><br><span class="line">		G[to][from] = min(G[to][from], val);</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	for(int k = 1; k &lt;= n; k++){</span><br><span class="line">		for(int i = 1; i &lt;= n; i++){</span><br><span class="line">			for(int j = 1; j &lt;= n; j++){</span><br><span class="line">				if(G[i][k] &lt; INF &amp;&amp; G[k][j] &lt; INF)</span><br><span class="line">					G[i][j] = min(G[i][j], G[i][k] + G[k][j]);</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		for(int j = 1; j&lt;= n; j++){</span><br><span class="line">			cout &lt;&lt; G[i][j] &lt;&lt; " ";</span><br><span class="line">		}</span><br><span class="line">		cout &lt;&lt; '\n';</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="3-Bellman-Ford算法"><a href="#3-Bellman-Ford算法" class="headerlink" title="3. Bellman Ford算法"></a>3. Bellman Ford算法</h2><p><strong>求单源最短路径</strong></p>
+<p><strong>使用****三元组</strong>来储存图（存边）</p>
+<p><strong>可用于负权边图，但不适用负环路图</strong></p>
+<p><strong>可检测负环路图</strong></p>
+<p><strong>时间复杂度不如Dijkstra算法好</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">const int MAXN = 1e5 + 5, MAXM = 2e5 + 5;</span><br><span class="line"></span><br><span class="line">int n, m, s;</span><br><span class="line">int u[MAXM], v[MAXM], w[MAXM];</span><br><span class="line">int dis[MAXN];</span><br><span class="line"></span><br><span class="line">void bellman_ford()</span><br><span class="line">{</span><br><span class="line">	dis[s] = 0;</span><br><span class="line">	for(int i = 1; i &lt;= n - 1; i++){</span><br><span class="line">		int check = 0;</span><br><span class="line">		for(int j = 1; j &lt;= m; j++){</span><br><span class="line">			if(dis[v[j]] &gt;= dis[u[j]] + w[j]){</span><br><span class="line">				dis[v[j]] = dis[u[j]] + w[j];</span><br><span class="line">				check = 1;</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">		if(!check) break;</span><br><span class="line">	}</span><br><span class="line">    // 再进行一次循环，若有更新就可以判断有负权边</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;</span><br><span class="line">	for(int i = 1; i &lt;= n; i++) dis[i] = 1e9;</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		cin &gt;&gt; u[i] &gt;&gt; v[i] &gt;&gt; w[i];</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	bellman_ford();</span><br><span class="line"></span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		cout &lt;&lt; dis[i] &lt;&lt; " ";</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="4-SPFA算法"><a href="#4-SPFA算法" class="headerlink" title="4.SPFA算法"></a>4.SPFA算法</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3385">模板</a></p>
+<p><strong>是Bellman Ford算法的优化</strong></p>
+<p><strong>可用来判断图中是否有负环</strong></p>
+<p><strong>使用****链式前向星</strong>来储存图</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int N = 2e3 + 5, M = 6e3 + 5;</span><br><span class="line">int T;</span><br><span class="line">int n, m;</span><br><span class="line">struct Edge{</span><br><span class="line">	int to, val, next;</span><br><span class="line">}edge[M];</span><br><span class="line"></span><br><span class="line">int head[N];</span><br><span class="line">int tot = 0;</span><br><span class="line">void add_edge(int from, int to, int val)</span><br><span class="line">{</span><br><span class="line">	edge[++tot] = {to, val, head[from]};</span><br><span class="line">	head[from] = tot;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int dis[N], vis[N], cnt[N];</span><br><span class="line">bool SPFA()</span><br><span class="line">{</span><br><span class="line">	memset(dis, 0x3f, sizeof(dis));</span><br><span class="line">	memset(vis, 0, sizeof(vis));</span><br><span class="line">	memset(cnt, 0, sizeof(cnt));</span><br><span class="line">	queue&lt;int&gt; q;</span><br><span class="line">	dis[1] = 0;</span><br><span class="line">	vis[1] = 1;</span><br><span class="line">	q.push(1);</span><br><span class="line">	while(!q.empty()){</span><br><span class="line">		int x = q.front();</span><br><span class="line">		q.pop();</span><br><span class="line">		vis[x] = 0;</span><br><span class="line"></span><br><span class="line">		for(int i = head[x]; i; i = edge[i].next){</span><br><span class="line">			int y = edge[i].to;</span><br><span class="line">			if(dis[y] &gt; dis[x] + edge[i].val){</span><br><span class="line">				dis[y] = dis[x] + edge[i].val;</span><br><span class="line">				cnt[y] = cnt[x] + 1;</span><br><span class="line">				if(cnt[y] &gt;= n) return true;</span><br><span class="line">				if(!vis[y]){</span><br><span class="line">					q.push(y);</span><br><span class="line">					vis[y] = 1;</span><br><span class="line">				}</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	return false;</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; T;</span><br><span class="line">	while(T--){</span><br><span class="line">		cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">		tot = 0;</span><br><span class="line">		memset(head, 0, sizeof(head));</span><br><span class="line"></span><br><span class="line">		for(int i = 1; i &lt;= m; i++){</span><br><span class="line">			int from, to, val;</span><br><span class="line">			cin &gt;&gt; from &gt;&gt; to &gt;&gt; val;</span><br><span class="line">			add_edge(from, to, val);</span><br><span class="line">			if(val &gt;= 0) add_edge(to, from, val); </span><br><span class="line">		}</span><br><span class="line"></span><br><span class="line">		bool res = SPFA();</span><br><span class="line">		if(res) cout &lt;&lt; "YES\n";</span><br><span class="line">		else cout &lt;&lt; "NO\n";</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="并查集"><a href="#并查集" class="headerlink" title="并查集"></a>并查集</h1><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3367">模板</a></p>
+<p><strong>将不同的元素放在同一个集合进行区分</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int N = 1e4 + 5, M = 2e5 + 5;</span><br><span class="line"></span><br><span class="line">int n, m;</span><br><span class="line">int fa[N];</span><br><span class="line">void init()</span><br><span class="line">{</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		fa[i] = i;</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int find(int x)</span><br><span class="line">{</span><br><span class="line">	if(fa[x] == x){</span><br><span class="line">		return x;</span><br><span class="line">	}else{</span><br><span class="line">		fa[x] = find(fa[x]);</span><br><span class="line">		return fa[x];</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">void join(int x, int y)</span><br><span class="line">{</span><br><span class="line">	x = find(x);</span><br><span class="line">	y = find(y);</span><br><span class="line">	if(x == y) return;</span><br><span class="line">	fa[y] = x;</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	init();</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		int z, x, y;</span><br><span class="line">		cin &gt;&gt; z &gt;&gt; x &gt;&gt; y;</span><br><span class="line">        // z为1表示合并，z为2表示查询是否在一个集合</span><br><span class="line">		if(z == 1){</span><br><span class="line">			join(x, y);</span><br><span class="line">		}else if(z == 2){</span><br><span class="line">			if(find(x) == find(y)) cout &lt;&lt; "Y\n";</span><br><span class="line">			else cout &lt;&lt; "N\n";</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="最小生成树"><a href="#最小生成树" class="headerlink" title="最小生成树"></a>最小生成树</h1><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3366">模板</a></p>
+<p><strong>n个点，n-1条边，边的权值和最小</strong></p>
+<h2 id="Kruscal算法"><a href="#Kruscal算法" class="headerlink" title="Kruscal算法"></a>Kruscal算法</h2><p><strong>适用于无向图，将边按小到大进行排列，依次选择，成环就丢弃，直到边的数量为n - 1条</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int N = 5e3 + 5, M = 2e5 + 5;</span><br><span class="line">struct Edge{</span><br><span class="line">	int u, v, z; </span><br><span class="line">}edge[M];</span><br><span class="line">int n, m, fa[N], cnt = 0, ans = 0;</span><br><span class="line">// 并查集操作 </span><br><span class="line">int find(int x)</span><br><span class="line">{</span><br><span class="line">	if(fa[x] == x){</span><br><span class="line">		return x;</span><br><span class="line">	}else{</span><br><span class="line">		fa[x] = find(fa[x]);</span><br><span class="line">		return fa[x];</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">void join(int x, int y)</span><br><span class="line">{</span><br><span class="line">	int f_x = find(x);</span><br><span class="line">	int f_y = find(y);</span><br><span class="line">	if(f_x == f_y) return;</span><br><span class="line">	fa[f_x] = f_y;</span><br><span class="line">}</span><br><span class="line">void kruscal()</span><br><span class="line">{</span><br><span class="line">	sort(edge, edge + m, [](Edge e1, Edge e2){</span><br><span class="line">		return e1.z &lt; e2.z;</span><br><span class="line">	});</span><br><span class="line">	for(int i = 1; i &lt;= m; i++)</span><br><span class="line">	{</span><br><span class="line">		int u = edge[i].u, v = edge[i].v;</span><br><span class="line">		if(find(u) == find(v)) continue; // 成环就丢弃</span><br><span class="line">		else{</span><br><span class="line">			join(u, v);</span><br><span class="line">			ans += edge[i].z;</span><br><span class="line">			cnt++;</span><br><span class="line">		}</span><br><span class="line">		if(cnt == n - 1) break;</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		fa[i] = i;</span><br><span class="line">	}</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		cin &gt;&gt; edge[i].u &gt;&gt; edge[i].v &gt;&gt; edge[i].z;</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	kruscal();</span><br><span class="line">	if(cnt == n - 1) cout &lt;&lt; ans;</span><br><span class="line">	else cout &lt;&lt; "orz";</span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="Prim算法"><a href="#Prim算法" class="headerlink" title="Prim算法"></a>Prim算法</h2><p>update….</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechat.jpg" alt="Langou 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Langou 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C++</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2cc2fa98.html" rel="prev" title="常用算法">
+      <i class="fa fa-chevron-left"></i> 常用算法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/b2626942.html" rel="next" title="背包问题">
+      背包问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E7%9A%84%E9%81%8D%E5%8E%86"><span class="nav-number">1.</span> <span class="nav-text">图的遍历</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DFS"><span class="nav-number">1.1.</span> <span class="nav-text">DFS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BFS"><span class="nav-number">1.2.</span> <span class="nav-text">BFS</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E7%9A%84%E5%82%A8%E5%AD%98"><span class="nav-number">2.</span> <span class="nav-text">图的储存</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5"><span class="nav-number">2.1.</span> <span class="nav-text">1.邻接矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E9%82%BB%E6%8E%A5%E8%A1%A8"><span class="nav-number">2.2.</span> <span class="nav-text">2.邻接表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9E%E9%80%9A%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">连通问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Tarjan%E6%B1%82%E5%BC%BA%E8%BF%9E%E9%80%9A%E5%88%86%E9%87%8F"><span class="nav-number">3.1.</span> <span class="nav-text">Tarjan求强连通分量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8Tarjan%E8%BF%9B%E8%A1%8C%E7%BC%A9%E7%82%B9"><span class="nav-number">3.2.</span> <span class="nav-text">利用Tarjan进行缩点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tarjan%E6%B1%82%E5%89%B2%E7%82%B9%E5%92%8C%E6%A1%A5"><span class="nav-number">3.3.</span> <span class="nav-text">Tarjan求割点和桥</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84"><span class="nav-number">4.</span> <span class="nav-text">最短路径</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Dijkstra%E7%AE%97%E6%B3%95"><span class="nav-number">4.1.</span> <span class="nav-text">1.Dijkstra算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Floyd%E7%AE%97%E6%B3%95"><span class="nav-number">4.2.</span> <span class="nav-text">2.Floyd算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Bellman-Ford%E7%AE%97%E6%B3%95"><span class="nav-number">4.3.</span> <span class="nav-text">3. Bellman Ford算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-SPFA%E7%AE%97%E6%B3%95"><span class="nav-number">4.4.</span> <span class="nav-text">4.SPFA算法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E6%9F%A5%E9%9B%86"><span class="nav-number">5.</span> <span class="nav-text">并查集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91"><span class="nav-number">6.</span> <span class="nav-text">最小生成树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kruscal%E7%AE%97%E6%B3%95"><span class="nav-number">6.1.</span> <span class="nav-text">Kruscal算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prim%E7%AE%97%E6%B3%95"><span class="nav-number">6.2.</span> <span class="nav-text">Prim算法</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Langou"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Langou</p>
+  <div class="site-description" itemprop="description">Talk is cheap, show me the code</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/langou0115" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;langou0115" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:langou0115@foxmail.com" title="E-Mail → mailto:langou0115@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Langou</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">43k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">39 分钟</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>

@@ -28,18 +28,18 @@
 <meta property="og:site_name" content="Langou的窝">
 <meta property="og:description" content="进程在Linux系统中扮演着至关重要的角色。它不仅是系统资源管理和任务调度的基本单位，还直接影响着系统的性能和稳定性。本文将详细探讨Linux中的进程，包括其概念、生命周期、内核数据结构、以及与进程管理相关的常用API函数，以便读者更深入地理解进程在Linux中的重要性和实现机制。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://langou0115.github.io/undefined/image-20240702212909754.png">
-<meta property="og:image" content="https://langou0115.github.io/undefined/image-20240702213346684.png">
-<meta property="og:image" content="https://langou0115.github.io/undefined/image-20240701181207013.png">
-<meta property="og:image" content="https://langou0115.github.io/undefined/image-20240701202424640.png">
-<meta property="og:image" content="https://langou0115.github.io/undefined/image-20240702222117113.png">
+<meta property="og:image" content="https://langou0115.github.io/87698413/image-20240702212909754.png">
+<meta property="og:image" content="https://langou0115.github.io/87698413/image-20240702213346684.png">
+<meta property="og:image" content="https://langou0115.github.io/87698413/image-20240701181207013.png">
+<meta property="og:image" content="https://langou0115.github.io/87698413/image-20240701202424640.png">
+<meta property="og:image" content="https://langou0115.github.io/87698413/image-20240702222117113.png">
 <meta property="article:published_time" content="2024-06-30T13:40:36.000Z">
-<meta property="article:modified_time" content="2024-07-02T14:22:21.724Z">
+<meta property="article:modified_time" content="2024-07-02T14:23:19.947Z">
 <meta property="article:author" content="Langou">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="C">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://langou0115.github.io/undefined/image-20240702212909754.png">
+<meta name="twitter:image" content="https://langou0115.github.io/87698413/image-20240702212909754.png">
 
 <link rel="canonical" href="https://langou0115.github.io/87698413.html">
 
@@ -231,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-07-02 22:22:21" itemprop="dateModified" datetime="2024-07-02T22:22:21+08:00">2024-07-02</time>
+                <time title="修改时间：2024-07-02 22:23:19" itemprop="dateModified" datetime="2024-07-02T22:23:19+08:00">2024-07-02</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -293,7 +293,7 @@
 
 <p><strong>exit和return的区别：</strong></p>
 <p>exit会进入内核，而return只是一个返回，把指挥权交给上层调用，return也会调用终止处理函数并刷新缓冲</p>
-<h1 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h1><img src="/undefined/image-20240702212909754.png" class="">
+<h1 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h1><img src="/87698413/image-20240702212909754.png" class="">
 
 <p>进程中相关属性</p>
 <ol>
@@ -306,7 +306,7 @@
 <li><p>sid</p>
 <p>会话是一个或多个进程组的集合，其与进程组、进程之间的关系如</p>
 <p>下图所示：</p>
-<img src="/undefined/image-20240702213346684.png" class="">
+<img src="/87698413/image-20240702213346684.png" class="">
 
 <p>一个会话可以有控制终端、也可没有控制终端，在有控制终端的情况下也只能连接一个控制终端。</p>
 <p>对于会话来说，会话的首领进程的进程组 ID 将作为该会话的标识，也就是会话 ID（sid），在默认情况下，新创建的进程会继承父进程的会话 ID。</p>
@@ -332,7 +332,7 @@
 <p>常用操作</p>
 <figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// man 3 查看使用</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 设置环境变量</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">putenv</span><span class="params">(<span class="type">char</span> *<span class="built_in">string</span>)</span>; <span class="comment">// 修改string会修改环境变量</span></span><br><span class="line"><span class="comment">// 修改name和value不会修改环境变量，创建了一个缓冲区指向他们</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="type">const</span> <span class="type">char</span> *value, <span class="type">int</span> overwrite)</span>; </span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unsetenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 清空</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">clearenv</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">clearenv()函数内部的做法其实就是将environ赋值为NULL。在某些情况下，使用setenv()函数和clearenv()</span></span><br><span class="line"><span class="comment">函数可能会导致程序内存泄漏。setenv()函数会为环境变量分配一块内存缓冲区，随之称为进程的一部分；而调用 clearenv()函数时没有释放该缓冲区（clearenv()调用并不知晓该缓冲区的存在，故而也无法将其释放）</span></span><br><span class="line"><span class="comment">反复调用者两个函数的程序，会不断产生内存泄漏。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
 
-<h1 id="内存布局"><a href="#内存布局" class="headerlink" title="内存布局"></a>内存布局</h1><img src="/undefined/image-20240701181207013.png" class="">
+<h1 id="内存布局"><a href="#内存布局" class="headerlink" title="内存布局"></a>内存布局</h1><img src="/87698413/image-20240701181207013.png" class="">
 
 <h1 id="父子进程"><a href="#父子进程" class="headerlink" title="父子进程"></a>父子进程</h1><p><code>fork</code>函数</p>
 <ol>
@@ -343,7 +343,7 @@
 <p><code>vfork</code>函数：与父进程共有代码段，堆，栈</p>
 <p>ps: 创建的子进程退出需要使用_exit而不是exit</p>
 <p>对文件的共享</p>
-<img src="/undefined/image-20240701202424640.png" class="">
+<img src="/87698413/image-20240701202424640.png" class="">
 
 <p>父子进程fd指向同一个文件表</p>
 <p>fork 后子进程会继承父进程绑定的信号处理函数，若调用 exec 加载新程序后，就不会在继承这个信号处理函数了fork 后子进程会继承父进程的信号掩码，执行 exec 后仍会继承这个信号掩码</p>
@@ -365,7 +365,7 @@
 <li>长期运行</li>
 <li>与控制终端分离</li>
 </ol>
-<h1 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h1><img src="/undefined/image-20240702222117113.png" class="">
+<h1 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h1><img src="/87698413/image-20240702222117113.png" class="">
 
 <ul>
 <li><p>UNIX IPC：管道、FIFO、信号；</p>

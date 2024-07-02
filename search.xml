@@ -756,4 +756,125 @@
         <tag>算法</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Linux进程</title>
+    <url>/87698413.html</url>
+    <content><![CDATA[<p>进程在Linux系统中扮演着至关重要的角色。它不仅是系统资源管理和任务调度的基本单位，还直接影响着系统的性能和稳定性。本文将详细探讨Linux中的进程，包括其概念、生命周期、内核数据结构、以及与进程管理相关的常用API函数，以便读者更深入地理解进程在Linux中的重要性和实现机制。</p>
+<span id="more"></span>
+
+<h1 id="进程概念"><a href="#进程概念" class="headerlink" title="进程概念"></a>进程概念</h1><p>进程是一个动态过程，而非静态文件，它是程序的一次运行过程，当应用程序被加载到内存中运行之后，它就称为了一个进程，当程序运行结束后也就意味着进程终止，这就是进程的一个生命周期。</p>
+<p>Linux系统下的所有进程都是由其父进程创建而来，譬如在 shell 终端通过命令的方式执行一个程序./app，那么 app进程就是由 shell 终端进程创建出来的，shell 终端就是该进程的父进程。init 进程，它是 Linux 系统启动之后运行的第一个进程，它管理着系统上所有其它进程，init 进程是由内核启动，因此理论上说它没有父进程。</p>
+<p>程序结束其实就是进程终止，进程终止的方式通常有多种，大体上分为正常终止和异常终止，正常终止</p>
+<p>包括：</p>
+<ul>
+<li><p>main()函数中通过 return 语句返回来终止进程；</p>
+</li>
+<li><p>应用程序中调用 exit()函数终止进程；</p>
+</li>
+<li><p>应用程序中调用<code>_exit()</code>终止进程；</p>
+</li>
+</ul>
+<p>异常终止包括：</p>
+<ul>
+<li>应用程序中调用 abort()函数终止进程；</li>
+<li>进程接收到一个信号，譬如 SIGKILL 信号。</li>
+</ul>
+<p><strong>exit和_exit的区别：</strong></p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">exit</span> = atexit + _exit;</span><br><span class="line"><span class="comment">// atexit: 调用终止处理+刷新IO（注册,最后exit执行按先进后出顺序来）</span></span><br><span class="line"><span class="comment">// _exit: 进入内核执行清理工作</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>exit和return的区别：</strong></p>
+<p>exit会进入内核，而return只是一个返回，把指挥权交给上层调用，return也会调用终止处理函数并刷新缓冲</p>
+<h1 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h1><img src="/undefined/image-20240702212909754.png" class="">
+
+<p>进程中相关属性</p>
+<ol>
+<li><p>pid</p>
+<p>每个进程都有自己唯一的标识：进程号（进程 ID、PID）。</p>
+</li>
+<li><p>pgid</p>
+<p>每个进程除了有一个进程 ID、父进程 ID 之外，还有一个进程组 ID，用于标识该进程属于哪一个进程组，进程组是一个或多个进程的集合。每一个进程组有一个组长进程，组长进程的 ID 就等于进程组 ID；组长进程不能再创建新的进程组；只要进程组中还存在一个进程，则该进程组就存在，这与其组长进程是否终止无关。</p>
+</li>
+<li><p>sid</p>
+<p>会话是一个或多个进程组的集合，其与进程组、进程之间的关系如</p>
+<p>下图所示：</p>
+<img src="/undefined/image-20240702213346684.png" class="">
+
+<p>一个会话可以有控制终端、也可没有控制终端，在有控制终端的情况下也只能连接一个控制终端。</p>
+<p>对于会话来说，会话的首领进程的进程组 ID 将作为该会话的标识，也就是会话 ID（sid），在默认情况下，新创建的进程会继承父进程的会话 ID。</p>
+</li>
+</ol>
+<p>相关操作</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">getpid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getppid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getsid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">setsid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h1 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h1><p>获取进程中的环境变量</p>
+<ol>
+<li><p>environ变量</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 代码中使用</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ; <span class="comment">// 申明外部全局变量 environ</span></span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>getenv()函数</p>
+<p><code>man 3</code> 查看使用</p>
+</li>
+<li><p>通过main函数参数获取</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *env[])</span> <span class="comment">// 不推荐，有些系统不支持</span></span><br></pre></td></tr></tbody></table></figure></li>
+</ol>
+<p>程序启动时可设置环境变量<code>NAME=value ./app</code></p>
+<p>常用操作</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// man 3 查看使用</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 设置环境变量</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">putenv</span><span class="params">(<span class="type">char</span> *<span class="built_in">string</span>)</span>; <span class="comment">// 修改string会修改环境变量</span></span><br><span class="line"><span class="comment">// 修改name和value不会修改环境变量，创建了一个缓冲区指向他们</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="type">const</span> <span class="type">char</span> *value, <span class="type">int</span> overwrite)</span>; </span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unsetenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 清空</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">clearenv</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">clearenv()函数内部的做法其实就是将environ赋值为NULL。在某些情况下，使用setenv()函数和clearenv()</span></span><br><span class="line"><span class="comment">函数可能会导致程序内存泄漏。setenv()函数会为环境变量分配一块内存缓冲区，随之称为进程的一部分；而调用 clearenv()函数时没有释放该缓冲区（clearenv()调用并不知晓该缓冲区的存在，故而也无法将其释放）</span></span><br><span class="line"><span class="comment">反复调用者两个函数的程序，会不断产生内存泄漏。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="内存布局"><a href="#内存布局" class="headerlink" title="内存布局"></a>内存布局</h1><img src="/undefined/image-20240701181207013.png" class="">
+
+<h1 id="父子进程"><a href="#父子进程" class="headerlink" title="父子进程"></a>父子进程</h1><p><code>fork</code>函数</p>
+<ol>
+<li>一次fork两个返回值，0为子进程，大于0为父进程</li>
+<li>fork进程创建了与原来进程几乎完全相同的进程（复制父进程的代码段，堆，栈）</li>
+<li>子进程从fork调用后开始执行</li>
+</ol>
+<p><code>vfork</code>函数：与父进程共有代码段，堆，栈</p>
+<p>ps: 创建的子进程退出需要使用_exit而不是exit</p>
+<p>对文件的共享</p>
+<img src="/undefined/image-20240701202424640.png" class="">
+
+<p>父子进程fd指向同一个文件表</p>
+<p>fork 后子进程会继承父进程绑定的信号处理函数，若调用 exec 加载新程序后，就不会在继承这个信号处理函数了fork 后子进程会继承父进程的信号掩码，执行 exec 后仍会继承这个信号掩码</p>
+<h1 id="监视子进程"><a href="#监视子进程" class="headerlink" title="监视子进程"></a>监视子进程</h1><p><strong>孤儿进程：</strong>父进程先死且未回收子进程，子进程的父进程会交给init进程（图形化界面不一样）</p>
+<p><strong>僵尸进程：</strong>子进程先死但父进程未回收，此时使用kill也无法杀死</p>
+<p>SIGCHLD 信号发送条件：</p>
+<ul>
+<li>当父进程的某个子进程终止时，父进程会收到 SIGCHLD 信号；</li>
+<li>当父进程的某个子进程因收到信号而停止（暂停运行）或恢复时，内核也可能向父进程发送该信号。</li>
+</ul>
+<p>监视子进程函数</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 返回值是回收的子进程的pid号, man查看</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>; <span class="comment">// 只能阻塞等待</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>; <span class="comment">// 可非阻塞</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="执行程序"><a href="#执行程序" class="headerlink" title="执行程序"></a>执行程序</h1><p><code>man</code>进行查看</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="comment">// 以下都是对execve的封装，path表示路径，file表示若本目录没找到会在PATH里找</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/* (char *) NULL */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/* (char *) NULL */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execle</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/*, (char *) NULL, char * const envp[] */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvpe</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h1><p>守护进程（Daemon）也称为精灵进程，是运行在后台的一种特殊进程，它独立于控制终端并且周期性地执行某种任务或等待处理某些事情的发生，主要表现为以下两个特点：</p>
+<ol>
+<li>长期运行</li>
+<li>与控制终端分离</li>
+</ol>
+<h1 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h1><img src="/undefined/image-20240702222117113.png" class="">
+
+<ul>
+<li><p>UNIX IPC：管道、FIFO、信号；</p>
+</li>
+<li><p>System V IPC：信号量、消息队列、共享内存；</p>
+</li>
+<li><p>POSIX IPC：信号量、消息队列、共享内存（最快）；</p>
+</li>
+<li><p>Socket IPC：基于 Socket 进程间通信。（网络）</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Linux应用</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>C</tag>
+      </tags>
+  </entry>
 </search>

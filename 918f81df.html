@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://langou0115.github.io/918f81df/image-20240706223032854.png">
 <meta property="og:image" content="https://langou0115.github.io/918f81df/image-20240706223328484.png">
 <meta property="article:published_time" content="2024-07-03T13:57:14.000Z">
-<meta property="article:modified_time" content="2024-07-06T14:43:11.887Z">
+<meta property="article:modified_time" content="2024-07-07T07:08:36.207Z">
 <meta property="article:author" content="Langou">
 <meta property="article:tag" content="C">
 <meta property="article:tag" content="Linux">
@@ -233,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-07-06 22:43:11" itemprop="dateModified" datetime="2024-07-06T22:43:11+08:00">2024-07-06</time>
+                <time title="修改时间：2024-07-07 15:08:36" itemprop="dateModified" datetime="2024-07-07T15:08:36+08:00">2024-07-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -316,7 +316,7 @@
 <p><strong>PTHREAD_MUTEX_NORMAL</strong>：一种标准的互斥锁类型，不做任何的错误检查或死锁检测。如果线程试图对已经由自己锁定的互斥锁再次进行加锁，则发生死锁；互斥锁处于未锁定状态，或者已由其它线程锁定，对其解锁会导致不确定结果。</p>
 <p><strong>PTHREAD_MUTEX_ERRORCHECK</strong>：此类互斥锁会提供错误检查。譬如这三种情况都会导致返回错误：线程试图对已经由自己锁定的互斥锁再次进行加锁（同一线程对同一互斥锁加锁两次），返回错误；线程对由其它线程锁定的互斥锁进行解锁，返回错误；线程对处于未锁定状态的互斥锁进行解锁，返回错误。这类互斥锁运行起来比较慢，因为它需要做错误检查，不过可将其作为调试工具，以发现程序哪里违反了互斥锁使用的基本原则。</p>
 <p><strong>PTHREAD_MUTEX_RECURSIVE</strong>：此类互斥锁允许同一线程在互斥锁解锁之前对该互斥锁进行多次加锁，然后维护互斥锁加锁的次数，把这种互斥锁称为递归互斥锁，但是如果解锁次数不等于加速次数，则是不会释放锁的；所以，如果对一个递归互斥锁加锁两次，然后解锁一次，那么这个互斥锁依然处于锁定状态，对它再次进行解锁之前不会释放该锁。</p>
-<p> <strong>PTHREAD_MUTEX_DEFAULT</strong>：此类互斥锁提供默认的行为和特性。 使用宏PTHREAD_MUTEX_INITIALIZER 初 始化的互斥锁 ， 或 者 调 用 参 数 arg 为 NULL 的pthread_mutexattr_init()函数所创建的互斥锁，都属于此类型。此类锁意在为互斥锁的实现保留最大灵活性， Linux 上 ， PTHREAD_MUTEX_DEFAULT类型互斥锁的行为与PTHREAD_MUTEX_NORMAL 类型相仿。</p>
+<p> <strong>PTHREAD_MUTEX_DEFAULT</strong>：此类互斥锁提供默认的行为和特性。使用宏PTHREAD_MUTEX_INITIALIZER初始化的互斥锁， 或者调用参数arg为NULL的pthread_mutexattr_init()函数所创建的互斥锁，都属于此类型。此类锁意在为互斥锁的实现保留最大灵活性，Linux 上， PTHREAD_MUTEX_DEFAULT类型互斥锁的行为与PTHREAD_MUTEX_NORMAL 类型相仿。</p>
 <h2 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h2><p>条件变量是线程可用的另一种同步机制。条件变量用于自动阻塞线程，知道某个特定事件发生或某个条件满足为止，通常情况下，条件变量是和互斥锁一起搭配使用的。</p>
 <figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 条件变量初始化</span></span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">const</span> <span class="type">pthread_condattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_destroy</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></tbody></table></figure>
 

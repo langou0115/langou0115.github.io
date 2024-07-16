@@ -36,10 +36,10 @@
 <meta property="og:image" content="https://langou0115.github.io/918f81df/image-20240706223032854.png">
 <meta property="og:image" content="https://langou0115.github.io/918f81df/image-20240706223328484.png">
 <meta property="article:published_time" content="2024-07-03T13:57:14.000Z">
-<meta property="article:modified_time" content="2024-07-07T07:08:36.207Z">
+<meta property="article:modified_time" content="2024-07-07T14:52:17.485Z">
 <meta property="article:author" content="Langou">
-<meta property="article:tag" content="C">
 <meta property="article:tag" content="Linux">
+<meta property="article:tag" content="C">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://langou0115.github.io/918f81df/image-20240703220319726.png">
 
@@ -233,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-07-07 15:08:36" itemprop="dateModified" datetime="2024-07-07T15:08:36+08:00">2024-07-07</time>
+                <time title="修改时间：2024-07-07 22:52:17" itemprop="dateModified" datetime="2024-07-07T22:52:17+08:00">2024-07-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -251,14 +251,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>6.8k</span>
+              <span>7.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>6 分钟</span>
+              <span>7 分钟</span>
             </span>
 
         </div>
@@ -338,7 +338,7 @@
 
 <figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// init and destroy</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_destroy</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_init</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock, <span class="type">const</span> <span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_rdlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 读模式上锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_wrlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 写模式上锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_unlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 解锁</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 非阻塞</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_tryrdlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_trywrlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 属性</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_destroy</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_init</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_getpshared</span><span class="params">(<span class="type">const</span> <span class="type">pthread_rwlockattr_t</span> *attr, <span class="type">int</span> *pshared)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_setpshared</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr, <span class="type">int</span> pshared)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> pshared 表示自旋锁的进程共享属性</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_SHARED：共享自旋锁。该自旋锁可以在多个进程中的线程之间共享；</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_PRIVATE：私有自旋锁。只有本进程内的线程才能够使用该自旋锁。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
 
-<h1 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h1><p><strong>可重入函数</strong>：如果一个函数被同一进程的多个不同的执行流同时调用，每次函数调用总是能产生正确的结果（或者叫产生预期的结果），把这样的函数就称为可重入函数。</p>
+<h1 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h1><h2 id="线程安全函数"><a href="#线程安全函数" class="headerlink" title="线程安全函数"></a>线程安全函数</h2><p><strong>可重入函数</strong>：如果一个函数被同一进程的多个不同的执行流同时调用，每次函数调用总是能产生正确的结果（或者叫产生预期的结果），把这样的函数就称为可重入函数。</p>
 <p>分类：</p>
 <ol>
 <li><strong>绝对的可重入函数：</strong>所谓绝对，指的是该函数不管如何调用，都刚断言它是可重入的，都能得到预期的结果。</li>
@@ -359,10 +359,33 @@
 <p>POSIX.1-2001 和 POSIX.1-2008 标准中规定的所有函数都必须是线程安全函数，但以下函数除外：</p>
 <img src="/918f81df/image-20240706223328484.png" class="">
 
-<p><strong>一次性初始化</strong>：在多线程编程环境下，有些代码段只需要执行一次，譬如一些初始化相关的代码段。</p>
+<h2 id="线程特有数据"><a href="#线程特有数据" class="headerlink" title="线程特有数据"></a>线程特有数据</h2><p><strong>一次性初始化</strong>：在多线程编程环境下，有些代码段只需要执行一次，譬如一些初始化相关的代码段。</p>
 <figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pthread_once_t</span> once_control = PTHREAD_ONCE_INIT;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_once</span><span class="params">(<span class="type">pthread_once_t</span> *once_control, <span class="type">void</span> (*init_routine)(<span class="type">void</span>))</span>;</span><br></pre></td></tr></tbody></table></figure>
 
 <p>在多线程编程环境下，尽管 pthread_once()调用会出现在多个线程中，但该函数会保证 init_routine()函数仅执行一次，究竟在哪个线程中执行是不定的，是由内核调度来决定。</p>
+<p><strong>线程特有数据</strong></p>
+<p>很多库函数都会返回一个字符串指针，譬如 asctime()、ctime()、localtime()等，返回出来的字符串可以被调用线程直接使用，但该字符串缓冲区通常是这些函数内部所维护的静态数组或者是某个全局数组。被多个线程同时调用时，返回的字符串中的数据可能是混乱的，因为某一线程调用它时，缓冲区中的数据可能被另一个调用线程修改了。</p>
+<p>线程特有数据的核心思想其实非常简单，就是为每一个调用线程（调用某函数的线程，该函数就是我们要通过线程特有数据将其实现为线程安全的函数）分配属于该线程的私有数据区，为每个调用线程分别维护一份变量的副本。</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建键值对</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_key_create</span><span class="params">(<span class="type">pthread_key_t</span> *key, <span class="type">void</span> (*destructor)(<span class="type">void</span>*))</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置键值对，对应的value就是要复制的值</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setspecific</span><span class="params">(<span class="type">pthread_key_t</span> key, <span class="type">const</span> <span class="type">void</span> *value)</span>;</span><br><span class="line"><span class="comment">// 返回复制值的内存地址</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">pthread_getspecific</span><span class="params">(<span class="type">pthread_key_t</span> key)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_key_delete</span><span class="params">(<span class="type">pthread_key_t</span> key)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>或者也可以使用<code>__thread</code>，也可以达成特有数据的效果</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> __thread <span class="type">char</span> buf[MAX_ERROR_LEN];</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="线程与信号"><a href="#线程与信号" class="headerlink" title="线程与信号"></a>线程与信号</h1><ul>
+<li>信号的系统默认行为是属于进程层面。</li>
+<li>信号处理函数属于进程层面。</li>
+<li>信号的发送既可针对整个进程，也可针对某个特定的线程。在满足以下三个条件中的任意一个时，信号的发送针对的是某个线程：<ol>
+<li>产生了硬件异常相关信号，譬如 SIGBUS、SIGFPE、SIGILL 和 SIGSEGV 信号；</li>
+<li>当线程试图对已断开的管道进行写操作时所产生的 SIGPIPE 信号；</li>
+<li>由函数 pthread_kill()或 pthread_sigqueue()所发出的信号</li>
+</ol>
+</li>
+<li>当一个多线程进程接收到一个信号时，且该信号绑定了信号处理函数时，内核会任选一个线程来接收这个信号</li>
+<li>信号掩码其实是属于线程层面的，<code> pthread_sigmask()</code>函数来设置各自线程的信号掩码</li>
+</ul>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 设置线程掩码</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_sigmask</span><span class="params">(<span class="type">int</span> how, <span class="type">const</span> <span class="type">sigset_t</span> *<span class="built_in">set</span>, <span class="type">sigset_t</span> *oldset)</span>;</span><br><span class="line"><span class="comment">// 向线程发送信号</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_kill</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">int</span> sig)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>异步信号安全函数</strong>：指的是可以在信号处理函数中可以被安全调用的线程安全函数，可重入函数一定是异步信号安全函数。</p>
 
     </div>
 
@@ -392,8 +415,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/C/" rel="tag"># C</a>
               <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/C/" rel="tag"># C</a>
           </div>
 
         
@@ -405,7 +428,10 @@
     <a href="/87698413.html" rel="prev" title="Linux进程">
       <i class="fa fa-chevron-left"></i> Linux进程
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/1fd3d10d.html" rel="next" title="Linux高级IO">
+      Linux高级IO <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -464,7 +490,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%89%B9%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">线程特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8BAPI"><span class="nav-number">2.</span> <span class="nav-text">线程API</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%96%E6%B6%88%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">取消点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%B1%9E%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">线程属性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="nav-number">5.</span> <span class="nav-text">线程同步</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81"><span class="nav-number">5.1.</span> <span class="nav-text">互斥锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F"><span class="nav-number">5.2.</span> <span class="nav-text">条件变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E6%97%8B%E9%94%81"><span class="nav-number">5.3.</span> <span class="nav-text">自旋锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81"><span class="nav-number">5.4.</span> <span class="nav-text">读写锁</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">6.</span> <span class="nav-text">线程安全</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%89%B9%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">线程特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8BAPI"><span class="nav-number">2.</span> <span class="nav-text">线程API</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%96%E6%B6%88%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">取消点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%B1%9E%E6%80%A7"><span class="nav-number">4.</span> <span class="nav-text">线程属性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="nav-number">5.</span> <span class="nav-text">线程同步</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81"><span class="nav-number">5.1.</span> <span class="nav-text">互斥锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F"><span class="nav-number">5.2.</span> <span class="nav-text">条件变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E6%97%8B%E9%94%81"><span class="nav-number">5.3.</span> <span class="nav-text">自旋锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81"><span class="nav-number">5.4.</span> <span class="nav-text">读写锁</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">6.</span> <span class="nav-text">线程安全</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0"><span class="nav-number">6.1.</span> <span class="nav-text">线程安全函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%89%B9%E6%9C%89%E6%95%B0%E6%8D%AE"><span class="nav-number">6.2.</span> <span class="nav-text">线程特有数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E4%B8%8E%E4%BF%A1%E5%8F%B7"><span class="nav-number">7.</span> <span class="nav-text">线程与信号</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -480,7 +506,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -538,13 +564,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">54k</span>
+    <span title="站点总字数">58k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">49 分钟</span>
+    <span title="站点阅读时长">53 分钟</span>
 </div>
 
         

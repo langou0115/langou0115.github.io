@@ -28,15 +28,15 @@
 <meta property="og:site_name" content="Langou的窝">
 <meta property="og:description" content="本文再次回到文件 I&#x2F;O 相关话题的讨论，将会介绍文件 I&#x2F;O 当中的一些高级用法，以应对不同应用场合的需求，主要包括：非阻塞 I&#x2F;O、I&#x2F;O 多路复用、异步 I&#x2F;O、存储映射 I&#x2F;O 以及文件锁，">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://langou0115.github.io/undefined/image-20240715222704115.png">
-<meta property="og:image" content="https://langou0115.github.io/undefined/image-20240715225728423.png">
+<meta property="og:image" content="https://langou0115.github.io/1fd3d10d/image-20240715222704115.png">
+<meta property="og:image" content="https://langou0115.github.io/1fd3d10d/image-20240715225728423.png">
 <meta property="article:published_time" content="2024-07-08T14:31:54.000Z">
-<meta property="article:modified_time" content="2024-07-15T15:04:43.440Z">
+<meta property="article:modified_time" content="2024-07-16T12:50:18.710Z">
 <meta property="article:author" content="Langou">
-<meta property="article:tag" content="Linux">
 <meta property="article:tag" content="C">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://langou0115.github.io/undefined/image-20240715222704115.png">
+<meta name="twitter:image" content="https://langou0115.github.io/1fd3d10d/image-20240715222704115.png">
 
 <link rel="canonical" href="https://langou0115.github.io/1fd3d10d.html">
 
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-07-15 23:04:43" itemprop="dateModified" datetime="2024-07-15T23:04:43+08:00">2024-07-15</time>
+                <time title="修改时间：2024-07-16 20:50:18" itemprop="dateModified" datetime="2024-07-16T20:50:18+08:00">2024-07-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -302,7 +302,7 @@
 <h1 id="存储映射IO"><a href="#存储映射IO" class="headerlink" title="存储映射IO"></a>存储映射IO</h1><p>存储映射 I/O（memory-mapped I/O）是一种基于内存区域的高级 I/O 操作，它能将一个文件映射到进程地址空间中的一块内存区域中，当从这段内存中读数据时，就相当于读文件中的数据（对文件进行 read 操作），将数据写入这段内存时，则相当于将数据直接写入文件中（对文件进行 write 操作）。</p>
 <figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></tbody></table></figure>
 
-<img src="/undefined/image-20240715222704115.png" class="">
+<img src="/1fd3d10d/image-20240715222704115.png" class="">
 
 <h1 id="文件锁"><a href="#文件锁" class="headerlink" title="文件锁"></a>文件锁</h1><ol>
 <li><p>建议性锁</p>
@@ -328,7 +328,7 @@
 <li>fcntl()可以对文件的某个区域（某部分内容）进行加锁解锁，可以精确到某一个字节数据。</li>
 <li>fcntl()可支持建议性锁和强制性锁两种类型</li>
 </ul>
-<img src="/undefined/image-20240715225728423.png" class="">
+<img src="/1fd3d10d/image-20240715225728423.png" class="">
 
 <p>如果要开启强制性锁机制，需要设置文件的 Set-GroupID（S_ISGID）位为 1，并且禁止文件的组用户执行权限（S_IXGRP），也就是将其设置为 0。</p>
 <p>有些发行版不支持。</p>
@@ -362,8 +362,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Linux/" rel="tag"># Linux</a>
               <a href="/tags/C/" rel="tag"># C</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
           </div>
 
         

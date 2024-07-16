@@ -1,252 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Linux文件IO</title>
-    <url>/1f3f638f.html</url>
-    <content><![CDATA[<p>在Linux中，对文件进行I/O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I/O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。</p>
-<span id="more"></span>
-
-<h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p>read, write, lseek, perror, strerror, truncate(截断), ftruncate(截断), fcntl(文件描述符操作)</p>
-<p>ioctl(一般用于操作特殊文件或硬件外设，后期介绍)</p>
-<p>linux中0，1，2表示标准输入、标准输出和标准错误，文件分配符fd不会取到这三个值</p>
-<p>详情可使用<code>man 2 read/write/lseek...</code>查看</p>
-<h2 id="错误返回"><a href="#错误返回" class="headerlink" title="错误返回"></a>错误返回</h2><p><code>errno</code>表示错误对应的标号需要<code>#include &lt;errno.h&gt;</code></p>
-<p><code>strerr(errno)</code>打印出错误信息</p>
-<p><code>perror()</code>直接打印</p>
-<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>多次open()和dup()复制的区别</p>
-<ol>
-<li><p>多次open()</p>
-<img src="/1f3f638f/image-20240624230432725.png" class="">
-</li>
-<li><p>dup(), dup2()复制</p>
-<img src="/1f3f638f/image-20240624230350781.png" class=""></li>
-</ol>
-<p>可以看出多次open()的fd会指向不同的文件表，不同文件表指向同一个inode节点，而dup(), dup2()指向一个文件表</p>
-<h3 id="三种实现方法"><a href="#三种实现方法" class="headerlink" title="三种实现方法"></a>三种实现方法</h3><ol>
-<li><p>同一个进程中多次调用 open 函数打开同一个文件</p>
-<img src="/1f3f638f/image-20240624231735907.png" class="" title="image-20240624231735907">
-</li>
-<li><p>不同进程中分别使用 open 函数打开同一个文件</p>
-<img src="/1f3f638f/image-20240624231752361.png" class="" title="image-20240624231752361">
-</li>
-<li><p>同一个进程中通过 dup(dup2)函数对文件描述符进行复制</p>
-<img src="/1f3f638f/image-20240624231804747.png" class="" title="image-20240624231804747"></li>
-</ol>
-<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><ol>
-<li><p><strong>O_APPEND</strong></p>
-<p>open时加入该标志</p>
-</li>
-<li><p><strong>pread()<strong>和</strong>pwrite()</strong></p>
-<p><code>man 2 pread</code>查看</p>
-</li>
-<li><p><strong>O_EXCL</strong></p>
-<p>避免创建文件出现问题</p>
-</li>
-</ol>
-<h1 id="标准IO"><a href="#标准IO" class="headerlink" title="标准IO"></a>标准IO</h1><p>标准 I/O 是对文件 I/O 进行了封装。标准 I/O 会处理很多细节，譬如分配 stdio 缓冲区、以优</p>
-<p>化的块长度执行 I/O 等，这些处理使用户不必担心如何选择使用正确的块长度。</p>
-<h2 id="常用函数-1"><a href="#常用函数-1" class="headerlink" title="常用函数"></a>常用函数</h2><p>文件：fopen, fclose, fseek, fread, fwrite</p>
-<p>错误：feof, ferror, clearerr</p>
-<p>详情使用<code>man 3 fopen/fclose...</code>来查看</p>
-<h1 id="格式化IO"><a href="#格式化IO" class="headerlink" title="格式化IO"></a>格式化IO</h1><h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：write(1, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dprintf</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：read(0, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="文件描述符和FILE指针相互转换"><a href="#文件描述符和FILE指针相互转换" class="headerlink" title="文件描述符和FILE指针相互转换"></a>文件描述符和FILE指针相互转换</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fileno</span><span class="params">(FILE *stream)</span>; <span class="comment">// FILE* -&gt; fd</span></span><br><span class="line">FILE *<span class="title function_">fdopen</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *mode)</span>; <span class="comment">// fd -&gt; FILE*</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h1 id="IO缓冲"><a href="#IO缓冲" class="headerlink" title="IO缓冲"></a>IO缓冲</h1><img src="/1f3f638f/image-20240625115550593.png" class="" title="image-20240625115550593">
-
-<p>可以看出：文件IO比标准IO要快</p>
-<h2 id="文件IO缓冲"><a href="#文件IO缓冲" class="headerlink" title="文件IO缓冲"></a>文件IO缓冲</h2><p>刷新缓冲区：fsync, fdatasync, sync</p>
-<p><code>man 3 sync</code>查看</p>
-<p>fsync: 文件内数据和元数据</p>
-<p>fdatasync: 文件内容数据</p>
-<p>sync: 所有</p>
-<h3 id="绕过IO缓冲"><a href="#绕过IO缓冲" class="headerlink" title="绕过IO缓冲"></a>绕过IO缓冲</h3><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE <span class="comment">// 需要定义宏</span></span></span><br><span class="line">fd = open(filepath, O_WRONLY | O_DIRECT);</span><br></pre></td></tr></tbody></table></figure>
-
-<p>限制：</p>
-<ul>
-<li>应用程序中用于存放数据的缓冲区，其内存起始地址必须以块大小的整数倍进行对齐；</li>
-<li>写文件时，文件的位置偏移量必须是块大小的整数倍；</li>
-<li>写入到文件的数据大小必须是块大小的整数倍。</li>
-</ul>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 查看blocksize</span></span><br><span class="line"><span class="built_in">df</span> -h <span class="comment"># 查看根目录在哪</span></span><br><span class="line">tune2fs -l /dev/sda? | grep <span class="string">"Block size"</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>内存起始地址对齐</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> buf[<span class="number">8192</span>] __attribute__((aligned(<span class="number">4096</span>)));</span><br></pre></td></tr></tbody></table></figure>
-
-<p>写入块大小整数倍</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> ret = write(fd, buf, <span class="number">4096</span>);</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="标准IO缓冲"><a href="#标准IO缓冲" class="headerlink" title="标准IO缓冲"></a>标准IO缓冲</h2><p>对stdio缓冲设置</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuffer</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>man 3</code>查看文档</p>
-<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>使用stat，fstat, lstat查看文件（目录）属性，stat返回一个<code>struct stat</code>结构体</p>
-<p>可使用<code>man 2</code>查看，fstat可通过fd来查看属性，lstat可以看链接文件属性</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">{</span></span><br><span class="line"> <span class="type">dev_t</span> st_dev; <span class="comment">/* 文件所在设备的 ID */</span></span><br><span class="line"> <span class="type">ino_t</span> st_ino; <span class="comment">/* 文件对应 inode 节点编号 */</span></span><br><span class="line"> <span class="type">mode_t</span> st_mode; <span class="comment">/* 文件对应的模式 */</span></span><br><span class="line"> <span class="type">nlink_t</span> st_nlink; <span class="comment">/* 文件的链接数 */</span></span><br><span class="line"> <span class="type">uid_t</span> st_uid; <span class="comment">/* 文件所有者的用户 ID */</span></span><br><span class="line"> <span class="type">gid_t</span> st_gid; <span class="comment">/* 文件所有者的组 ID */</span></span><br><span class="line"> <span class="type">dev_t</span> st_rdev; <span class="comment">/* 设备号（指针对设备文件） */</span></span><br><span class="line"> <span class="type">off_t</span> st_size; <span class="comment">/* 文件大小（以字节为单位） */</span></span><br><span class="line"> <span class="type">blksize_t</span> st_blksize; <span class="comment">/* 文件内容存储的块大小 */</span></span><br><span class="line"> <span class="type">blkcnt_t</span> st_blocks; <span class="comment">/* 文件内容所占块数 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span> <span class="comment">/* 文件最后被访问的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span> <span class="comment">/* 文件内容最后被修改的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span> <span class="comment">/* 文件状态最后被改变的时间 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="归属"><a href="#归属" class="headerlink" title="归属"></a>归属</h2><p>使用chown, fchown, lchown来更改文件所属，三者区别上同</p>
-<p>PS：进程相关联ID</p>
-<img src="/1f3f638f/image-20240626092456008.png" class="">
-
-<h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p>修改时间属性utime, utimes(精度区别)</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> {</span></span><br><span class="line">	<span class="type">time_t</span> actime; <span class="comment">/* 访问时间 */</span></span><br><span class="line">	<span class="type">time_t</span> modtime; <span class="comment">/* 内容修改时间 */</span></span><br><span class="line">};</span><br><span class="line"><span class="type">int</span> <span class="title function_">utimes</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> {</span></span><br><span class="line"> <span class="type">long</span> tv_sec; <span class="comment">/* 秒 */</span></span><br><span class="line"> <span class="type">long</span> tv_usec; <span class="comment">/* 微秒 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<p>还有futimens()和 utimensat()，区别是：</p>
-<ul>
-<li>可按纳秒级精度设置时间戳。</li>
-<li>可单独设置某一时间戳。</li>
-<li>可独立将任一时间戳设置为当前时间。</li>
-</ul>
-<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>通过<code>link</code>设置硬连接，<code>symlink</code>设置软连接，<code>readlink</code>读取链接文件</p>
-<h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><p><code>unlink</code>删除文件</p>
-<p><code>man 2</code>查看</p>
-<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>存储形式</p>
-<img src="/1f3f638f/image-20240626105646448.png" class="">
-
-<p>常用操作：mkdir, rmdir, opendir, readdir, rewinddir, closedir, getcwd, chdir, fchdir</p>
-<p><code>man 2</code>查看</p>
-]]></content>
-      <categories>
-        <category>Linux应用</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux线程</title>
-    <url>/918f81df.html</url>
-    <content><![CDATA[<p>线程是程序最基本的运行单位，而进程不能运行，真正运行的是进程中的线程。当启动应用程序后，系统就创建了一个进程，可以认为进程仅仅是一个容器，它包含了线程运行所需的数据结构、环境变量等信息。</p>
-<span id="more"></span>
-
-<h1 id="线程特点"><a href="#线程特点" class="headerlink" title="线程特点"></a>线程特点</h1><ul>
-<li>线程不单独存在、而是包含在进程中；</li>
-<li>线程是参与系统调度的基本单位；</li>
-<li>可并发执行。同一进程的多个线程之间可并发执行，在宏观上实现同时运行的效果；</li>
-<li>共享进程资源。</li>
-</ul>
-<p><strong>串行，并行，并发区别</strong></p>
-<p>串行</p>
-<img src="/918f81df/image-20240703220319726.png" class="">
-
-<p>并行</p>
-<img src="/918f81df/image-20240703220348407.png" class="">
-
-<p>并发</p>
-<img src="/918f81df/image-20240703220412134.png" class="">
-
-<h1 id="线程API"><a href="#线程API" class="headerlink" title="线程API"></a>线程API</h1><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 线程ID</span></span><br><span class="line"><span class="type">pthread_t</span> <span class="title function_">pthread_self</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_equal</span><span class="params">(<span class="type">pthread_t</span> t1, <span class="type">pthread_t</span> t2)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建线程 attr: 定义了线程的各种属性 arg: 传入start_routine的参数</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程终止 retval返回值可由pthread_join()获取</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 回收线程</span></span><br><span class="line"><span class="comment">// 调用 pthread_join()函数将会以阻塞的形式等待指定的线程终止，如果该线程已经终止，则 pthread_join()</span></span><br><span class="line"><span class="comment">// 立刻返回。</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消线程</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 默认情况下，线程是响应其它线程发送过来的取消请求的，响应请求然后退出线程。当然，线程可以选</span></span><br><span class="line"><span class="comment">// 择不被取消或者控制如何被取消</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcancelstate</span><span class="params">(<span class="type">int</span> state, <span class="type">int</span> *oldstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcanceltype</span><span class="params">(<span class="type">int</span> type, <span class="type">int</span> *oldtype)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 分离线程</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_detach</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程清理，需要一一对应</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_cleanup_push</span><span class="params">(<span class="type">void</span> (*routine)(<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_cleanup_pop</span><span class="params">(<span class="type">int</span> execute)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="取消点"><a href="#取消点" class="headerlink" title="取消点"></a>取消点</h1><p>取消点其实就是一系列函数，当执行到这些函数的时候，才会真正响应取消请求，这些函数就是取消点；在没有出现取消点时，取消请求是无法得到处理的。</p>
-<p>可作为取消点的函数</p>
-<img src="/918f81df/image-20240704223904340.png" class="">
-
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 设置取消状态</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcanceltype</span><span class="params">(<span class="type">int</span> type, <span class="type">int</span> *oldtype)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">对于type项</span></span><br><span class="line"><span class="comment">PTHREAD_CANCEL_DEFERRED：取消请求到来时，线程还是继续运行，取消请求被挂起，直</span></span><br><span class="line"><span class="comment">到线程到达某个取消点</span></span><br><span class="line"><span class="comment">PTHREAD_CANCEL_ASYNCHRONOUS：可能会在任何时间点（也许是立即取消，但不一定）</span></span><br><span class="line"><span class="comment">取消线程（应用较少）</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 产生一个取消点</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_testcancel</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="线程属性"><a href="#线程属性" class="headerlink" title="线程属性"></a>线程属性</h1><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 初始化和销毁属性</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_init</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_destroy</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>每个线程都有自己的栈空间，pthread_attr_t 数据结构中定义了栈的起始地址以及栈大小</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 设置和获取栈位置和大小</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setstack</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *stackaddr, <span class="type">size_t</span> stacksize)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getstack</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> **stackaddr, <span class="type">size_t</span> *stacksize)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setstacksize</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">size_t</span> stacksize)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getstacksize</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">size_t</span> *stacksize)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setstackaddr</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *stackaddr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getstackaddr</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> **stackaddr)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>pthread_attr_t也可以设置detach属性</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setdetachstate</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> detachstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getdetachstate</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *detachstate)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h1><p>线程同步是为了对共享资源的访问进行保护。</p>
-<h2 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h2><p>仅列出API</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// init mutex</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_init</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex, <span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// lock and unlock</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>; <span class="comment">// 若无法上锁，会阻塞</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>; <span class="comment">// 不会阻塞</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_unlock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">// destroy mutex</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destroy</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>互斥锁属性</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 初始化和销毁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_init</span><span class="params">(<span class="type">pthread_mutexattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_destroy</span><span class="params">(<span class="type">pthread_mutexattr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_gettype</span><span class="params">(<span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *attr, <span class="type">int</span> *type)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_settype</span><span class="params">(<span class="type">pthread_mutexattr_t</span> *attr, <span class="type">int</span> type)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>互斥锁的类型属性控制着互斥锁的锁定特性，一共有 4 中类型：</p>
-<p><strong>PTHREAD_MUTEX_NORMAL</strong>：一种标准的互斥锁类型，不做任何的错误检查或死锁检测。如果线程试图对已经由自己锁定的互斥锁再次进行加锁，则发生死锁；互斥锁处于未锁定状态，或者已由其它线程锁定，对其解锁会导致不确定结果。</p>
-<p><strong>PTHREAD_MUTEX_ERRORCHECK</strong>：此类互斥锁会提供错误检查。譬如这三种情况都会导致返回错误：线程试图对已经由自己锁定的互斥锁再次进行加锁（同一线程对同一互斥锁加锁两次），返回错误；线程对由其它线程锁定的互斥锁进行解锁，返回错误；线程对处于未锁定状态的互斥锁进行解锁，返回错误。这类互斥锁运行起来比较慢，因为它需要做错误检查，不过可将其作为调试工具，以发现程序哪里违反了互斥锁使用的基本原则。</p>
-<p><strong>PTHREAD_MUTEX_RECURSIVE</strong>：此类互斥锁允许同一线程在互斥锁解锁之前对该互斥锁进行多次加锁，然后维护互斥锁加锁的次数，把这种互斥锁称为递归互斥锁，但是如果解锁次数不等于加速次数，则是不会释放锁的；所以，如果对一个递归互斥锁加锁两次，然后解锁一次，那么这个互斥锁依然处于锁定状态，对它再次进行解锁之前不会释放该锁。</p>
-<p> <strong>PTHREAD_MUTEX_DEFAULT</strong>：此类互斥锁提供默认的行为和特性。使用宏PTHREAD_MUTEX_INITIALIZER初始化的互斥锁， 或者调用参数arg为NULL的pthread_mutexattr_init()函数所创建的互斥锁，都属于此类型。此类锁意在为互斥锁的实现保留最大灵活性，Linux 上， PTHREAD_MUTEX_DEFAULT类型互斥锁的行为与PTHREAD_MUTEX_NORMAL 类型相仿。</p>
-<h2 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h2><p>条件变量是线程可用的另一种同步机制。条件变量用于自动阻塞线程，知道某个特定事件发生或某个条件满足为止，通常情况下，条件变量是和互斥锁一起搭配使用的。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 条件变量初始化</span></span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">const</span> <span class="type">pthread_condattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_destroy</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>在使用条件变量之前必须对条件变量进行初始化操作，使用 PTHREAD_COND_INITIALIZER 宏或者函数 pthread_cond_init()都行；</li>
-<li>对已经初始化的条件变量再次进行初始化，将可能会导致未定义行为；</li>
-<li>对没有进行初始化的条件变量进行销毁，也将可能会导致未定义行为；</li>
-<li>对某个条件变量而言，仅当没有任何线程等待它时，将其销毁才是最安全的；</li>
-</ul>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 发送信号</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_broadcast</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_signal</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 等待</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_wait</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>自旋锁与互斥锁很相似，从本质上说也是一把锁，在访问共享资源之前对自旋锁进行上锁，在访问完成后释放自旋锁（解锁）；事实上，从实现方式上来说，互斥锁是基于自旋锁来实现的，所以自旋锁相较于互斥锁更加底层。</p>
-<p>自旋锁与互斥锁相似，但是互斥锁在无法获取到锁时会让线程陷入阻塞等待状态；而自旋锁在无法获取到锁时，将会在原地“自旋”等待。“自旋”其实就是调用者一直在循环查看该自旋锁的持有者是否已经释放了锁。</p>
-<p>自旋锁的不足之处在于：自旋锁一直占用的 CPU，它在未获得锁的情况下，一直处于运行状态（自旋），所以占着 CPU，如果不能在很短的时间内获取锁，这无疑会使 CPU 效率降低。（一般在内核中使用，中断….）</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// init and destroy</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_destroy</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_init</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock, <span class="type">int</span> pshared)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> pshared 表示自旋锁的进程共享属性</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_SHARED：共享自旋锁。该自旋锁可以在多个进程中的线程之间共享；</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_PRIVATE：私有自旋锁。只有本进程内的线程才能够使用该自旋锁。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// So easy, no need to explain</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_lock</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_trylock</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_unlock</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h2><p>读写锁有3 种状态：读模式下的加锁状态（以下简称读加锁状态）、写模式下的加锁状态（以下简称写加锁状态）和不加锁状态（见），一次只有一个线程可以占有写模式的读写锁，但是可以有多个线程同时占有读模式的读写锁。</p>
-<img src="/918f81df/image-20240705230905164.png" class="">
-
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// init and destroy</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_destroy</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_init</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock, <span class="type">const</span> <span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_rdlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 读模式上锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_wrlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 写模式上锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_unlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 解锁</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 非阻塞</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_tryrdlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_trywrlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 属性</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_destroy</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_init</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_getpshared</span><span class="params">(<span class="type">const</span> <span class="type">pthread_rwlockattr_t</span> *attr, <span class="type">int</span> *pshared)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_setpshared</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr, <span class="type">int</span> pshared)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> pshared 表示自旋锁的进程共享属性</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_SHARED：共享自旋锁。该自旋锁可以在多个进程中的线程之间共享；</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_PRIVATE：私有自旋锁。只有本进程内的线程才能够使用该自旋锁。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h1><h2 id="线程安全函数"><a href="#线程安全函数" class="headerlink" title="线程安全函数"></a>线程安全函数</h2><p><strong>可重入函数</strong>：如果一个函数被同一进程的多个不同的执行流同时调用，每次函数调用总是能产生正确的结果（或者叫产生预期的结果），把这样的函数就称为可重入函数。</p>
-<p>分类：</p>
-<ol>
-<li><strong>绝对的可重入函数：</strong>所谓绝对，指的是该函数不管如何调用，都刚断言它是可重入的，都能得到预期的结果。</li>
-<li><strong>带条件的可重入函数：</strong>指的是在满足某个/某些条件的情况下，可以断言该函数是可重入的，不管怎么调用都能得到预期的结果。</li>
-</ol>
-<p>绝对可重入函数的特点：</p>
-<ul>
-<li><p>函数内所使用到的变量均为局部变量，换句话说，该函数内的操作的内存地址均为本地栈地址；</p>
-</li>
-<li><p>函数参数和返回值均是值类型；</p>
-</li>
-<li><p>函数内调用的其它函数也均是绝对可重入函数。</p>
-</li>
-</ul>
-<p><strong>线程安全函数</strong>：一个函数被多个线程（其实也是多个执行流，但是不包括由信号处理函数所产生的执行流）同时用时，它总会一直产生正确的结果，把这样的函数称为线程安全函数。线程安全函数包括可重入函数，可重入函数是线程安全函数的一个真子集，也就是说可重入函数一定是线程安全函数，但线程安全函数不一定是可重入函数。</p>
-<img src="/918f81df/image-20240706223032854.png" class="">
-
-<p>POSIX.1-2001 和 POSIX.1-2008 标准中规定的所有函数都必须是线程安全函数，但以下函数除外：</p>
-<img src="/918f81df/image-20240706223328484.png" class="">
-
-<h2 id="线程特有数据"><a href="#线程特有数据" class="headerlink" title="线程特有数据"></a>线程特有数据</h2><p><strong>一次性初始化</strong>：在多线程编程环境下，有些代码段只需要执行一次，譬如一些初始化相关的代码段。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">pthread_once_t</span> once_control = PTHREAD_ONCE_INIT;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_once</span><span class="params">(<span class="type">pthread_once_t</span> *once_control, <span class="type">void</span> (*init_routine)(<span class="type">void</span>))</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>在多线程编程环境下，尽管 pthread_once()调用会出现在多个线程中，但该函数会保证 init_routine()函数仅执行一次，究竟在哪个线程中执行是不定的，是由内核调度来决定。</p>
-<p><strong>线程特有数据</strong></p>
-<p>很多库函数都会返回一个字符串指针，譬如 asctime()、ctime()、localtime()等，返回出来的字符串可以被调用线程直接使用，但该字符串缓冲区通常是这些函数内部所维护的静态数组或者是某个全局数组。被多个线程同时调用时，返回的字符串中的数据可能是混乱的，因为某一线程调用它时，缓冲区中的数据可能被另一个调用线程修改了。</p>
-<p>线程特有数据的核心思想其实非常简单，就是为每一个调用线程（调用某函数的线程，该函数就是我们要通过线程特有数据将其实现为线程安全的函数）分配属于该线程的私有数据区，为每个调用线程分别维护一份变量的副本。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 创建键值对</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_key_create</span><span class="params">(<span class="type">pthread_key_t</span> *key, <span class="type">void</span> (*destructor)(<span class="type">void</span>*))</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置键值对，对应的value就是要复制的值</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setspecific</span><span class="params">(<span class="type">pthread_key_t</span> key, <span class="type">const</span> <span class="type">void</span> *value)</span>;</span><br><span class="line"><span class="comment">// 返回复制值的内存地址</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">pthread_getspecific</span><span class="params">(<span class="type">pthread_key_t</span> key)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_key_delete</span><span class="params">(<span class="type">pthread_key_t</span> key)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>或者也可以使用<code>__thread</code>，也可以达成特有数据的效果</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> __thread <span class="type">char</span> buf[MAX_ERROR_LEN];</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="线程与信号"><a href="#线程与信号" class="headerlink" title="线程与信号"></a>线程与信号</h1><ul>
-<li>信号的系统默认行为是属于进程层面。</li>
-<li>信号处理函数属于进程层面。</li>
-<li>信号的发送既可针对整个进程，也可针对某个特定的线程。在满足以下三个条件中的任意一个时，信号的发送针对的是某个线程：<ol>
-<li>产生了硬件异常相关信号，譬如 SIGBUS、SIGFPE、SIGILL 和 SIGSEGV 信号；</li>
-<li>当线程试图对已断开的管道进行写操作时所产生的 SIGPIPE 信号；</li>
-<li>由函数 pthread_kill()或 pthread_sigqueue()所发出的信号</li>
-</ol>
-</li>
-<li>当一个多线程进程接收到一个信号时，且该信号绑定了信号处理函数时，内核会任选一个线程来接收这个信号</li>
-<li>信号掩码其实是属于线程层面的，<code> pthread_sigmask()</code>函数来设置各自线程的信号掩码</li>
-</ul>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 设置线程掩码</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_sigmask</span><span class="params">(<span class="type">int</span> how, <span class="type">const</span> <span class="type">sigset_t</span> *<span class="built_in">set</span>, <span class="type">sigset_t</span> *oldset)</span>;</span><br><span class="line"><span class="comment">// 向线程发送信号</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_kill</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">int</span> sig)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>异步信号安全函数</strong>：指的是可以在信号处理函数中可以被安全调用的线程安全函数，可重入函数一定是异步信号安全函数。</p>
-]]></content>
-      <categories>
-        <category>Linux应用</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Linux系统信息与资源</title>
     <url>/8c131bee.html</url>
     <content><![CDATA[<p>在应用程序当中，有时往往需要去获取到一些系统相关的信息，譬如时间、日期、以及其它一些系统相关信息，本章将向大家介绍如何通过 Linux 系统调用或 C 库函数获取系统信息，譬如获取系统时间、日期以及设置系统时间、日期等；除此之外，还会向大家介绍 Linux 系统下的/proc 虚拟文件系统，包括/proc 文件系统是什么以及如何从/proc 文件系统中读取系统、进程有关信息。也会提及到信号相关的问题。</p>
@@ -461,30 +215,127 @@
         <category>Linux应用</category>
       </categories>
       <tags>
-        <tag>Linux</tag>
         <tag>C</tag>
+        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/4a17b156.html</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+    <title>Linux文件IO</title>
+    <url>/1f3f638f.html</url>
+    <content><![CDATA[<p>在Linux中，对文件进行I/O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I/O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。</p>
 <span id="more"></span>
 
+<h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p>read, write, lseek, perror, strerror, truncate(截断), ftruncate(截断), fcntl(文件描述符操作)</p>
+<p>ioctl(一般用于操作特殊文件或硬件外设，后期介绍)</p>
+<p>linux中0，1，2表示标准输入、标准输出和标准错误，文件分配符fd不会取到这三个值</p>
+<p>详情可使用<code>man 2 read/write/lseek...</code>查看</p>
+<h2 id="错误返回"><a href="#错误返回" class="headerlink" title="错误返回"></a>错误返回</h2><p><code>errno</code>表示错误对应的标号需要<code>#include &lt;errno.h&gt;</code></p>
+<p><code>strerr(errno)</code>打印出错误信息</p>
+<p><code>perror()</code>直接打印</p>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>多次open()和dup()复制的区别</p>
+<ol>
+<li><p>多次open()</p>
+<img src="/1f3f638f/image-20240624230432725.png" class="">
+</li>
+<li><p>dup(), dup2()复制</p>
+<img src="/1f3f638f/image-20240624230350781.png" class=""></li>
+</ol>
+<p>可以看出多次open()的fd会指向不同的文件表，不同文件表指向同一个inode节点，而dup(), dup2()指向一个文件表</p>
+<h3 id="三种实现方法"><a href="#三种实现方法" class="headerlink" title="三种实现方法"></a>三种实现方法</h3><ol>
+<li><p>同一个进程中多次调用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231735907.png" class="" title="image-20240624231735907">
+</li>
+<li><p>不同进程中分别使用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231752361.png" class="" title="image-20240624231752361">
+</li>
+<li><p>同一个进程中通过 dup(dup2)函数对文件描述符进行复制</p>
+<img src="/1f3f638f/image-20240624231804747.png" class="" title="image-20240624231804747"></li>
+</ol>
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><ol>
+<li><p><strong>O_APPEND</strong></p>
+<p>open时加入该标志</p>
+</li>
+<li><p><strong>pread()<strong>和</strong>pwrite()</strong></p>
+<p><code>man 2 pread</code>查看</p>
+</li>
+<li><p><strong>O_EXCL</strong></p>
+<p>避免创建文件出现问题</p>
+</li>
+</ol>
+<h1 id="标准IO"><a href="#标准IO" class="headerlink" title="标准IO"></a>标准IO</h1><p>标准 I/O 是对文件 I/O 进行了封装。标准 I/O 会处理很多细节，譬如分配 stdio 缓冲区、以优</p>
+<p>化的块长度执行 I/O 等，这些处理使用户不必担心如何选择使用正确的块长度。</p>
+<h2 id="常用函数-1"><a href="#常用函数-1" class="headerlink" title="常用函数"></a>常用函数</h2><p>文件：fopen, fclose, fseek, fread, fwrite</p>
+<p>错误：feof, ferror, clearerr</p>
+<p>详情使用<code>man 3 fopen/fclose...</code>来查看</p>
+<h1 id="格式化IO"><a href="#格式化IO" class="headerlink" title="格式化IO"></a>格式化IO</h1><h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：write(1, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dprintf</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></tbody></table></figure>
+<h2 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：read(0, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="文件描述符和FILE指针相互转换"><a href="#文件描述符和FILE指针相互转换" class="headerlink" title="文件描述符和FILE指针相互转换"></a>文件描述符和FILE指针相互转换</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fileno</span><span class="params">(FILE *stream)</span>; <span class="comment">// FILE* -&gt; fd</span></span><br><span class="line">FILE *<span class="title function_">fdopen</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *mode)</span>; <span class="comment">// fd -&gt; FILE*</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></tbody></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<h1 id="IO缓冲"><a href="#IO缓冲" class="headerlink" title="IO缓冲"></a>IO缓冲</h1><img src="/1f3f638f/image-20240625115550593.png" class="" title="image-20240625115550593">
+
+<p>可以看出：文件IO比标准IO要快</p>
+<h2 id="文件IO缓冲"><a href="#文件IO缓冲" class="headerlink" title="文件IO缓冲"></a>文件IO缓冲</h2><p>刷新缓冲区：fsync, fdatasync, sync</p>
+<p><code>man 3 sync</code>查看</p>
+<p>fsync: 文件内数据和元数据</p>
+<p>fdatasync: 文件内容数据</p>
+<p>sync: 所有</p>
+<h3 id="绕过IO缓冲"><a href="#绕过IO缓冲" class="headerlink" title="绕过IO缓冲"></a>绕过IO缓冲</h3><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE <span class="comment">// 需要定义宏</span></span></span><br><span class="line">fd = open(filepath, O_WRONLY | O_DIRECT);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>限制：</p>
+<ul>
+<li>应用程序中用于存放数据的缓冲区，其内存起始地址必须以块大小的整数倍进行对齐；</li>
+<li>写文件时，文件的位置偏移量必须是块大小的整数倍；</li>
+<li>写入到文件的数据大小必须是块大小的整数倍。</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 查看blocksize</span></span><br><span class="line"><span class="built_in">df</span> -h <span class="comment"># 查看根目录在哪</span></span><br><span class="line">tune2fs -l /dev/sda? | grep <span class="string">"Block size"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>内存起始地址对齐</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> buf[<span class="number">8192</span>] __attribute__((aligned(<span class="number">4096</span>)));</span><br></pre></td></tr></tbody></table></figure>
+
+<p>写入块大小整数倍</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> ret = write(fd, buf, <span class="number">4096</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="标准IO缓冲"><a href="#标准IO缓冲" class="headerlink" title="标准IO缓冲"></a>标准IO缓冲</h2><p>对stdio缓冲设置</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuffer</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>man 3</code>查看文档</p>
+<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>使用stat，fstat, lstat查看文件（目录）属性，stat返回一个<code>struct stat</code>结构体</p>
+<p>可使用<code>man 2</code>查看，fstat可通过fd来查看属性，lstat可以看链接文件属性</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">{</span></span><br><span class="line"> <span class="type">dev_t</span> st_dev; <span class="comment">/* 文件所在设备的 ID */</span></span><br><span class="line"> <span class="type">ino_t</span> st_ino; <span class="comment">/* 文件对应 inode 节点编号 */</span></span><br><span class="line"> <span class="type">mode_t</span> st_mode; <span class="comment">/* 文件对应的模式 */</span></span><br><span class="line"> <span class="type">nlink_t</span> st_nlink; <span class="comment">/* 文件的链接数 */</span></span><br><span class="line"> <span class="type">uid_t</span> st_uid; <span class="comment">/* 文件所有者的用户 ID */</span></span><br><span class="line"> <span class="type">gid_t</span> st_gid; <span class="comment">/* 文件所有者的组 ID */</span></span><br><span class="line"> <span class="type">dev_t</span> st_rdev; <span class="comment">/* 设备号（指针对设备文件） */</span></span><br><span class="line"> <span class="type">off_t</span> st_size; <span class="comment">/* 文件大小（以字节为单位） */</span></span><br><span class="line"> <span class="type">blksize_t</span> st_blksize; <span class="comment">/* 文件内容存储的块大小 */</span></span><br><span class="line"> <span class="type">blkcnt_t</span> st_blocks; <span class="comment">/* 文件内容所占块数 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span> <span class="comment">/* 文件最后被访问的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span> <span class="comment">/* 文件内容最后被修改的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span> <span class="comment">/* 文件状态最后被改变的时间 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="归属"><a href="#归属" class="headerlink" title="归属"></a>归属</h2><p>使用chown, fchown, lchown来更改文件所属，三者区别上同</p>
+<p>PS：进程相关联ID</p>
+<img src="/1f3f638f/image-20240626092456008.png" class="">
+
+<h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p>修改时间属性utime, utimes(精度区别)</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> {</span></span><br><span class="line">	<span class="type">time_t</span> actime; <span class="comment">/* 访问时间 */</span></span><br><span class="line">	<span class="type">time_t</span> modtime; <span class="comment">/* 内容修改时间 */</span></span><br><span class="line">};</span><br><span class="line"><span class="type">int</span> <span class="title function_">utimes</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> {</span></span><br><span class="line"> <span class="type">long</span> tv_sec; <span class="comment">/* 秒 */</span></span><br><span class="line"> <span class="type">long</span> tv_usec; <span class="comment">/* 微秒 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>还有futimens()和 utimensat()，区别是：</p>
+<ul>
+<li>可按纳秒级精度设置时间戳。</li>
+<li>可单独设置某一时间戳。</li>
+<li>可独立将任一时间戳设置为当前时间。</li>
+</ul>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>通过<code>link</code>设置硬连接，<code>symlink</code>设置软连接，<code>readlink</code>读取链接文件</p>
+<h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><p><code>unlink</code>删除文件</p>
+<p><code>man 2</code>查看</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>存储形式</p>
+<img src="/1f3f638f/image-20240626105646448.png" class="">
+
+<p>常用操作：mkdir, rmdir, opendir, readdir, rewinddir, closedir, getcwd, chdir, fchdir</p>
+<p><code>man 2</code>查看</p>
 ]]></content>
+      <categories>
+        <category>Linux应用</category>
+      </categories>
+      <tags>
+        <tag>C</tag>
+        <tag>Linux</tag>
+      </tags>
   </entry>
   <entry>
     <title>Linux进程</title>
@@ -603,9 +454,238 @@
         <category>Linux应用</category>
       </categories>
       <tags>
-        <tag>Linux</tag>
         <tag>C</tag>
+        <tag>Linux</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Linux高级IO</title>
+    <url>/1fd3d10d.html</url>
+    <content><![CDATA[<p>本文再次回到文件 I/O 相关话题的讨论，将会介绍文件 I/O 当中的一些高级用法，以应对不同应用场合的需求，主要包括：非阻塞 I/O、I/O 多路复用、异步 I/O、存储映射 I/O 以及文件锁，</p>
+<span id="more"></span>
+
+<h1 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h1><p>本小节我们将分别演示使用阻塞式 I/O 和非阻塞式 I/O 对文件进行读操作，在调用 open()函数打开文件时，为参数 flags 指定 O_NONBLOCK 标志，open()调用成功后，后续的 I/O 操作将以非阻塞式方式进行；这就是非阻塞 I/O 的打开方式，如果未指定 O_NONBLOCK 标志，则默认使用阻塞式 I/O 进行操作。</p>
+<p>当对文件进行读取操作时，如果文件当前无数据可读，那么阻塞式 I/O 会将调用者应用程序挂起、进入休眠阻塞状态，直到有数据可读时才会解除阻塞；而对于非阻塞 I/O，应用程序不会被挂起，而是会立即返回，它要么一直轮训等待，直到数据可读，要么直接放弃！</p>
+<p>所以阻塞式 I/O 的优点在于能够提升 CPU 的处理效率，当自身条件不满足时，进入阻塞状态，交出 CPU资源，将 CPU 资源让给别人使用；而非阻塞式则是抓紧利用 CPU 资源，譬如不断地去轮训，这样就会导致该程序占用了非常高的 CPU 使用率！</p>
+<h1 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h1><p>I/O 多路复用（IO multiplexing）它通过一种机制，可以监视多个文件描述符，一旦某个文件描述符（也就是某个文件）可以执行 I/O 操作时，能够通知应用程序进行相应的读写操作。</p>
+<h2 id="select"><a href="#select" class="headerlink" title="select"></a>select</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 调用 select()会一直阻塞，直到某一个或多个文件描述符成为就绪态（可以读或写）</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>对于fds，都是 fd_set 类型指针，指向一个 fd_set 类型对象，fd_set 数据类型是一个文件描述符的集合体。本质是bitmap</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>缺点：</p>
+<ol>
+<li>bitmap位数有限</li>
+<li>fd_set不可重用</li>
+<li>用户态到内核态切换有开销</li>
+<li>O(n)遍历哪一个被置位</li>
+</ol>
+<h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> {</span></span><br><span class="line"> <span class="type">int</span> fd; <span class="comment">/* file descriptor */</span></span><br><span class="line"> <span class="type">short</span> events; <span class="comment">/* requested events */</span></span><br><span class="line"> <span class="type">short</span> revents; <span class="comment">/* returned events */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>每次恢复revents就行了，不需要重置整个bitmap</p>
+<h2 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">新建epoll描述符==epoll_create()</span><br><span class="line">epoll_ctrl(epoll描述符，添加或者删除所有待监控的连接)</span><br><span class="line">返回的活跃连接 ==epoll_wait（ epoll描述符 ）</span><br></pre></td></tr></tbody></table></figure>
+
+<p>epoll是通过内核与用户空间mmap同一块内存实现的。mmap将用户空间的一块地址和内核空间的一块地址同时映射到相同的一块物理内存地址，减少了用户态和内核态之间的数据交换。</p>
+<p>epoll_wait会返回改动文件的数，并将其置于epoll的前列（红黑树），所以只需遍历前几个就行了</p>
+<h1 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h1><p>O_ASYNC 标志可用于使能文件描述符的异步 I/O 事件，当文件描述符可执行 I/O 操作时，内核会向异步 I/O 事件的接收进程发送 SIGIO 信号。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 只能使用fcntl设置异步IO</span></span><br><span class="line"><span class="type">int</span> flag;</span><br><span class="line">flag = fcntl(fd, F_GETFL); <span class="comment">//先获取原来的 flag</span></span><br><span class="line">flag |= O_ASYNC; <span class="comment">//将 O_ASYNC 标志添加到 flag</span></span><br><span class="line">fcntl(fd, F_SETFL, flag); <span class="comment">//重新设置 flag</span></span><br><span class="line"><span class="comment">// 设置异步 I/O 事件的接收进程</span></span><br><span class="line">fcntl(fd, F_SETOWN, getpid());</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>优化</strong></p>
+<p>默认的SIGIO是非可靠信号，使用</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">fcntl(fd, F_SETSIG, SIGRTMIN);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>将其设为可靠信号。</p>
+<h1 id="存储映射IO"><a href="#存储映射IO" class="headerlink" title="存储映射IO"></a>存储映射IO</h1><p>存储映射 I/O（memory-mapped I/O）是一种基于内存区域的高级 I/O 操作，它能将一个文件映射到进程地址空间中的一块内存区域中，当从这段内存中读数据时，就相当于读文件中的数据（对文件进行 read 操作），将数据写入这段内存时，则相当于将数据直接写入文件中（对文件进行 write 操作）。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<img src="/1fd3d10d/image-20240715222704115.png" class="">
+
+<h1 id="文件锁"><a href="#文件锁" class="headerlink" title="文件锁"></a>文件锁</h1><ol>
+<li><p>建议性锁</p>
+<p>建议性锁本质上是一种协议，程序访问文件之前，先对文件上锁，上锁成功之后再访问文件，这是建议性锁的一种用法；但是如果你的程序不管三七二十一，在没有对文件上锁的情况下直接访问文件，也是可以访问的，并非无法访问文件；如果是这样，那么建议性锁就没有起到任何作用，如果要使得建议性锁起作用，那么大家就要遵守协议，访问文件之前先对文件上锁。</p>
+</li>
+<li><p>强制性锁</p>
+<p>如果进程对文件上了强制性锁，其它的进程在没有获取到文件锁的情况下是无法对文件进行访问的。其本质原因在于，强制性锁会让内核检查每一个 I/O 操作（譬如 read()、write()），验证调用进程是否是该文件锁的拥有者，如果不是将无法访问文件。</p>
+</li>
+</ol>
+<p><strong>flock</strong></p>
+<ol>
+<li>同一进程对文件多次加锁不会导致死锁。</li>
+<li>文件关闭的时候，会自动解锁。</li>
+<li>一个进程不可以对另一个进程持有的文件锁进行解锁。</li>
+<li>由 fork()创建的子进程不会继承父进程所创建的锁。</li>
+</ol>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 建议性锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">flock</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> operation)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>fcntl</strong></p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 功能很强大，目前只谈论文件锁功能</span></span><br><span class="line"><span class="comment">// cmd: F_GETLK, F_SETLK, F_SETLKW(阻塞版)</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">struct flock {</span></span><br><span class="line"><span class="comment"> ...</span></span><br><span class="line"><span class="comment"> short l_type; // Type of lock: F_RDLCK,F_WRLCK, F_UNLCK</span></span><br><span class="line"><span class="comment"> short l_whence; // How to interpret l_start: SEEK_SET, SEEK_CUR, SEEK_END</span></span><br><span class="line"><span class="comment"> off_t l_start; // Starting offset for lock</span></span><br><span class="line"><span class="comment"> off_t l_len; // Number of bytes to lock</span></span><br><span class="line"><span class="comment"> pid_t l_pid; // PID of process blocking our lock(set by F_GETLK and F_OFD_GETLK)</span></span><br><span class="line"><span class="comment">};</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fcntl</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> cmd, ... <span class="comment">/* struct flock *flockptr */</span> )</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>fcntl()可以对文件的某个区域（某部分内容）进行加锁解锁，可以精确到某一个字节数据。</li>
+<li>fcntl()可支持建议性锁和强制性锁两种类型</li>
+</ul>
+<img src="/1fd3d10d/image-20240715225728423.png" class="">
+
+<p>如果要开启强制性锁机制，需要设置文件的 Set-GroupID（S_ISGID）位为 1，并且禁止文件的组用户执行权限（S_IXGRP），也就是将其设置为 0。</p>
+<p>有些发行版不支持。</p>
+<p>**lockf()**：对fcntl的封装</p>
+]]></content>
+      <categories>
+        <category>Linux应用</category>
+      </categories>
+      <tags>
+        <tag>C</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux线程</title>
+    <url>/918f81df.html</url>
+    <content><![CDATA[<p>线程是程序最基本的运行单位，而进程不能运行，真正运行的是进程中的线程。当启动应用程序后，系统就创建了一个进程，可以认为进程仅仅是一个容器，它包含了线程运行所需的数据结构、环境变量等信息。</p>
+<span id="more"></span>
+
+<h1 id="线程特点"><a href="#线程特点" class="headerlink" title="线程特点"></a>线程特点</h1><ul>
+<li>线程不单独存在、而是包含在进程中；</li>
+<li>线程是参与系统调度的基本单位；</li>
+<li>可并发执行。同一进程的多个线程之间可并发执行，在宏观上实现同时运行的效果；</li>
+<li>共享进程资源。</li>
+</ul>
+<p><strong>串行，并行，并发区别</strong></p>
+<p>串行</p>
+<img src="/918f81df/image-20240703220319726.png" class="">
+
+<p>并行</p>
+<img src="/918f81df/image-20240703220348407.png" class="">
+
+<p>并发</p>
+<img src="/918f81df/image-20240703220412134.png" class="">
+
+<h1 id="线程API"><a href="#线程API" class="headerlink" title="线程API"></a>线程API</h1><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 线程ID</span></span><br><span class="line"><span class="type">pthread_t</span> <span class="title function_">pthread_self</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_equal</span><span class="params">(<span class="type">pthread_t</span> t1, <span class="type">pthread_t</span> t2)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建线程 attr: 定义了线程的各种属性 arg: 传入start_routine的参数</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程终止 retval返回值可由pthread_join()获取</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 回收线程</span></span><br><span class="line"><span class="comment">// 调用 pthread_join()函数将会以阻塞的形式等待指定的线程终止，如果该线程已经终止，则 pthread_join()</span></span><br><span class="line"><span class="comment">// 立刻返回。</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消线程</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 默认情况下，线程是响应其它线程发送过来的取消请求的，响应请求然后退出线程。当然，线程可以选</span></span><br><span class="line"><span class="comment">// 择不被取消或者控制如何被取消</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcancelstate</span><span class="params">(<span class="type">int</span> state, <span class="type">int</span> *oldstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcanceltype</span><span class="params">(<span class="type">int</span> type, <span class="type">int</span> *oldtype)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 分离线程</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_detach</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程清理，需要一一对应</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_cleanup_push</span><span class="params">(<span class="type">void</span> (*routine)(<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_cleanup_pop</span><span class="params">(<span class="type">int</span> execute)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="取消点"><a href="#取消点" class="headerlink" title="取消点"></a>取消点</h1><p>取消点其实就是一系列函数，当执行到这些函数的时候，才会真正响应取消请求，这些函数就是取消点；在没有出现取消点时，取消请求是无法得到处理的。</p>
+<p>可作为取消点的函数</p>
+<img src="/918f81df/image-20240704223904340.png" class="">
+
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 设置取消状态</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setcanceltype</span><span class="params">(<span class="type">int</span> type, <span class="type">int</span> *oldtype)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">对于type项</span></span><br><span class="line"><span class="comment">PTHREAD_CANCEL_DEFERRED：取消请求到来时，线程还是继续运行，取消请求被挂起，直</span></span><br><span class="line"><span class="comment">到线程到达某个取消点</span></span><br><span class="line"><span class="comment">PTHREAD_CANCEL_ASYNCHRONOUS：可能会在任何时间点（也许是立即取消，但不一定）</span></span><br><span class="line"><span class="comment">取消线程（应用较少）</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 产生一个取消点</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">pthread_testcancel</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="线程属性"><a href="#线程属性" class="headerlink" title="线程属性"></a>线程属性</h1><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 初始化和销毁属性</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_init</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_destroy</span><span class="params">(<span class="type">pthread_attr_t</span> *attr)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>每个线程都有自己的栈空间，pthread_attr_t 数据结构中定义了栈的起始地址以及栈大小</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 设置和获取栈位置和大小</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setstack</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *stackaddr, <span class="type">size_t</span> stacksize)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getstack</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> **stackaddr, <span class="type">size_t</span> *stacksize)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setstacksize</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">size_t</span> stacksize)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getstacksize</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">size_t</span> *stacksize)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setstackaddr</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *stackaddr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getstackaddr</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> **stackaddr)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>pthread_attr_t也可以设置detach属性</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_setdetachstate</span><span class="params">(<span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> detachstate)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_attr_getdetachstate</span><span class="params">(<span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">int</span> *detachstate)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h1><p>线程同步是为了对共享资源的访问进行保护。</p>
+<h2 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h2><p>仅列出API</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// init mutex</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_init</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex, <span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// lock and unlock</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>; <span class="comment">// 若无法上锁，会阻塞</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>; <span class="comment">// 不会阻塞</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_unlock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">// destroy mutex</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destroy</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>互斥锁属性</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 初始化和销毁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_init</span><span class="params">(<span class="type">pthread_mutexattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_destroy</span><span class="params">(<span class="type">pthread_mutexattr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_gettype</span><span class="params">(<span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *attr, <span class="type">int</span> *type)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutexattr_settype</span><span class="params">(<span class="type">pthread_mutexattr_t</span> *attr, <span class="type">int</span> type)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>互斥锁的类型属性控制着互斥锁的锁定特性，一共有 4 中类型：</p>
+<p><strong>PTHREAD_MUTEX_NORMAL</strong>：一种标准的互斥锁类型，不做任何的错误检查或死锁检测。如果线程试图对已经由自己锁定的互斥锁再次进行加锁，则发生死锁；互斥锁处于未锁定状态，或者已由其它线程锁定，对其解锁会导致不确定结果。</p>
+<p><strong>PTHREAD_MUTEX_ERRORCHECK</strong>：此类互斥锁会提供错误检查。譬如这三种情况都会导致返回错误：线程试图对已经由自己锁定的互斥锁再次进行加锁（同一线程对同一互斥锁加锁两次），返回错误；线程对由其它线程锁定的互斥锁进行解锁，返回错误；线程对处于未锁定状态的互斥锁进行解锁，返回错误。这类互斥锁运行起来比较慢，因为它需要做错误检查，不过可将其作为调试工具，以发现程序哪里违反了互斥锁使用的基本原则。</p>
+<p><strong>PTHREAD_MUTEX_RECURSIVE</strong>：此类互斥锁允许同一线程在互斥锁解锁之前对该互斥锁进行多次加锁，然后维护互斥锁加锁的次数，把这种互斥锁称为递归互斥锁，但是如果解锁次数不等于加速次数，则是不会释放锁的；所以，如果对一个递归互斥锁加锁两次，然后解锁一次，那么这个互斥锁依然处于锁定状态，对它再次进行解锁之前不会释放该锁。</p>
+<p> <strong>PTHREAD_MUTEX_DEFAULT</strong>：此类互斥锁提供默认的行为和特性。使用宏PTHREAD_MUTEX_INITIALIZER初始化的互斥锁， 或者调用参数arg为NULL的pthread_mutexattr_init()函数所创建的互斥锁，都属于此类型。此类锁意在为互斥锁的实现保留最大灵活性，Linux 上， PTHREAD_MUTEX_DEFAULT类型互斥锁的行为与PTHREAD_MUTEX_NORMAL 类型相仿。</p>
+<h2 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h2><p>条件变量是线程可用的另一种同步机制。条件变量用于自动阻塞线程，知道某个特定事件发生或某个条件满足为止，通常情况下，条件变量是和互斥锁一起搭配使用的。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 条件变量初始化</span></span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">const</span> <span class="type">pthread_condattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_destroy</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>在使用条件变量之前必须对条件变量进行初始化操作，使用 PTHREAD_COND_INITIALIZER 宏或者函数 pthread_cond_init()都行；</li>
+<li>对已经初始化的条件变量再次进行初始化，将可能会导致未定义行为；</li>
+<li>对没有进行初始化的条件变量进行销毁，也将可能会导致未定义行为；</li>
+<li>对某个条件变量而言，仅当没有任何线程等待它时，将其销毁才是最安全的；</li>
+</ul>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 发送信号</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_broadcast</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_signal</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 等待</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_wait</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>自旋锁与互斥锁很相似，从本质上说也是一把锁，在访问共享资源之前对自旋锁进行上锁，在访问完成后释放自旋锁（解锁）；事实上，从实现方式上来说，互斥锁是基于自旋锁来实现的，所以自旋锁相较于互斥锁更加底层。</p>
+<p>自旋锁与互斥锁相似，但是互斥锁在无法获取到锁时会让线程陷入阻塞等待状态；而自旋锁在无法获取到锁时，将会在原地“自旋”等待。“自旋”其实就是调用者一直在循环查看该自旋锁的持有者是否已经释放了锁。</p>
+<p>自旋锁的不足之处在于：自旋锁一直占用的 CPU，它在未获得锁的情况下，一直处于运行状态（自旋），所以占着 CPU，如果不能在很短的时间内获取锁，这无疑会使 CPU 效率降低。（一般在内核中使用，中断….）</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// init and destroy</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_destroy</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_init</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock, <span class="type">int</span> pshared)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> pshared 表示自旋锁的进程共享属性</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_SHARED：共享自旋锁。该自旋锁可以在多个进程中的线程之间共享；</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_PRIVATE：私有自旋锁。只有本进程内的线程才能够使用该自旋锁。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// So easy, no need to explain</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_lock</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_trylock</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_spin_unlock</span><span class="params">(<span class="type">pthread_spinlock_t</span> *lock)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h2><p>读写锁有3 种状态：读模式下的加锁状态（以下简称读加锁状态）、写模式下的加锁状态（以下简称写加锁状态）和不加锁状态（见），一次只有一个线程可以占有写模式的读写锁，但是可以有多个线程同时占有读模式的读写锁。</p>
+<img src="/918f81df/image-20240705230905164.png" class="">
+
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// init and destroy</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_destroy</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_init</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock, <span class="type">const</span> <span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_rdlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 读模式上锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_wrlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 写模式上锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_unlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>; <span class="comment">// 解锁</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 非阻塞</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_tryrdlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_trywrlock</span><span class="params">(<span class="type">pthread_rwlock_t</span> *rwlock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 属性</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_destroy</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_init</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_getpshared</span><span class="params">(<span class="type">const</span> <span class="type">pthread_rwlockattr_t</span> *attr, <span class="type">int</span> *pshared)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlockattr_setpshared</span><span class="params">(<span class="type">pthread_rwlockattr_t</span> *attr, <span class="type">int</span> pshared)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> pshared 表示自旋锁的进程共享属性</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_SHARED：共享自旋锁。该自旋锁可以在多个进程中的线程之间共享；</span></span><br><span class="line"><span class="comment"> PTHREAD_PROCESS_PRIVATE：私有自旋锁。只有本进程内的线程才能够使用该自旋锁。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h1><h2 id="线程安全函数"><a href="#线程安全函数" class="headerlink" title="线程安全函数"></a>线程安全函数</h2><p><strong>可重入函数</strong>：如果一个函数被同一进程的多个不同的执行流同时调用，每次函数调用总是能产生正确的结果（或者叫产生预期的结果），把这样的函数就称为可重入函数。</p>
+<p>分类：</p>
+<ol>
+<li><strong>绝对的可重入函数：</strong>所谓绝对，指的是该函数不管如何调用，都刚断言它是可重入的，都能得到预期的结果。</li>
+<li><strong>带条件的可重入函数：</strong>指的是在满足某个/某些条件的情况下，可以断言该函数是可重入的，不管怎么调用都能得到预期的结果。</li>
+</ol>
+<p>绝对可重入函数的特点：</p>
+<ul>
+<li><p>函数内所使用到的变量均为局部变量，换句话说，该函数内的操作的内存地址均为本地栈地址；</p>
+</li>
+<li><p>函数参数和返回值均是值类型；</p>
+</li>
+<li><p>函数内调用的其它函数也均是绝对可重入函数。</p>
+</li>
+</ul>
+<p><strong>线程安全函数</strong>：一个函数被多个线程（其实也是多个执行流，但是不包括由信号处理函数所产生的执行流）同时用时，它总会一直产生正确的结果，把这样的函数称为线程安全函数。线程安全函数包括可重入函数，可重入函数是线程安全函数的一个真子集，也就是说可重入函数一定是线程安全函数，但线程安全函数不一定是可重入函数。</p>
+<img src="/918f81df/image-20240706223032854.png" class="">
+
+<p>POSIX.1-2001 和 POSIX.1-2008 标准中规定的所有函数都必须是线程安全函数，但以下函数除外：</p>
+<img src="/918f81df/image-20240706223328484.png" class="">
+
+<h2 id="线程特有数据"><a href="#线程特有数据" class="headerlink" title="线程特有数据"></a>线程特有数据</h2><p><strong>一次性初始化</strong>：在多线程编程环境下，有些代码段只需要执行一次，譬如一些初始化相关的代码段。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">pthread_once_t</span> once_control = PTHREAD_ONCE_INIT;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_once</span><span class="params">(<span class="type">pthread_once_t</span> *once_control, <span class="type">void</span> (*init_routine)(<span class="type">void</span>))</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>在多线程编程环境下，尽管 pthread_once()调用会出现在多个线程中，但该函数会保证 init_routine()函数仅执行一次，究竟在哪个线程中执行是不定的，是由内核调度来决定。</p>
+<p><strong>线程特有数据</strong></p>
+<p>很多库函数都会返回一个字符串指针，譬如 asctime()、ctime()、localtime()等，返回出来的字符串可以被调用线程直接使用，但该字符串缓冲区通常是这些函数内部所维护的静态数组或者是某个全局数组。被多个线程同时调用时，返回的字符串中的数据可能是混乱的，因为某一线程调用它时，缓冲区中的数据可能被另一个调用线程修改了。</p>
+<p>线程特有数据的核心思想其实非常简单，就是为每一个调用线程（调用某函数的线程，该函数就是我们要通过线程特有数据将其实现为线程安全的函数）分配属于该线程的私有数据区，为每个调用线程分别维护一份变量的副本。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 创建键值对</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_key_create</span><span class="params">(<span class="type">pthread_key_t</span> *key, <span class="type">void</span> (*destructor)(<span class="type">void</span>*))</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置键值对，对应的value就是要复制的值</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_setspecific</span><span class="params">(<span class="type">pthread_key_t</span> key, <span class="type">const</span> <span class="type">void</span> *value)</span>;</span><br><span class="line"><span class="comment">// 返回复制值的内存地址</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">pthread_getspecific</span><span class="params">(<span class="type">pthread_key_t</span> key)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_key_delete</span><span class="params">(<span class="type">pthread_key_t</span> key)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>或者也可以使用<code>__thread</code>，也可以达成特有数据的效果</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> __thread <span class="type">char</span> buf[MAX_ERROR_LEN];</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="线程与信号"><a href="#线程与信号" class="headerlink" title="线程与信号"></a>线程与信号</h1><ul>
+<li>信号的系统默认行为是属于进程层面。</li>
+<li>信号处理函数属于进程层面。</li>
+<li>信号的发送既可针对整个进程，也可针对某个特定的线程。在满足以下三个条件中的任意一个时，信号的发送针对的是某个线程：<ol>
+<li>产生了硬件异常相关信号，譬如 SIGBUS、SIGFPE、SIGILL 和 SIGSEGV 信号；</li>
+<li>当线程试图对已断开的管道进行写操作时所产生的 SIGPIPE 信号；</li>
+<li>由函数 pthread_kill()或 pthread_sigqueue()所发出的信号</li>
+</ol>
+</li>
+<li>当一个多线程进程接收到一个信号时，且该信号绑定了信号处理函数时，内核会任选一个线程来接收这个信号</li>
+<li>信号掩码其实是属于线程层面的，<code> pthread_sigmask()</code>函数来设置各自线程的信号掩码</li>
+</ul>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 设置线程掩码</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_sigmask</span><span class="params">(<span class="type">int</span> how, <span class="type">const</span> <span class="type">sigset_t</span> *<span class="built_in">set</span>, <span class="type">sigset_t</span> *oldset)</span>;</span><br><span class="line"><span class="comment">// 向线程发送信号</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_kill</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">int</span> sig)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>异步信号安全函数</strong>：指的是可以在信号处理函数中可以被安全调用的线程安全函数，可重入函数一定是异步信号安全函数。</p>
+]]></content>
+      <categories>
+        <category>Linux应用</category>
+      </categories>
+      <tags>
+        <tag>C</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/4a17b156.html</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<span id="more"></span>
+
+
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></tbody></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></tbody></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></tbody></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>RM装甲板识别</title>
@@ -788,194 +868,6 @@
       </tags>
   </entry>
   <entry>
-    <title>树论</title>
-    <url>/b8c50a86.html</url>
-    <content><![CDATA[<p>最难的一集…..</p>
-<span id="more"></span>
-
-<h1 id="树状数组"><a href="#树状数组" class="headerlink" title="树状数组"></a>树状数组</h1><p><a href="https://www.luogu.com.cn/problem/P3374">模板1</a></p>
-<p><a href="https://www.luogu.com.cn/problem/P3368">模板2</a></p>
-<p><strong>对于单点改变的题目，求动态区间和</strong></p>
-<p><strong>Template</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int n, m, tree[N];</span><br><span class="line"></span><br><span class="line">int lowbit(int x){</span><br><span class="line">	return x &amp; (-x);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">void update(int loc, int k){</span><br><span class="line">	while(loc &lt;= n){</span><br><span class="line">		tree[loc] += k;</span><br><span class="line">		loc += lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int query(int loc){</span><br><span class="line">	int ans = 0;</span><br><span class="line">	while(loc){</span><br><span class="line">		ans += tree[loc];</span><br><span class="line">		loc -= lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">	return ans;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>实现差分数组</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; arr[i];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		int a;</span><br><span class="line">		cin &gt;&gt; a;</span><br><span class="line">		if(a == 1){</span><br><span class="line">			int x, y, k;</span><br><span class="line">			cin &gt;&gt; x &gt;&gt; y &gt;&gt; k;</span><br><span class="line">			update(x, k);</span><br><span class="line">			update(y + 1, -k);</span><br><span class="line">		}</span><br><span class="line">		if(a == 2){</span><br><span class="line">			int x;</span><br><span class="line">			cin &gt;&gt; x;</span><br><span class="line">			cout &lt;&lt; arr[x] + query(x) &lt;&lt; '\n';</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="LCA"><a href="#LCA" class="headerlink" title="LCA"></a>LCA</h1><p><a href="https://www.luogu.com.cn/problem/P3379">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">const int N = 5e5 + 5;</span><br><span class="line">int n, m, s;</span><br><span class="line"></span><br><span class="line">int dep[N];</span><br><span class="line">int jump[N][20];</span><br><span class="line">vector&lt;int&gt; G[N];</span><br><span class="line">void dfs(int x, int fa)</span><br><span class="line">{</span><br><span class="line">	jump[x][0] = fa;</span><br><span class="line">	dep[x] = dep[fa] + 1;</span><br><span class="line">	for(int i = 1; i &lt; 20; i++){</span><br><span class="line">		jump[x][i] = jump[jump[x][i - 1]][i - 1];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 0; i &lt; G[x].size(); i++){</span><br><span class="line">		int y = G[x][i];</span><br><span class="line">		if(y != fa){</span><br><span class="line">			dfs(y, x);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int LCA(int x, int y){</span><br><span class="line">	if(dep[x] &lt; dep[y]) swap(x, y);</span><br><span class="line">	while(dep[x] &gt; dep[y]){</span><br><span class="line">		x = jump[x][(int)log2(dep[x] - dep[y])];</span><br><span class="line">	}</span><br><span class="line">	if(x == y) return x;</span><br><span class="line">	for(int i = log2(dep[x]); i &gt;= 0; i--){</span><br><span class="line">		if(jump[x][i] != jump[y][i]){</span><br><span class="line">			x = jump[x][i];</span><br><span class="line">			y = jump[y][i];</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	return jump[x][0];</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;</span><br><span class="line">	int x, y;</span><br><span class="line">	for(int i = 0; i &lt; n - 1; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		G[x].push_back(y);</span><br><span class="line">		G[y].push_back(x);</span><br><span class="line">	}</span><br><span class="line">	dfs(s, 0);</span><br><span class="line">	for(int i = 0; i &lt; m; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		int ans = LCA(x, y);</span><br><span class="line">		cout &lt;&lt; ans &lt;&lt; '\n';</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="树的直径"><a href="#树的直径" class="headerlink" title="树的直径"></a>树的直径</h1><p><strong>两次dfs，但是好像还是有点问题，待更正……</strong></p>
-<p><strong>Template</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">typedef long long ll;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int N = 2e5 + 5;</span><br><span class="line">struct Edge{</span><br><span class="line">	int v, w, next;</span><br><span class="line">}edge[N];</span><br><span class="line"></span><br><span class="line">// 链式前向星 </span><br><span class="line">int head[N];</span><br><span class="line">int cnt;</span><br><span class="line">void add_edge(int u, int v, int w){</span><br><span class="line">	edge[++cnt].v = v;</span><br><span class="line">	edge[cnt].w = w;</span><br><span class="line">	edge[cnt].next = head[u];</span><br><span class="line">	head[u] = cnt;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int n, vis[N], fa[N];</span><br><span class="line">ll dis[N];</span><br><span class="line">void dfs(int x, int d, int&amp; fnode){</span><br><span class="line">	vis[x] = 1;</span><br><span class="line">	dis[x] = d;</span><br><span class="line">	for(int i = head[x]; i; i = edge[i].next){</span><br><span class="line">		int y = edge[i].v;</span><br><span class="line">		int w = edge[i].w;</span><br><span class="line">		if(!vis[y]){</span><br><span class="line">			fa[y] = x;</span><br><span class="line">			dfs(y, d + w, fnode);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	if(d &gt; dis[fnode]){</span><br><span class="line">		fnode = x;</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n;</span><br><span class="line">	int u, v, w;</span><br><span class="line">	for(int i = 1; i &lt;= n - 1; i++){</span><br><span class="line">		cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;</span><br><span class="line">		add_edge(u, v, w);</span><br><span class="line">		add_edge(v, u, w);</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	int fnode = 1;</span><br><span class="line">	dfs(1, 0, fnode);</span><br><span class="line"></span><br><span class="line">	int o_fnode = fnode;</span><br><span class="line">	memset(vis, 0, sizeof(vis));</span><br><span class="line">	dfs(fnode, 0, o_fnode);</span><br><span class="line"></span><br><span class="line">	ll diameter = dis[o_fnode];</span><br><span class="line">	cout &lt;&lt; diameter &lt;&lt; '\n';</span><br><span class="line"></span><br><span class="line">	// 记录路径上的边</span><br><span class="line">    int cnt = 0;</span><br><span class="line">    int node = o_fnode;</span><br><span class="line">    while (node != fnode) {</span><br><span class="line">        node = fa[node];</span><br><span class="line">        cnt++;</span><br><span class="line">    }</span><br><span class="line">    cout &lt;&lt; cnt - 1;</span><br><span class="line"></span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>update….</p>
-]]></content>
-      <categories>
-        <category>算法</category>
-      </categories>
-      <tags>
-        <tag>C++</tag>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux高级IO</title>
-    <url>/1fd3d10d.html</url>
-    <content><![CDATA[<p>本文再次回到文件 I/O 相关话题的讨论，将会介绍文件 I/O 当中的一些高级用法，以应对不同应用场合的需求，主要包括：非阻塞 I/O、I/O 多路复用、异步 I/O、存储映射 I/O 以及文件锁，</p>
-<span id="more"></span>
-
-<h1 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h1><p>本小节我们将分别演示使用阻塞式 I/O 和非阻塞式 I/O 对文件进行读操作，在调用 open()函数打开文件时，为参数 flags 指定 O_NONBLOCK 标志，open()调用成功后，后续的 I/O 操作将以非阻塞式方式进行；这就是非阻塞 I/O 的打开方式，如果未指定 O_NONBLOCK 标志，则默认使用阻塞式 I/O 进行操作。</p>
-<p>当对文件进行读取操作时，如果文件当前无数据可读，那么阻塞式 I/O 会将调用者应用程序挂起、进入休眠阻塞状态，直到有数据可读时才会解除阻塞；而对于非阻塞 I/O，应用程序不会被挂起，而是会立即返回，它要么一直轮训等待，直到数据可读，要么直接放弃！</p>
-<p>所以阻塞式 I/O 的优点在于能够提升 CPU 的处理效率，当自身条件不满足时，进入阻塞状态，交出 CPU资源，将 CPU 资源让给别人使用；而非阻塞式则是抓紧利用 CPU 资源，譬如不断地去轮训，这样就会导致该程序占用了非常高的 CPU 使用率！</p>
-<h1 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h1><p>I/O 多路复用（IO multiplexing）它通过一种机制，可以监视多个文件描述符，一旦某个文件描述符（也就是某个文件）可以执行 I/O 操作时，能够通知应用程序进行相应的读写操作。</p>
-<h2 id="select"><a href="#select" class="headerlink" title="select"></a>select</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 调用 select()会一直阻塞，直到某一个或多个文件描述符成为就绪态（可以读或写）</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>对于fds，都是 fd_set 类型指针，指向一个 fd_set 类型对象，fd_set 数据类型是一个文件描述符的集合体。本质是bitmap</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>缺点：</p>
-<ol>
-<li>bitmap位数有限</li>
-<li>fd_set不可重用</li>
-<li>用户态到内核态切换有开销</li>
-<li>O(n)遍历哪一个被置位</li>
-</ol>
-<h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> {</span></span><br><span class="line"> <span class="type">int</span> fd; <span class="comment">/* file descriptor */</span></span><br><span class="line"> <span class="type">short</span> events; <span class="comment">/* requested events */</span></span><br><span class="line"> <span class="type">short</span> revents; <span class="comment">/* returned events */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<p>每次恢复revents就行了，不需要重置整个bitmap</p>
-<h2 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">新建epoll描述符==epoll_create()</span><br><span class="line">epoll_ctrl(epoll描述符，添加或者删除所有待监控的连接)</span><br><span class="line">返回的活跃连接 ==epoll_wait（ epoll描述符 ）</span><br></pre></td></tr></tbody></table></figure>
-
-<p>epoll是通过内核与用户空间mmap同一块内存实现的。mmap将用户空间的一块地址和内核空间的一块地址同时映射到相同的一块物理内存地址，减少了用户态和内核态之间的数据交换。</p>
-<p>epoll_wait会返回改动文件的数，并将其置于epoll的前列（红黑树），所以只需遍历前几个就行了</p>
-<h1 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h1><p>O_ASYNC 标志可用于使能文件描述符的异步 I/O 事件，当文件描述符可执行 I/O 操作时，内核会向异步 I/O 事件的接收进程发送 SIGIO 信号。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 只能使用fcntl设置异步IO</span></span><br><span class="line"><span class="type">int</span> flag;</span><br><span class="line">flag = fcntl(fd, F_GETFL); <span class="comment">//先获取原来的 flag</span></span><br><span class="line">flag |= O_ASYNC; <span class="comment">//将 O_ASYNC 标志添加到 flag</span></span><br><span class="line">fcntl(fd, F_SETFL, flag); <span class="comment">//重新设置 flag</span></span><br><span class="line"><span class="comment">// 设置异步 I/O 事件的接收进程</span></span><br><span class="line">fcntl(fd, F_SETOWN, getpid());</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>优化</strong></p>
-<p>默认的SIGIO是非可靠信号，使用</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">fcntl(fd, F_SETSIG, SIGRTMIN);</span><br></pre></td></tr></tbody></table></figure>
-
-<p>将其设为可靠信号。</p>
-<h1 id="存储映射IO"><a href="#存储映射IO" class="headerlink" title="存储映射IO"></a>存储映射IO</h1><p>存储映射 I/O（memory-mapped I/O）是一种基于内存区域的高级 I/O 操作，它能将一个文件映射到进程地址空间中的一块内存区域中，当从这段内存中读数据时，就相当于读文件中的数据（对文件进行 read 操作），将数据写入这段内存时，则相当于将数据直接写入文件中（对文件进行 write 操作）。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<img src="/undefined/image-20240715222704115.png" class="">
-
-<h1 id="文件锁"><a href="#文件锁" class="headerlink" title="文件锁"></a>文件锁</h1><ol>
-<li><p>建议性锁</p>
-<p>建议性锁本质上是一种协议，程序访问文件之前，先对文件上锁，上锁成功之后再访问文件，这是建议性锁的一种用法；但是如果你的程序不管三七二十一，在没有对文件上锁的情况下直接访问文件，也是可以访问的，并非无法访问文件；如果是这样，那么建议性锁就没有起到任何作用，如果要使得建议性锁起作用，那么大家就要遵守协议，访问文件之前先对文件上锁。</p>
-</li>
-<li><p>强制性锁</p>
-<p>如果进程对文件上了强制性锁，其它的进程在没有获取到文件锁的情况下是无法对文件进行访问的。其本质原因在于，强制性锁会让内核检查每一个 I/O 操作（譬如 read()、write()），验证调用进程是否是该文件锁的拥有者，如果不是将无法访问文件。</p>
-</li>
-</ol>
-<p><strong>flock</strong></p>
-<ol>
-<li>同一进程对文件多次加锁不会导致死锁。</li>
-<li>文件关闭的时候，会自动解锁。</li>
-<li>一个进程不可以对另一个进程持有的文件锁进行解锁。</li>
-<li>由 fork()创建的子进程不会继承父进程所创建的锁。</li>
-</ol>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 建议性锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">flock</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> operation)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>fcntl</strong></p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 功能很强大，目前只谈论文件锁功能</span></span><br><span class="line"><span class="comment">// cmd: F_GETLK, F_SETLK, F_SETLKW(阻塞版)</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">struct flock {</span></span><br><span class="line"><span class="comment"> ...</span></span><br><span class="line"><span class="comment"> short l_type; // Type of lock: F_RDLCK,F_WRLCK, F_UNLCK</span></span><br><span class="line"><span class="comment"> short l_whence; // How to interpret l_start: SEEK_SET, SEEK_CUR, SEEK_END</span></span><br><span class="line"><span class="comment"> off_t l_start; // Starting offset for lock</span></span><br><span class="line"><span class="comment"> off_t l_len; // Number of bytes to lock</span></span><br><span class="line"><span class="comment"> pid_t l_pid; // PID of process blocking our lock(set by F_GETLK and F_OFD_GETLK)</span></span><br><span class="line"><span class="comment">};</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fcntl</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> cmd, ... <span class="comment">/* struct flock *flockptr */</span> )</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>fcntl()可以对文件的某个区域（某部分内容）进行加锁解锁，可以精确到某一个字节数据。</li>
-<li>fcntl()可支持建议性锁和强制性锁两种类型</li>
-</ul>
-<img src="/undefined/image-20240715225728423.png" class="">
-
-<p>如果要开启强制性锁机制，需要设置文件的 Set-GroupID（S_ISGID）位为 1，并且禁止文件的组用户执行权限（S_IXGRP），也就是将其设置为 0。</p>
-<p>有些发行版不支持。</p>
-<p>**lockf()**：对fcntl的封装</p>
-]]></content>
-      <categories>
-        <category>Linux应用</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>背包问题</title>
-    <url>/b2626942.html</url>
-    <content><![CDATA[<p>背包九讲经典问题！！！</p>
-<span id="more"></span>
-
-<p><strong>DP做题顺序</strong></p>
-<ol>
-<li><strong>确定dp数组（dp table）以及下标的含义</strong></li>
-<li><strong>确定递推公式</strong></li>
-<li><strong>dp数组如何初始化</strong></li>
-<li><strong>确定遍历顺序</strong></li>
-<li><strong>举例推导dp数组</strong></li>
-</ol>
-<blockquote>
-<p><strong>以下背包均用一维数组来完成</strong></p>
-<p><strong>多少种方法</strong> <code>dp[j] += dp[j - num[i]]</code></p>
-</blockquote>
-<h2 id="0-1背包问题"><a href="#0-1背包问题" class="headerlink" title="0/1背包问题"></a>0/1背包问题</h2><p><a href="https://www.acwing.com/problem/content/2/">模板</a></p>
-<p><strong>二维数组推算公式</strong> <code>dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i])</code></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 滚动数组法</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> m,n;</span><br><span class="line"><span class="type">int</span> w[<span class="number">10000</span>], v[<span class="number">10000</span>];</span><br><span class="line"><span class="type">int</span> dp[<span class="number">10000</span>]; <span class="comment">// 0 - n</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; m &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;w[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;v[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="comment">// 先遍历物品，再遍历容量，容量要倒序遍历</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = n; j &gt;= w[i]; --j){</span><br><span class="line">			dp[j] = <span class="built_in">max</span>(dp[j], dp[j - w[i]] + v[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[n];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="完全背包问题"><a href="#完全背包问题" class="headerlink" title="完全背包问题"></a>完全背包问题</h2><p><a href="https://www.acwing.com/problem/content/3/">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="type">int</span> m,n;</span><br><span class="line">ll w[<span class="number">10000</span>], v[<span class="number">10000</span>];</span><br><span class="line">ll dp[<span class="number">10000</span>]; <span class="comment">// 0 - n</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; m &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d %d"</span>, &amp;w[i], &amp;v[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="comment">// 与01背包问题不同，容量按照正序遍历</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = w[i]; j &lt;= n; ++j){</span><br><span class="line">			dp[j] = <span class="built_in">max</span>(dp[j], dp[j - w[i]] + v[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[n];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="多重背包问题"><a href="#多重背包问题" class="headerlink" title="多重背包问题"></a>多重背包问题</h2><p><a href="https://www.luogu.com.cn/problem/P1776">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1e5</span> + <span class="number">5</span>, MAXW = <span class="number">4e4</span> + <span class="number">5</span>; <span class="comment">// 开大一点建议....</span></span><br><span class="line"><span class="type">int</span> n, W;</span><br><span class="line"><span class="type">int</span> v[N], w[N];</span><br><span class="line"><span class="type">int</span> dp[MAXW];</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; W;</span><br><span class="line">	<span class="type">int</span> v_val, w_val, m_val;</span><br><span class="line">	<span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; v_val &gt;&gt; w_val &gt;&gt; m_val;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> k = <span class="number">1</span>; k &lt;= m_val; k &lt;&lt;= <span class="number">1</span>){</span><br><span class="line">            <span class="comment">// 二进制优化</span></span><br><span class="line">			v[++cnt] = k * v_val;</span><br><span class="line">			w[cnt] = k * w_val;</span><br><span class="line">			m_val -= k;</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">if</span>(m_val &gt; <span class="number">0</span>){</span><br><span class="line">			v[++cnt] = m_val * v_val;</span><br><span class="line">			w[cnt] = m_val * w_val;</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= cnt; i++){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = W; j &gt;= w[i]; j--){</span><br><span class="line">				dp[j] = <span class="built_in">max</span>(dp[j], dp[j - w[i]] + v[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[W];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="有依赖背包问题"><a href="#有依赖背包问题" class="headerlink" title="有依赖背包问题"></a>有依赖背包问题</h2><p><a href="https://www.luogu.com.cn/problem/P1064">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">3.2e4</span> + <span class="number">5</span>, M = <span class="number">65</span>;</span><br><span class="line"><span class="type">int</span> cost[M], val[M], king[M], fans[M];</span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; follow;</span><br><span class="line"><span class="type">int</span> dp[N];</span><br><span class="line"><span class="type">int</span> n, m;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	follow.<span class="built_in">resize</span>(m + <span class="number">1</span>);</span><br><span class="line">	<span class="type">int</span> v, belong;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= m; i++){</span><br><span class="line">		cin &gt;&gt; cost[i] &gt;&gt; v &gt;&gt; belong;</span><br><span class="line">		val[i] = v * cost[i];</span><br><span class="line">		<span class="keyword">if</span>(belong == <span class="number">0</span>) king[i] = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">else</span>{</span><br><span class="line">			fans[belong]++;</span><br><span class="line">			follow[belong].<span class="built_in">push_back</span>(i);</span><br><span class="line">		} </span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>, fan1, fan2; i &lt;= m; i++){</span><br><span class="line">		<span class="keyword">if</span>(king[i]){</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> j = n; j &gt;= cost[i]; j--){</span><br><span class="line">					dp[j] = <span class="built_in">max</span>(dp[j - cost[i]] + val[i], dp[j]);</span><br><span class="line">					fan1 = fans[i] &gt;= <span class="number">1</span>? follow[i][<span class="number">0</span>]: <span class="number">-1</span>;</span><br><span class="line">					fan2 = fans[i] &gt;= <span class="number">2</span>? follow[i][<span class="number">1</span>]: <span class="number">-1</span>;</span><br><span class="line">					<span class="keyword">if</span>(fan1 != <span class="number">-1</span> &amp;&amp; j &gt;= cost[i] + cost[fan1]){</span><br><span class="line">						dp[j] = <span class="built_in">max</span>(dp[j - cost[i] - cost[fan1]] + val[i] + val[fan1], dp[j]);</span><br><span class="line">					}</span><br><span class="line">					<span class="keyword">if</span>(fan1 != <span class="number">-1</span> &amp;&amp; j &gt;= cost[i] + cost[fan2]){</span><br><span class="line">						dp[j] = <span class="built_in">max</span>(dp[j - cost[i] - cost[fan2]] + val[i] + val[fan2], dp[j]);</span><br><span class="line">					}</span><br><span class="line">					<span class="keyword">if</span>(fan1 != <span class="number">-1</span> &amp;&amp; fan2 != <span class="number">-1</span> &amp;&amp; j &gt;= cost[i] + cost[fan1] + cost[fan2]){</span><br><span class="line">						dp[j] = <span class="built_in">max</span>(dp[j - cost[i] - cost[fan1] - cost[fan2]] + val[i] + val[fan1] + val[fan2], dp[j]);</span><br><span class="line">					}</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	cout &lt;&lt; dp[n];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="分组背包问题"><a href="#分组背包问题" class="headerlink" title="分组背包问题"></a>分组背包问题</h2><p><a href="https://www.luogu.com.cn/problem/P1757">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1005</span>, M = <span class="number">1005</span>;</span><br><span class="line">ll dp[M];</span><br><span class="line"><span class="type">int</span> w[N], v[N], t[N]; <span class="comment">// t--&gt;分组 </span></span><br><span class="line"><span class="type">int</span> n, m;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; m &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; w[i] &gt;&gt; v[i] &gt;&gt; t[i];</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> start = <span class="number">1</span>, end = <span class="number">2</span>; start &lt;= n; ){</span><br><span class="line">		<span class="keyword">while</span>(t[end] == t[end - <span class="number">1</span>] &amp;&amp; end &lt;= n){</span><br><span class="line">			end++;</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = m; j &gt;= <span class="number">0</span>; j--){</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k = start; k &lt; end; k++){</span><br><span class="line">				<span class="keyword">if</span>(j - w[k] &gt;= <span class="number">0</span>) dp[j] = <span class="built_in">max</span>(dp[j - w[k]] + v[k], dp[j]);</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">		start = end++;</span><br><span class="line">	}</span><br><span class="line">	cout &lt;&lt; dp[m];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="混合背包问题"><a href="#混合背包问题" class="headerlink" title="混合背包问题"></a>混合背包问题</h2><p><a href="https://www.acwing.com/problem/content/7/">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1e5</span> + <span class="number">5</span>, V = <span class="number">1e5</span> + <span class="number">5</span>; <span class="comment">//要开大一点.....</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> v[N], w[N];</span><br><span class="line"><span class="type">int</span> dp[V];</span><br><span class="line"><span class="type">int</span> n, m;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	<span class="type">int</span> a, b, s;</span><br><span class="line">	<span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; a &gt;&gt; b &gt;&gt; s;</span><br><span class="line">		<span class="keyword">if</span>(s == <span class="number">-1</span>) s = <span class="number">1</span>; <span class="comment">// 01转换为多重</span></span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span>(s == <span class="number">0</span>) s = m / a; <span class="comment">// 完全转换为多重...</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> k = <span class="number">1</span>; k &lt;= s; k *= <span class="number">2</span>){</span><br><span class="line">			v[++cnt] = k * a;</span><br><span class="line">			w[cnt] = k * b;</span><br><span class="line">			s -= k;</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">if</span>(s &gt; <span class="number">0</span>){</span><br><span class="line">			v[++cnt] = s * a;</span><br><span class="line">			w[cnt] = s * b;</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= cnt; i++){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = m; j &gt;= v[i]; j--){</span><br><span class="line">			dp[j] = <span class="built_in">max</span>(dp[j], dp[j - v[i]] + w[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	cout &lt;&lt; dp[m];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="二维费用背包"><a href="#二维费用背包" class="headerlink" title="二维费用背包"></a>二维费用背包</h2><p><a href="https://www.acwing.com/problem/content/8/">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1005</span>, V = <span class="number">105</span>, M = <span class="number">105</span>;</span><br><span class="line"><span class="type">int</span> v[N], m[N], w[N];</span><br><span class="line"><span class="type">int</span> dp[V][M];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	<span class="type">int</span> a, b, c;</span><br><span class="line">	cin &gt;&gt; a &gt;&gt; b &gt;&gt; c;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= a; i++){</span><br><span class="line">		cin &gt;&gt; v[i] &gt;&gt; m[i] &gt;&gt; w[i];</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= a; i++){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = b; j &gt;= v[i]; j--){</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k = c; k &gt;= m[i]; k--){</span><br><span class="line">				dp[j][k] = <span class="built_in">max</span>(dp[j][k], dp[j - v[i]][k - m[i]] + w[i]);</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[b][c];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-]]></content>
-      <categories>
-        <category>算法</category>
-      </categories>
-      <tags>
-        <tag>C++</tag>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>排序</title>
-    <url>/a444b428.html</url>
-    <content><![CDATA[<p>排序算法中的一些思想可以用于解决一些题目，例如逆序对等….</p>
-<span id="more"></span>
-
-<h1 id="归并排序-分治算法"><a href="#归并排序-分治算法" class="headerlink" title="归并排序(分治算法)"></a>归并排序(分治算法)</h1><p><a href="https://www.luogu.com.cn/problem/P1908">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">5e5</span> + <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n, arr[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">merge</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> mid, <span class="type">int</span> r)</span></span>{</span><br><span class="line">	<span class="type">int</span> n1 = mid - l + <span class="number">1</span>;</span><br><span class="line">	<span class="type">int</span> n2 = r - mid;</span><br><span class="line">	<span class="type">int</span> larr[n1], rarr[n2];</span><br><span class="line">	<span class="type">int</span> i, j, k;</span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n1; i++){</span><br><span class="line">		larr[i] = arr[i + l];</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; n2; j++){</span><br><span class="line">		rarr[j] = arr[mid + <span class="number">1</span> + j];</span><br><span class="line">	}</span><br><span class="line">	i = <span class="number">0</span>, j = <span class="number">0</span>, k = l;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; n1 &amp;&amp; j &lt; n2){</span><br><span class="line">		<span class="keyword">if</span>(larr[i] &gt; rarr[j]){</span><br><span class="line">			arr[k++] = rarr[j++];</span><br><span class="line">		}<span class="keyword">else</span>{</span><br><span class="line">			arr[k++] = larr[i++];</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">while</span>(i &lt; n1) arr[k++] = larr[i++];</span><br><span class="line">	<span class="keyword">while</span>(j &lt; n2) arr[k++] = rarr[j++];</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">mergesort</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	<span class="keyword">if</span>(l &lt; r){</span><br><span class="line">		<span class="type">int</span> mid = (l + r) / <span class="number">2</span>;</span><br><span class="line">		<span class="built_in">mergesort</span>(l, mid);</span><br><span class="line">		<span class="built_in">mergesort</span>(mid + <span class="number">1</span>, r);</span><br><span class="line">		<span class="built_in">merge</span>(l, mid, r);</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;arr[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="built_in">mergesort</span>(<span class="number">1</span>, n);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>update….</p>
-]]></content>
-      <categories>
-        <category>算法</category>
-      </categories>
-      <tags>
-        <tag>C++</tag>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>常用算法</title>
     <url>/2cc2fa98.html</url>
     <content><![CDATA[<p>蓝桥杯之前进行的一些算法小总结，本文只写了一些简单的算法，图论，树论，动态规划，排序请看该站算法目录下的…..</p>
@@ -1078,6 +970,114 @@
 <figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1e6</span> + <span class="number">5</span>;</span><br><span class="line">string s1, s2;</span><br><span class="line"><span class="type">int</span> nxt[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">get_nxt</span><span class="params">()</span></span>{</span><br><span class="line">	<span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt; s2.<span class="built_in">size</span>(); i++){</span><br><span class="line">		<span class="keyword">while</span>(s2[j] != s2[i] &amp;&amp; j &gt; <span class="number">0</span>){</span><br><span class="line">			j = nxt[j - <span class="number">1</span>];</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">if</span>(s2[i] == s2[j]) j++;</span><br><span class="line">		nxt[i] = j;</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; s1 &gt;&gt; s2;</span><br><span class="line">	<span class="built_in">get_nxt</span>();</span><br><span class="line">	<span class="type">int</span> i = <span class="number">0</span>, j = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; s1.<span class="built_in">size</span>()){</span><br><span class="line">		<span class="keyword">if</span>(s1[i] == s2[j]){</span><br><span class="line">			i++, j++;</span><br><span class="line">		}<span class="keyword">else</span>{</span><br><span class="line">			<span class="keyword">if</span>(j &gt; <span class="number">0</span>) j = nxt[j - <span class="number">1</span>];</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span>(j == <span class="number">0</span>) i++;</span><br><span class="line">		}</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span>(j == s2.<span class="built_in">size</span>()){</span><br><span class="line">			cout &lt;&lt; i - s2.<span class="built_in">size</span>() + <span class="number">1</span> &lt;&lt; <span class="string">'\n'</span>;</span><br><span class="line">			j = nxt[j - <span class="number">1</span>];</span><br><span class="line">		} </span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; s2.<span class="built_in">size</span>(); i++){</span><br><span class="line">		cout &lt;&lt; nxt[i] &lt;&lt; <span class="string">" "</span>;</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
 
 <p>Update: 水了个国二😆</p>
+]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>排序</title>
+    <url>/a444b428.html</url>
+    <content><![CDATA[<p>排序算法中的一些思想可以用于解决一些题目，例如逆序对等….</p>
+<span id="more"></span>
+
+<h1 id="归并排序-分治算法"><a href="#归并排序-分治算法" class="headerlink" title="归并排序(分治算法)"></a>归并排序(分治算法)</h1><p><a href="https://www.luogu.com.cn/problem/P1908">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">5e5</span> + <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n, arr[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">merge</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> mid, <span class="type">int</span> r)</span></span>{</span><br><span class="line">	<span class="type">int</span> n1 = mid - l + <span class="number">1</span>;</span><br><span class="line">	<span class="type">int</span> n2 = r - mid;</span><br><span class="line">	<span class="type">int</span> larr[n1], rarr[n2];</span><br><span class="line">	<span class="type">int</span> i, j, k;</span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n1; i++){</span><br><span class="line">		larr[i] = arr[i + l];</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; n2; j++){</span><br><span class="line">		rarr[j] = arr[mid + <span class="number">1</span> + j];</span><br><span class="line">	}</span><br><span class="line">	i = <span class="number">0</span>, j = <span class="number">0</span>, k = l;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; n1 &amp;&amp; j &lt; n2){</span><br><span class="line">		<span class="keyword">if</span>(larr[i] &gt; rarr[j]){</span><br><span class="line">			arr[k++] = rarr[j++];</span><br><span class="line">		}<span class="keyword">else</span>{</span><br><span class="line">			arr[k++] = larr[i++];</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">while</span>(i &lt; n1) arr[k++] = larr[i++];</span><br><span class="line">	<span class="keyword">while</span>(j &lt; n2) arr[k++] = rarr[j++];</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">mergesort</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	<span class="keyword">if</span>(l &lt; r){</span><br><span class="line">		<span class="type">int</span> mid = (l + r) / <span class="number">2</span>;</span><br><span class="line">		<span class="built_in">mergesort</span>(l, mid);</span><br><span class="line">		<span class="built_in">mergesort</span>(mid + <span class="number">1</span>, r);</span><br><span class="line">		<span class="built_in">merge</span>(l, mid, r);</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;arr[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="built_in">mergesort</span>(<span class="number">1</span>, n);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>update….</p>
+]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树论</title>
+    <url>/b8c50a86.html</url>
+    <content><![CDATA[<p>最难的一集…..</p>
+<span id="more"></span>
+
+<h1 id="树状数组"><a href="#树状数组" class="headerlink" title="树状数组"></a>树状数组</h1><p><a href="https://www.luogu.com.cn/problem/P3374">模板1</a></p>
+<p><a href="https://www.luogu.com.cn/problem/P3368">模板2</a></p>
+<p><strong>对于单点改变的题目，求动态区间和</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int n, m, tree[N];</span><br><span class="line"></span><br><span class="line">int lowbit(int x){</span><br><span class="line">	return x &amp; (-x);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">void update(int loc, int k){</span><br><span class="line">	while(loc &lt;= n){</span><br><span class="line">		tree[loc] += k;</span><br><span class="line">		loc += lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int query(int loc){</span><br><span class="line">	int ans = 0;</span><br><span class="line">	while(loc){</span><br><span class="line">		ans += tree[loc];</span><br><span class="line">		loc -= lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">	return ans;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>实现差分数组</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; arr[i];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		int a;</span><br><span class="line">		cin &gt;&gt; a;</span><br><span class="line">		if(a == 1){</span><br><span class="line">			int x, y, k;</span><br><span class="line">			cin &gt;&gt; x &gt;&gt; y &gt;&gt; k;</span><br><span class="line">			update(x, k);</span><br><span class="line">			update(y + 1, -k);</span><br><span class="line">		}</span><br><span class="line">		if(a == 2){</span><br><span class="line">			int x;</span><br><span class="line">			cin &gt;&gt; x;</span><br><span class="line">			cout &lt;&lt; arr[x] + query(x) &lt;&lt; '\n';</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="LCA"><a href="#LCA" class="headerlink" title="LCA"></a>LCA</h1><p><a href="https://www.luogu.com.cn/problem/P3379">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">const int N = 5e5 + 5;</span><br><span class="line">int n, m, s;</span><br><span class="line"></span><br><span class="line">int dep[N];</span><br><span class="line">int jump[N][20];</span><br><span class="line">vector&lt;int&gt; G[N];</span><br><span class="line">void dfs(int x, int fa)</span><br><span class="line">{</span><br><span class="line">	jump[x][0] = fa;</span><br><span class="line">	dep[x] = dep[fa] + 1;</span><br><span class="line">	for(int i = 1; i &lt; 20; i++){</span><br><span class="line">		jump[x][i] = jump[jump[x][i - 1]][i - 1];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 0; i &lt; G[x].size(); i++){</span><br><span class="line">		int y = G[x][i];</span><br><span class="line">		if(y != fa){</span><br><span class="line">			dfs(y, x);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int LCA(int x, int y){</span><br><span class="line">	if(dep[x] &lt; dep[y]) swap(x, y);</span><br><span class="line">	while(dep[x] &gt; dep[y]){</span><br><span class="line">		x = jump[x][(int)log2(dep[x] - dep[y])];</span><br><span class="line">	}</span><br><span class="line">	if(x == y) return x;</span><br><span class="line">	for(int i = log2(dep[x]); i &gt;= 0; i--){</span><br><span class="line">		if(jump[x][i] != jump[y][i]){</span><br><span class="line">			x = jump[x][i];</span><br><span class="line">			y = jump[y][i];</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	return jump[x][0];</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;</span><br><span class="line">	int x, y;</span><br><span class="line">	for(int i = 0; i &lt; n - 1; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		G[x].push_back(y);</span><br><span class="line">		G[y].push_back(x);</span><br><span class="line">	}</span><br><span class="line">	dfs(s, 0);</span><br><span class="line">	for(int i = 0; i &lt; m; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		int ans = LCA(x, y);</span><br><span class="line">		cout &lt;&lt; ans &lt;&lt; '\n';</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="树的直径"><a href="#树的直径" class="headerlink" title="树的直径"></a>树的直径</h1><p><strong>两次dfs，但是好像还是有点问题，待更正……</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">typedef long long ll;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int N = 2e5 + 5;</span><br><span class="line">struct Edge{</span><br><span class="line">	int v, w, next;</span><br><span class="line">}edge[N];</span><br><span class="line"></span><br><span class="line">// 链式前向星 </span><br><span class="line">int head[N];</span><br><span class="line">int cnt;</span><br><span class="line">void add_edge(int u, int v, int w){</span><br><span class="line">	edge[++cnt].v = v;</span><br><span class="line">	edge[cnt].w = w;</span><br><span class="line">	edge[cnt].next = head[u];</span><br><span class="line">	head[u] = cnt;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int n, vis[N], fa[N];</span><br><span class="line">ll dis[N];</span><br><span class="line">void dfs(int x, int d, int&amp; fnode){</span><br><span class="line">	vis[x] = 1;</span><br><span class="line">	dis[x] = d;</span><br><span class="line">	for(int i = head[x]; i; i = edge[i].next){</span><br><span class="line">		int y = edge[i].v;</span><br><span class="line">		int w = edge[i].w;</span><br><span class="line">		if(!vis[y]){</span><br><span class="line">			fa[y] = x;</span><br><span class="line">			dfs(y, d + w, fnode);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	if(d &gt; dis[fnode]){</span><br><span class="line">		fnode = x;</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n;</span><br><span class="line">	int u, v, w;</span><br><span class="line">	for(int i = 1; i &lt;= n - 1; i++){</span><br><span class="line">		cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;</span><br><span class="line">		add_edge(u, v, w);</span><br><span class="line">		add_edge(v, u, w);</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	int fnode = 1;</span><br><span class="line">	dfs(1, 0, fnode);</span><br><span class="line"></span><br><span class="line">	int o_fnode = fnode;</span><br><span class="line">	memset(vis, 0, sizeof(vis));</span><br><span class="line">	dfs(fnode, 0, o_fnode);</span><br><span class="line"></span><br><span class="line">	ll diameter = dis[o_fnode];</span><br><span class="line">	cout &lt;&lt; diameter &lt;&lt; '\n';</span><br><span class="line"></span><br><span class="line">	// 记录路径上的边</span><br><span class="line">    int cnt = 0;</span><br><span class="line">    int node = o_fnode;</span><br><span class="line">    while (node != fnode) {</span><br><span class="line">        node = fa[node];</span><br><span class="line">        cnt++;</span><br><span class="line">    }</span><br><span class="line">    cout &lt;&lt; cnt - 1;</span><br><span class="line"></span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>update….</p>
+]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>背包问题</title>
+    <url>/b2626942.html</url>
+    <content><![CDATA[<p>背包九讲经典问题！！！</p>
+<span id="more"></span>
+
+<p><strong>DP做题顺序</strong></p>
+<ol>
+<li><strong>确定dp数组（dp table）以及下标的含义</strong></li>
+<li><strong>确定递推公式</strong></li>
+<li><strong>dp数组如何初始化</strong></li>
+<li><strong>确定遍历顺序</strong></li>
+<li><strong>举例推导dp数组</strong></li>
+</ol>
+<blockquote>
+<p><strong>以下背包均用一维数组来完成</strong></p>
+<p><strong>多少种方法</strong> <code>dp[j] += dp[j - num[i]]</code></p>
+</blockquote>
+<h2 id="0-1背包问题"><a href="#0-1背包问题" class="headerlink" title="0/1背包问题"></a>0/1背包问题</h2><p><a href="https://www.acwing.com/problem/content/2/">模板</a></p>
+<p><strong>二维数组推算公式</strong> <code>dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i])</code></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 滚动数组法</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> m,n;</span><br><span class="line"><span class="type">int</span> w[<span class="number">10000</span>], v[<span class="number">10000</span>];</span><br><span class="line"><span class="type">int</span> dp[<span class="number">10000</span>]; <span class="comment">// 0 - n</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; m &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;w[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;v[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="comment">// 先遍历物品，再遍历容量，容量要倒序遍历</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = n; j &gt;= w[i]; --j){</span><br><span class="line">			dp[j] = <span class="built_in">max</span>(dp[j], dp[j - w[i]] + v[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[n];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="完全背包问题"><a href="#完全背包问题" class="headerlink" title="完全背包问题"></a>完全背包问题</h2><p><a href="https://www.acwing.com/problem/content/3/">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="type">int</span> m,n;</span><br><span class="line">ll w[<span class="number">10000</span>], v[<span class="number">10000</span>];</span><br><span class="line">ll dp[<span class="number">10000</span>]; <span class="comment">// 0 - n</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; m &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">"%d %d"</span>, &amp;w[i], &amp;v[i]);</span><br><span class="line">	}</span><br><span class="line">	<span class="comment">// 与01背包问题不同，容量按照正序遍历</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; ++i){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = w[i]; j &lt;= n; ++j){</span><br><span class="line">			dp[j] = <span class="built_in">max</span>(dp[j], dp[j - w[i]] + v[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[n];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="多重背包问题"><a href="#多重背包问题" class="headerlink" title="多重背包问题"></a>多重背包问题</h2><p><a href="https://www.luogu.com.cn/problem/P1776">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1e5</span> + <span class="number">5</span>, MAXW = <span class="number">4e4</span> + <span class="number">5</span>; <span class="comment">// 开大一点建议....</span></span><br><span class="line"><span class="type">int</span> n, W;</span><br><span class="line"><span class="type">int</span> v[N], w[N];</span><br><span class="line"><span class="type">int</span> dp[MAXW];</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; W;</span><br><span class="line">	<span class="type">int</span> v_val, w_val, m_val;</span><br><span class="line">	<span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; v_val &gt;&gt; w_val &gt;&gt; m_val;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> k = <span class="number">1</span>; k &lt;= m_val; k &lt;&lt;= <span class="number">1</span>){</span><br><span class="line">            <span class="comment">// 二进制优化</span></span><br><span class="line">			v[++cnt] = k * v_val;</span><br><span class="line">			w[cnt] = k * w_val;</span><br><span class="line">			m_val -= k;</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">if</span>(m_val &gt; <span class="number">0</span>){</span><br><span class="line">			v[++cnt] = m_val * v_val;</span><br><span class="line">			w[cnt] = m_val * w_val;</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= cnt; i++){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = W; j &gt;= w[i]; j--){</span><br><span class="line">				dp[j] = <span class="built_in">max</span>(dp[j], dp[j - w[i]] + v[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[W];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="有依赖背包问题"><a href="#有依赖背包问题" class="headerlink" title="有依赖背包问题"></a>有依赖背包问题</h2><p><a href="https://www.luogu.com.cn/problem/P1064">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">3.2e4</span> + <span class="number">5</span>, M = <span class="number">65</span>;</span><br><span class="line"><span class="type">int</span> cost[M], val[M], king[M], fans[M];</span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; follow;</span><br><span class="line"><span class="type">int</span> dp[N];</span><br><span class="line"><span class="type">int</span> n, m;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	follow.<span class="built_in">resize</span>(m + <span class="number">1</span>);</span><br><span class="line">	<span class="type">int</span> v, belong;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= m; i++){</span><br><span class="line">		cin &gt;&gt; cost[i] &gt;&gt; v &gt;&gt; belong;</span><br><span class="line">		val[i] = v * cost[i];</span><br><span class="line">		<span class="keyword">if</span>(belong == <span class="number">0</span>) king[i] = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">else</span>{</span><br><span class="line">			fans[belong]++;</span><br><span class="line">			follow[belong].<span class="built_in">push_back</span>(i);</span><br><span class="line">		} </span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>, fan1, fan2; i &lt;= m; i++){</span><br><span class="line">		<span class="keyword">if</span>(king[i]){</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> j = n; j &gt;= cost[i]; j--){</span><br><span class="line">					dp[j] = <span class="built_in">max</span>(dp[j - cost[i]] + val[i], dp[j]);</span><br><span class="line">					fan1 = fans[i] &gt;= <span class="number">1</span>? follow[i][<span class="number">0</span>]: <span class="number">-1</span>;</span><br><span class="line">					fan2 = fans[i] &gt;= <span class="number">2</span>? follow[i][<span class="number">1</span>]: <span class="number">-1</span>;</span><br><span class="line">					<span class="keyword">if</span>(fan1 != <span class="number">-1</span> &amp;&amp; j &gt;= cost[i] + cost[fan1]){</span><br><span class="line">						dp[j] = <span class="built_in">max</span>(dp[j - cost[i] - cost[fan1]] + val[i] + val[fan1], dp[j]);</span><br><span class="line">					}</span><br><span class="line">					<span class="keyword">if</span>(fan1 != <span class="number">-1</span> &amp;&amp; j &gt;= cost[i] + cost[fan2]){</span><br><span class="line">						dp[j] = <span class="built_in">max</span>(dp[j - cost[i] - cost[fan2]] + val[i] + val[fan2], dp[j]);</span><br><span class="line">					}</span><br><span class="line">					<span class="keyword">if</span>(fan1 != <span class="number">-1</span> &amp;&amp; fan2 != <span class="number">-1</span> &amp;&amp; j &gt;= cost[i] + cost[fan1] + cost[fan2]){</span><br><span class="line">						dp[j] = <span class="built_in">max</span>(dp[j - cost[i] - cost[fan1] - cost[fan2]] + val[i] + val[fan1] + val[fan2], dp[j]);</span><br><span class="line">					}</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	cout &lt;&lt; dp[n];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="分组背包问题"><a href="#分组背包问题" class="headerlink" title="分组背包问题"></a>分组背包问题</h2><p><a href="https://www.luogu.com.cn/problem/P1757">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1005</span>, M = <span class="number">1005</span>;</span><br><span class="line">ll dp[M];</span><br><span class="line"><span class="type">int</span> w[N], v[N], t[N]; <span class="comment">// t--&gt;分组 </span></span><br><span class="line"><span class="type">int</span> n, m;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; m &gt;&gt; n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; w[i] &gt;&gt; v[i] &gt;&gt; t[i];</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> start = <span class="number">1</span>, end = <span class="number">2</span>; start &lt;= n; ){</span><br><span class="line">		<span class="keyword">while</span>(t[end] == t[end - <span class="number">1</span>] &amp;&amp; end &lt;= n){</span><br><span class="line">			end++;</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = m; j &gt;= <span class="number">0</span>; j--){</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k = start; k &lt; end; k++){</span><br><span class="line">				<span class="keyword">if</span>(j - w[k] &gt;= <span class="number">0</span>) dp[j] = <span class="built_in">max</span>(dp[j - w[k]] + v[k], dp[j]);</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">		start = end++;</span><br><span class="line">	}</span><br><span class="line">	cout &lt;&lt; dp[m];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="混合背包问题"><a href="#混合背包问题" class="headerlink" title="混合背包问题"></a>混合背包问题</h2><p><a href="https://www.acwing.com/problem/content/7/">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1e5</span> + <span class="number">5</span>, V = <span class="number">1e5</span> + <span class="number">5</span>; <span class="comment">//要开大一点.....</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> v[N], w[N];</span><br><span class="line"><span class="type">int</span> dp[V];</span><br><span class="line"><span class="type">int</span> n, m;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	<span class="type">int</span> a, b, s;</span><br><span class="line">	<span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; a &gt;&gt; b &gt;&gt; s;</span><br><span class="line">		<span class="keyword">if</span>(s == <span class="number">-1</span>) s = <span class="number">1</span>; <span class="comment">// 01转换为多重</span></span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span>(s == <span class="number">0</span>) s = m / a; <span class="comment">// 完全转换为多重...</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> k = <span class="number">1</span>; k &lt;= s; k *= <span class="number">2</span>){</span><br><span class="line">			v[++cnt] = k * a;</span><br><span class="line">			w[cnt] = k * b;</span><br><span class="line">			s -= k;</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">if</span>(s &gt; <span class="number">0</span>){</span><br><span class="line">			v[++cnt] = s * a;</span><br><span class="line">			w[cnt] = s * b;</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= cnt; i++){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = m; j &gt;= v[i]; j--){</span><br><span class="line">			dp[j] = <span class="built_in">max</span>(dp[j], dp[j - v[i]] + w[i]);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	cout &lt;&lt; dp[m];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="二维费用背包"><a href="#二维费用背包" class="headerlink" title="二维费用背包"></a>二维费用背包</h2><p><a href="https://www.acwing.com/problem/content/8/">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1005</span>, V = <span class="number">105</span>, M = <span class="number">105</span>;</span><br><span class="line"><span class="type">int</span> v[N], m[N], w[N];</span><br><span class="line"><span class="type">int</span> dp[V][M];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	<span class="type">int</span> a, b, c;</span><br><span class="line">	cin &gt;&gt; a &gt;&gt; b &gt;&gt; c;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= a; i++){</span><br><span class="line">		cin &gt;&gt; v[i] &gt;&gt; m[i] &gt;&gt; w[i];</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= a; i++){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = b; j &gt;= v[i]; j--){</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k = c; k &gt;= m[i]; k--){</span><br><span class="line">				dp[j][k] = <span class="built_in">max</span>(dp[j][k], dp[j - v[i]][k - m[i]] + w[i]);</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[b][c];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
 ]]></content>
       <categories>
         <category>算法</category>

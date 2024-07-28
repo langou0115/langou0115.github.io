@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"langou0115.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文只是记录一些常见的C++语法和细节，方便进行复习。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++基础语法">
+<meta property="og:url" content="https://langou0115.github.io/3c96480a.html">
+<meta property="og:site_name" content="Langou的窝">
+<meta property="og:description" content="本文只是记录一些常见的C++语法和细节，方便进行复习。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://langou0115.github.io/3c96480a/image-20240728230401601.png">
+<meta property="article:published_time" content="2024-07-19T14:50:43.000Z">
+<meta property="article:modified_time" content="2024-07-28T15:29:05.188Z">
+<meta property="article:author" content="Langou">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://langou0115.github.io/3c96480a/image-20240728230401601.png">
+
+<link rel="canonical" href="https://langou0115.github.io/3c96480a.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>C++基础语法 | Langou的窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Langou的窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://langou0115.github.io/3c96480a.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Langou">
+      <meta itemprop="description" content="Talk is cheap, show me the code">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Langou的窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++基础语法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-19 22:50:43" itemprop="dateCreated datePublished" datetime="2024-07-19T22:50:43+08:00">2024-07-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-07-28 23:29:05" itemprop="dateModified" datetime="2024-07-28T23:29:05+08:00">2024-07-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C-%E8%AF%AD%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">C++语法</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文只是记录一些常见的C++语法和细节，方便进行复习。</p>
+<span id="more"></span>
+
+<h1 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h1><figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">color</span> {red, green, blue};</span><br><span class="line"></span><br><span class="line"><span class="comment">// color cc = 1; // invalid</span></span><br><span class="line">color cc = <span class="built_in">color</span>(<span class="number">1</span>); <span class="comment">// cc = green</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p>引用是指针常量的伪装。</p>
+<p>引用是编译器提供的一个有用且安全的工具，去除了指针的一些缺点，禁止了部分不安全的操作。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a = <span class="number">10</span>;</span><br><span class="line"><span class="type">int</span> &amp;ref = a;</span><br><span class="line"><span class="comment">// 编译器将其转换为 int *const ref = &amp;a;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="函数重载"><a href="#函数重载" class="headerlink" title="函数重载"></a>函数重载</h1><p>C++允许不同函数形式有同一种名称，C++编译器会将其名称与参数进行拼接在一起，但是C编译器不会，为了调用C的函数需要使用</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"c"</span>{</span><br><span class="line">    ...</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>来声明里面的函数是C语言编译的形式。</p>
+<p>如果使用C语言编译头文件</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus <span class="comment">// 防止C编译器报错</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> {</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// all of your legacy C code here</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line">}</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h1><h2 id="dynamic-cast"><a href="#dynamic-cast" class="headerlink" title="dynamic_cast"></a>dynamic_cast</h2><p><code>dynamic_cast</code>运算符用于将指向基类的指针转换为派生类的指针。它不能回答“指针指向的是什么类类型的对象”的问题，但能回答“是否可以安全地将对象的地址赋给特定类型的指针”的问题。用于<strong>RTTI</strong>（运行时类型识别）机制。</p>
+<p>对于RTTI，也可以使用</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A a;</span><br><span class="line"><span class="built_in">typeid</span>(a).<span class="built_in">name</span>();</span><br></pre></td></tr></tbody></table></figure>
+
+<p>来判断类型，<code>typeid</code>也重载了==，!=运算符</p>
+<p>语法使用</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">派生类指针 = <span class="built_in">dynamic_cast</span>&lt;派生类类型 *&gt;(基类指针);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果转换成功，<code>dynamic_cast</code>返回对象的地址；如果失败，返回<code>nullptr</code>；</p>
+<p>注意事项：</p>
+<ol>
+<li><code>dynamic_cast</code>只适用于包含虚函数的类。</li>
+<li><code>dynamic_cast</code>可以将派生类指针转换为基类指针，这种做法通常没有意义。</li>
+<li><code>dynamic_cast</code>可以用于引用，但没有与空指针对应的引用值，如果转换请求不正确，会出现<code>bad_cast</code>异常。</li>
+</ol>
+<h2 id="static-cast"><a href="#static-cast" class="headerlink" title="static_cast"></a>static_cast</h2><p>⽤于各种隐式转换，⽐如⾮const转const，void*转指针等, static_cast能⽤于多态向上转化，如果向下转能成功但是不安全，结果未知；</p>
+<h2 id="const-cast"><a href="#const-cast" class="headerlink" title="const_cast"></a>const_cast</h2><p>⽤于将const变量转为⾮const</p>
+<h2 id="reinterpret-cast"><a href="#reinterpret-cast" class="headerlink" title="reinterpret_cast"></a>reinterpret_cast</h2><p>⼏乎什么都可以转，⽐如将int转指针，可能会出问题，尽量少⽤；</p>
+<h1 id="异常与断言"><a href="#异常与断言" class="headerlink" title="异常与断言"></a>异常与断言</h1><h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><p>基础使用</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>{</span><br><span class="line">    <span class="keyword">if</span>(...) <span class="keyword">throw</span> ..;</span><br><span class="line">}<span class="built_in">catch</span>(..){</span><br><span class="line">    </span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>若抛出异常未catch，程序会挂掉</p>
+<img src="/3c96480a/image-20240728230401601.png" class="" title="image-20240728230401601">
+
+<p><strong>重点关注</strong></p>
+<ol>
+<li><p><strong>std::bad_alloc</strong></p>
+<p>如果内存不足，调用 <code>new</code> 会产生异常，导致程序中止；如果在 <code>new</code> 关键字后面加 <code>(std::nothrow)</code> 选项，则返回 <code>nullptr</code>，不会产生异常。</p>
+</li>
+<li><p><strong>std::bad_cast</strong> </p>
+<p>dynamic_cast 可以用于引用，但是，没有与空指针对应的引用值，如果转换请求不正确，会出现 std::bad_cast 异常。</p>
+</li>
+<li><p><strong>std::bad_typeid</strong> </p>
+<p>假设有表达式 <code>typeid(*ptr)</code>，当 <code>ptr</code> 是空指针时，如果 <code>ptr</code> 是多态的类型，将引发 std::bad_typeid 异常。</p>
+</li>
+</ol>
+<h2 id="断言"><a href="#断言" class="headerlink" title="断言"></a>断言</h2><p>语法：<code>assert(表达式);</code></p>
+<p>断言就是判断(表达式)的值，如果为 0 (false)，程序将调用 abort() 函数中止，如果为非 0 (true)，程序继续执行。</p>
+<p>断言可以提高程序的可读性，帮助程序员定位违反了某些前提条件的错误。断言失败不是异常，不能捕获</p>
+<p>C++11 新增了静态断言 <code>static_assert</code>，用于在编译时检查源代码。</p>
+<p>使用静态断言不需要包含头文件。</p>
+<p>语法：<code>static_assert(常量表达式, 提示信息);</code></p>
+<p>注意：<code>static_assert</code> 的第一个参数是常量表达式。而 <code>assert</code> 的表达式既可以是常量，也可以是变量。</p>
+<h1 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h1><h2 id="auto-ptr"><a href="#auto-ptr" class="headerlink" title="auto_ptr"></a>auto_ptr</h2><p>已被摒弃，在复制和赋值时原auto_ptr会变为空</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">auto_ptr&lt;<span class="type">int</span>&gt; <span class="title">p1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>)</span></span>;</span><br><span class="line"><span class="function">auto_ptr&lt;<span class="type">int</span>&gt; <span class="title">p2</span><span class="params">(p1)</span></span>;</span><br><span class="line">cout &lt;&lt; <span class="string">"p1: "</span> &lt;&lt; p1.<span class="built_in">get</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">"p2: "</span> &lt;&lt; p2.<span class="built_in">get</span>() &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line"><span class="function">auto_ptr&lt;<span class="type">int</span>&gt; <span class="title">p3</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>)</span></span>;</span><br><span class="line">auto_ptr&lt;<span class="type">int</span>&gt; p4;</span><br><span class="line">p4 = p3;</span><br><span class="line">cout &lt;&lt; <span class="string">"p3: "</span> &lt;&lt; p3.<span class="built_in">get</span>() &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; <span class="string">"p4: "</span> &lt;&lt; p4.<span class="built_in">get</span>() &lt;&lt; endl;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>输出</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p1: 0</span><br><span class="line">p2: 0x55555556aeb0</span><br><span class="line">p3: 0</span><br><span class="line">p4: 0x55555556b2e0</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h2><p><strong>unique_ptr</strong> 对其持有的堆内存具有唯一拥有权，也就是说引用计数永远是 1，禁止了拷贝构造函数和赋值运算符，<strong>unique_ptr</strong> 对象销毁时会释放其持有的堆内存。可以使用以下方式初始化一个<strong>unique_ptr</strong>对象：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化方式1</span></span><br><span class="line"><span class="function">std::unique_ptr&lt;<span class="type">int</span>&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">123</span>))</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化方式2</span></span><br><span class="line">std::unique_ptr&lt;<span class="type">int</span>&gt; sp2;</span><br><span class="line">sp2.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">int</span>(<span class="number">123</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化方式3 更推荐！！！ C++14</span></span><br><span class="line">std::unique_ptr&lt;<span class="type">int</span>&gt; sp3 = std::<span class="built_in">make_unique</span>&lt;<span class="type">int</span>&gt;(<span class="number">123</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>可通过std::move来转移所有权</p>
+<h2 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h2><p><strong>std::shared_ptr</strong> 持有的资源可以在多个 <strong>std::shared_ptr</strong> 之间共享，每多一个 <strong>std::shared_ptr</strong> 对资源的引用，资源引用计数将增加 1，每一个指向该资源的 <strong>std::shared_ptr</strong> 对象析构时，资源引用计数减 1，最后一个 <strong>std::shared_ptr</strong> 对象析构时，发现资源计数为 0，将释放其持有的资源。多个线程之间，递增和减少资源的引用计数是安全的。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化方式1</span></span><br><span class="line"><span class="function">std::shared_ptr&lt;A&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line"></span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化方式2</span></span><br><span class="line"><span class="function">std::shared_ptr&lt;A&gt; <span class="title">sp2</span><span class="params">(sp1)</span></span>;</span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">sp2.<span class="built_in">reset</span>();</span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">{</span><br><span class="line">    std::shared_ptr&lt;A&gt; sp3 = sp1;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>实际开发中，有时候需要在类中返回包裹当前对象（this）的一个 <strong>std::shared_ptr</strong> 对象给外部使用，C++ 新标准也为我们考虑到了这一点，有如此需求的类只要继承自 <strong>std::enable_shared_from_this</strong> 模板对象即可。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> : <span class="keyword">public</span> std::enable_shared_from_this&lt;A&gt;</span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">A</span>()</span><br><span class="line">    {</span><br><span class="line">        std::cout &lt;&lt; <span class="string">"A constructor"</span> &lt;&lt; std::endl;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    ~<span class="built_in">A</span>()</span><br><span class="line">    {</span><br><span class="line">        std::cout &lt;&lt; <span class="string">"A destructor"</span> &lt;&lt; std::endl;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function">std::shared_ptr&lt;A&gt; <span class="title">getSelf</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">shared_from_this</span>();</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="function">std::shared_ptr&lt;A&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line"></span><br><span class="line">    std::shared_ptr&lt;A&gt; sp2 = sp1-&gt;<span class="built_in">getSelf</span>();</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>陷阱一：不应该共享栈对象的 this 给智能指针对象</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">A a;</span><br><span class="line">std::shared_ptr&lt;A&gt; sp2 = a.<span class="built_in">getSelf</span>(); <span class="comment">// 崩溃，a调用完后会析构</span></span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp2.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>陷阱二：避免 std::enable_shared_from_this 的循环引用问题</strong></p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span>： <span class="keyword">public</span> std::enable_shared_from_this&lt;A&gt;{</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        m_SelfPtr = <span class="built_in">shared_from_this</span>();</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">int</span>                 m_i;</span><br><span class="line">    std::shared_ptr&lt;A&gt;  m_SelfPtr;  </span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    {</span><br><span class="line">        <span class="function">std::shared_ptr&lt;A&gt; <span class="title">spa</span><span class="params">(<span class="keyword">new</span> A())</span></span>;</span><br><span class="line">        spa-&gt;<span class="built_in">func</span>();</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 会内存泄漏</span></span><br><span class="line">    <span class="comment">// 必须销毁 A 才能销毁其成员变量 m_SelfPtr，而销毁 m_SelfPtr 必须先销毁 A。</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h2><p><strong>std::weak_ptr</strong> 是一个不控制资源生命周期的智能指针，是对对象的一种弱引用，只是提供了对其管理的资源的一个访问手段，引入它的目的为协助 <strong>std::shared_ptr</strong> 工作。</p>
+<p><strong>std::weak_ptr</strong> 可以从一个 <strong>std::shared_ptr</strong> 或另一个 <strong>std::weak_ptr</strong> 对象构造，<strong>std::shared_ptr</strong> 可以直接赋值给 <strong>std::weak_ptr</strong> ，也可以通过 <strong>std::weak_ptr</strong> 的 <strong>lock()</strong> 函数来获得 <strong>std::shared_ptr</strong>。它的构造和析构不会引起引用计数的增加或减少。<strong>std::weak_ptr</strong> 可用来解决 <strong>std::shared_ptr</strong> 相互引用时的死锁问题（即两个<strong>std::shared_ptr</strong> 相互引用，那么这两个指针的引用计数永远不可能下降为 0， 资源永远不会释放）。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建一个std::shared_ptr对象</span></span><br><span class="line"><span class="function">std::shared_ptr&lt;<span class="type">int</span>&gt; <span class="title">sp1</span><span class="params">(<span class="keyword">new</span> <span class="type">int</span>(<span class="number">123</span>))</span></span>;</span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line"><span class="comment">//通过构造函数得到一个std::weak_ptr对象</span></span><br><span class="line"><span class="function">std::weak_ptr&lt;<span class="type">int</span>&gt; <span class="title">sp2</span><span class="params">(sp1)</span></span>;</span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line"><span class="comment">//通过赋值运算符得到一个std::weak_ptr对象</span></span><br><span class="line">std::weak_ptr&lt;<span class="type">int</span>&gt; sp3 = sp1;</span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line"><span class="comment">//通过一个std::weak_ptr对象得到另外一个std::weak_ptr对象</span></span><br><span class="line">std::weak_ptr&lt;<span class="type">int</span>&gt; sp4 = sp2;</span><br><span class="line">std::cout &lt;&lt; <span class="string">"use count: "</span> &lt;&lt; sp1.<span class="built_in">use_count</span>() &lt;&lt; std::endl;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>输出</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use count: 1</span><br><span class="line">use count: 1</span><br><span class="line">use count: 1</span><br><span class="line">use count: 1</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>std::weak_ptr</strong> 不管理对象的生命周期，那么其引用的对象可能在某个时刻被销毁了，如何得知呢？<strong>std::weak_ptr</strong> 提供了一个 <strong>expired()</strong> 方法来做这一项检测，返回 true，说明其引用的资源已经不存在了；返回 false，说明该资源仍然存在，这个时候可以使用 <strong>std::weak_ptr</strong> 的 <strong>lock()</strong> 方法得到一个 <strong>std::shared_ptr</strong> 对象然后继续操作资源。</p>
+<h2 id="自定义智能指针对象持有的资源的释放函数"><a href="#自定义智能指针对象持有的资源的释放函数" class="headerlink" title="自定义智能指针对象持有的资源的释放函数"></a>自定义智能指针对象持有的资源的释放函数</h2><p>默认情况下，智能指针对象在析构时只会释放其持有的堆内存（调用 delete 或者 delete[]），但是假设这块堆内存代表的对象还对应一种需要回收的资源（如操作系统的套接字句柄、文件句柄等），我们可以通过自定义智能指针的资源释放函数。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> deletor = [](Socket* pSocket) {</span><br><span class="line">    <span class="comment">//关闭句柄</span></span><br><span class="line">    pSocket-&gt;<span class="built_in">close</span>();</span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> 你甚至可以在这里打印一行日志...</span></span><br><span class="line">    <span class="keyword">delete</span> pSocket;</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="function">std::unique_ptr&lt;Socket, <span class="title">void</span><span class="params">(*)</span><span class="params">(Socket * pSocket)</span>&gt; <span class="title">spSocket</span><span class="params">(<span class="keyword">new</span> Socket(), deletor)</span></span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="右值引用"><a href="#右值引用" class="headerlink" title="右值引用"></a>右值引用</h1><p>C++11 扩展了右值的概念，将右值分为了纯右值和将亡值。</p>
+<ul>
+<li>纯右值：1. 非引用返回的临时变量；2. 运算表达式产生的结果；3. 字面常量（C风格字符串除外，它是地址）。</li>
+<li>将亡值：与右值引用相关的表达式，例如：将要被移动的对象、T&amp;&amp;函数返回的值、std::move(e())的返回值，转换成T&amp;&amp;的类型的转换函数的返回值。</li>
+</ul>
+<p>不懂纯右值和将亡值的区别其实没关系，统一看作右值即可，不影响使用。</p>
+<p><strong>右值引用</strong>就是给右值取个名字。</p>
+<p>语法：数据类型&amp;&amp; 变量名 = 右值;</p>
+<p>左值引用只能绑定（关联、指向）左值，右值引用只能绑定右值，如果绑定的不对，编译就会失败。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> &amp;&amp;a = <span class="number">7</span>;</span><br><span class="line"><span class="type">int</span> &amp;b = <span class="number">7</span>; <span class="comment">// error</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="移动语义"><a href="#移动语义" class="headerlink" title="移动语义"></a>移动语义</h1><figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">AA</span>(AA&amp;&amp; a) { <span class="comment">// 移动构造函数。</span></span><br><span class="line">    cout &lt;&lt; <span class="string">"调用了移动构造函数。\n"</span>; <span class="comment">// 显示自己被调用的日志。</span></span><br><span class="line">    <span class="keyword">if</span> (m_data != <span class="literal">nullptr</span>) <span class="keyword">delete</span> m_data; <span class="comment">// 如果已分配内存，先释放掉。</span></span><br><span class="line">    m_data = a.m_data; <span class="comment">// 把资源从源对象中转移过来。</span></span><br><span class="line">    a.m_data = <span class="literal">nullptr</span>; <span class="comment">// 把源对象中的指针置空。</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">AA&amp; <span class="keyword">operator</span>=(AA&amp;&amp; a) { <span class="comment">// 移动赋值函数。</span></span><br><span class="line">    cout &lt;&lt; <span class="string">"调用了移动赋值函数。\n"</span>; <span class="comment">// 显示自己被调用的日志。</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span> == &amp;a) <span class="keyword">return</span> *<span class="keyword">this</span>; <span class="comment">// 避免自我赋值。</span></span><br><span class="line">    <span class="keyword">if</span> (m_data != <span class="literal">nullptr</span>) <span class="keyword">delete</span> m_data; <span class="comment">// 如果已分配内存，先释放掉。</span></span><br><span class="line">    m_data = a.m_data; <span class="comment">// 把资源从源对象中转移过来。</span></span><br><span class="line">    a.m_data = <span class="literal">nullptr</span>; <span class="comment">// 把源对象中的指针置空。</span></span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>注意：</p>
+<ol>
+<li><p>对于一个左值，会调用拷贝构造函数，但是有些左值是局部变量，生命周期也很短，能不能也移动而不是拷贝呢？C++11 为了解决这个问题，提供了 <code>std::move()</code> 方法来将左值转义为右值，从而方便使用移动语义。它其实就是告诉编译器，虽然我是一个左值，但不要对我用拷贝构造函数，用移动构造函数吧。左值对象被转移资源后，不会立刻析构，只有在离开自己的作用域的时候才会析构，如果继续使用左值中的资源，可能会发生意想不到的错误。</p>
+</li>
+<li><p>如果没有提供移动构造/赋值函数，只提供了拷贝构造/赋值函数，编译器找不到移动构造/赋值函数就去寻找拷贝构造/赋值函数</p>
+</li>
+<li><p>C++11 中的所有容器都实现了移动语义，避免对含有资源的对象发生无谓的拷贝。</p>
+</li>
+<li><p>移动语义对于拥有资源（如内存、文件句柄）的对象有效，如果是基本类型，使用移动语义没有意义。</p>
+</li>
+</ol>
+<h1 id="完美转发"><a href="#完美转发" class="headerlink" title="完美转发"></a>完美转发</h1><p>在函数模板中，可以将参数“完美”的转发给其他函数。所谓完美，即不仅能准确的转发参数的值，还能保证被转发参数的左、右值属性不变。</p>
+<p>为了支持完美转发，C++11 提供了以下方案：</p>
+<p>1）如果模板中（包括类模板和函数模板）函数的参数书写成 T&amp;&amp;，那么函数可以接受左值和右值引用。</p>
+<p>2）提供了模板函数 <code>std::forward&lt;T&gt;(参数)</code>，用于转发参数，如果参数是一个右值，转发之后仍是右值引用；如果参数是一个左值，转发之后仍是左值引用。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func1</span><span class="params">(T&amp;&amp; a)</span></span>{</span><br><span class="line">    <span class="built_in">func2</span>(std::forward&lt;T&gt; a);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechat.jpg" alt="Langou 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Langou 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/1fd3d10d.html" rel="prev" title="Linux高级IO">
+      <i class="fa fa-chevron-left"></i> Linux高级IO
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/f4ecdc93.html" rel="next" title="C++类">
+      C++类 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.</span> <span class="nav-text">枚举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E9%87%8D%E8%BD%BD"><span class="nav-number">3.</span> <span class="nav-text">函数重载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">4.</span> <span class="nav-text">类型转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dynamic-cast"><span class="nav-number">4.1.</span> <span class="nav-text">dynamic_cast</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#static-cast"><span class="nav-number">4.2.</span> <span class="nav-text">static_cast</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#const-cast"><span class="nav-number">4.3.</span> <span class="nav-text">const_cast</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reinterpret-cast"><span class="nav-number">4.4.</span> <span class="nav-text">reinterpret_cast</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E4%B8%8E%E6%96%AD%E8%A8%80"><span class="nav-number">5.</span> <span class="nav-text">异常与断言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8"><span class="nav-number">5.1.</span> <span class="nav-text">异常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%AD%E8%A8%80"><span class="nav-number">5.2.</span> <span class="nav-text">断言</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88"><span class="nav-number">6.</span> <span class="nav-text">智能指针</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#auto-ptr"><span class="nav-number">6.1.</span> <span class="nav-text">auto_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unique-ptr"><span class="nav-number">6.2.</span> <span class="nav-text">unique_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shared-ptr"><span class="nav-number">6.3.</span> <span class="nav-text">shared_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#weak-ptr"><span class="nav-number">6.4.</span> <span class="nav-text">weak_ptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88%E5%AF%B9%E8%B1%A1%E6%8C%81%E6%9C%89%E7%9A%84%E8%B5%84%E6%BA%90%E7%9A%84%E9%87%8A%E6%94%BE%E5%87%BD%E6%95%B0"><span class="nav-number">6.5.</span> <span class="nav-text">自定义智能指针对象持有的资源的释放函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">右值引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89"><span class="nav-number">8.</span> <span class="nav-text">移动语义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91"><span class="nav-number">9.</span> <span class="nav-text">完美转发</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Langou"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Langou</p>
+  <div class="site-description" itemprop="description">Talk is cheap, show me the code</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/langou0115" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;langou0115" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:langou0115@foxmail.com" title="E-Mail → mailto:langou0115@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Langou</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">74k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:07</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>

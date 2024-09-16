@@ -274,130 +274,15 @@
 <p>2）提供了模板函数 <code>std::forward&lt;T&gt;(参数)</code>，用于转发参数，如果参数是一个右值，转发之后仍是右值引用；如果参数是一个左值，转发之后仍是左值引用。</p>
 <figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func1</span><span class="params">(T&amp;&amp; a)</span></span>{</span><br><span class="line">    <span class="built_in">func2</span>(std::forward&lt;T&gt; a);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
+<h1 id="类型萃取"><a href="#类型萃取" class="headerlink" title="类型萃取"></a>类型萃取</h1><p>C++11 提供了 <code>type_traits</code> 头文件，其中定义了一系列模板类，用于在编译期间判断类型的属性。</p>
+<p>类型萃取（type_traits）是一种编译时技术，用于在编译期间获取和操作类型的信息。主要用于泛型编程以及在编译时做出决策。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></tbody></table></figure>
 ]]></content>
       <categories>
         <category>C++语法</category>
       </categories>
       <tags>
         <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux文件IO</title>
-    <url>/1f3f638f.html</url>
-    <content><![CDATA[<p>在Linux中，对文件进行I/O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I/O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。</p>
-<span id="more"></span>
-
-<h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p>read, write, lseek, perror, strerror, truncate(截断), ftruncate(截断), fcntl(文件描述符操作)</p>
-<p>ioctl(一般用于操作特殊文件或硬件外设，后期介绍)</p>
-<p>linux中0，1，2表示标准输入、标准输出和标准错误，文件分配符fd不会取到这三个值</p>
-<p>详情可使用<code>man 2 read/write/lseek...</code>查看</p>
-<h2 id="错误返回"><a href="#错误返回" class="headerlink" title="错误返回"></a>错误返回</h2><p><code>errno</code>表示错误对应的标号需要<code>#include &lt;errno.h&gt;</code></p>
-<p><code>strerr(errno)</code>打印出错误信息</p>
-<p><code>perror()</code>直接打印</p>
-<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>多次open()和dup()复制的区别</p>
-<ol>
-<li><p>多次open()</p>
-<img src="/1f3f638f/image-20240624230432725.png" class="">
-</li>
-<li><p>dup(), dup2()复制</p>
-<img src="/1f3f638f/image-20240624230350781.png" class=""></li>
-</ol>
-<p>可以看出多次open()的fd会指向不同的文件表，不同文件表指向同一个inode节点，而dup(), dup2()指向一个文件表</p>
-<h3 id="三种实现方法"><a href="#三种实现方法" class="headerlink" title="三种实现方法"></a>三种实现方法</h3><ol>
-<li><p>同一个进程中多次调用 open 函数打开同一个文件</p>
-<img src="/1f3f638f/image-20240624231735907.png" class="" title="image-20240624231735907">
-</li>
-<li><p>不同进程中分别使用 open 函数打开同一个文件</p>
-<img src="/1f3f638f/image-20240624231752361.png" class="" title="image-20240624231752361">
-</li>
-<li><p>同一个进程中通过 dup(dup2)函数对文件描述符进行复制</p>
-<img src="/1f3f638f/image-20240624231804747.png" class="" title="image-20240624231804747"></li>
-</ol>
-<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><ol>
-<li><p><strong>O_APPEND</strong></p>
-<p>open时加入该标志</p>
-</li>
-<li><p><strong>pread()<strong>和</strong>pwrite()</strong></p>
-<p><code>man 2 pread</code>查看</p>
-</li>
-<li><p><strong>O_EXCL</strong></p>
-<p>避免创建文件出现问题</p>
-</li>
-</ol>
-<h1 id="标准IO"><a href="#标准IO" class="headerlink" title="标准IO"></a>标准IO</h1><p>标准 I/O 是对文件 I/O 进行了封装。标准 I/O 会处理很多细节，譬如分配 stdio 缓冲区、以优</p>
-<p>化的块长度执行 I/O 等，这些处理使用户不必担心如何选择使用正确的块长度。</p>
-<h2 id="常用函数-1"><a href="#常用函数-1" class="headerlink" title="常用函数"></a>常用函数</h2><p>文件：fopen, fclose, fseek, fread, fwrite</p>
-<p>错误：feof, ferror, clearerr</p>
-<p>详情使用<code>man 3 fopen/fclose...</code>来查看</p>
-<h1 id="格式化IO"><a href="#格式化IO" class="headerlink" title="格式化IO"></a>格式化IO</h1><h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：write(1, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dprintf</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：read(0, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="文件描述符和FILE指针相互转换"><a href="#文件描述符和FILE指针相互转换" class="headerlink" title="文件描述符和FILE指针相互转换"></a>文件描述符和FILE指针相互转换</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fileno</span><span class="params">(FILE *stream)</span>; <span class="comment">// FILE* -&gt; fd</span></span><br><span class="line">FILE *<span class="title function_">fdopen</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *mode)</span>; <span class="comment">// fd -&gt; FILE*</span></span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h1 id="IO缓冲"><a href="#IO缓冲" class="headerlink" title="IO缓冲"></a>IO缓冲</h1><img src="/1f3f638f/image-20240625115550593.png" class="" title="image-20240625115550593">
-
-<p>可以看出：文件IO比标准IO要快</p>
-<h2 id="文件IO缓冲"><a href="#文件IO缓冲" class="headerlink" title="文件IO缓冲"></a>文件IO缓冲</h2><p>刷新缓冲区：fsync, fdatasync, sync</p>
-<p><code>man 3 sync</code>查看</p>
-<p>fsync: 文件内数据和元数据</p>
-<p>fdatasync: 文件内容数据</p>
-<p>sync: 所有</p>
-<h3 id="绕过IO缓冲"><a href="#绕过IO缓冲" class="headerlink" title="绕过IO缓冲"></a>绕过IO缓冲</h3><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE <span class="comment">// 需要定义宏</span></span></span><br><span class="line">fd = open(filepath, O_WRONLY | O_DIRECT);</span><br></pre></td></tr></tbody></table></figure>
-
-<p>限制：</p>
-<ul>
-<li>应用程序中用于存放数据的缓冲区，其内存起始地址必须以块大小的整数倍进行对齐；</li>
-<li>写文件时，文件的位置偏移量必须是块大小的整数倍；</li>
-<li>写入到文件的数据大小必须是块大小的整数倍。</li>
-</ul>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 查看blocksize</span></span><br><span class="line"><span class="built_in">df</span> -h <span class="comment"># 查看根目录在哪</span></span><br><span class="line">tune2fs -l /dev/sda? | grep <span class="string">"Block size"</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>内存起始地址对齐</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> buf[<span class="number">8192</span>] __attribute__((aligned(<span class="number">4096</span>)));</span><br></pre></td></tr></tbody></table></figure>
-
-<p>写入块大小整数倍</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> ret = write(fd, buf, <span class="number">4096</span>);</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="标准IO缓冲"><a href="#标准IO缓冲" class="headerlink" title="标准IO缓冲"></a>标准IO缓冲</h2><p>对stdio缓冲设置</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuffer</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>man 3</code>查看文档</p>
-<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>使用stat，fstat, lstat查看文件（目录）属性，stat返回一个<code>struct stat</code>结构体</p>
-<p>可使用<code>man 2</code>查看，fstat可通过fd来查看属性，lstat可以看链接文件属性</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">{</span></span><br><span class="line"> <span class="type">dev_t</span> st_dev; <span class="comment">/* 文件所在设备的 ID */</span></span><br><span class="line"> <span class="type">ino_t</span> st_ino; <span class="comment">/* 文件对应 inode 节点编号 */</span></span><br><span class="line"> <span class="type">mode_t</span> st_mode; <span class="comment">/* 文件对应的模式 */</span></span><br><span class="line"> <span class="type">nlink_t</span> st_nlink; <span class="comment">/* 文件的链接数 */</span></span><br><span class="line"> <span class="type">uid_t</span> st_uid; <span class="comment">/* 文件所有者的用户 ID */</span></span><br><span class="line"> <span class="type">gid_t</span> st_gid; <span class="comment">/* 文件所有者的组 ID */</span></span><br><span class="line"> <span class="type">dev_t</span> st_rdev; <span class="comment">/* 设备号（指针对设备文件） */</span></span><br><span class="line"> <span class="type">off_t</span> st_size; <span class="comment">/* 文件大小（以字节为单位） */</span></span><br><span class="line"> <span class="type">blksize_t</span> st_blksize; <span class="comment">/* 文件内容存储的块大小 */</span></span><br><span class="line"> <span class="type">blkcnt_t</span> st_blocks; <span class="comment">/* 文件内容所占块数 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span> <span class="comment">/* 文件最后被访问的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span> <span class="comment">/* 文件内容最后被修改的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span> <span class="comment">/* 文件状态最后被改变的时间 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="归属"><a href="#归属" class="headerlink" title="归属"></a>归属</h2><p>使用chown, fchown, lchown来更改文件所属，三者区别上同</p>
-<p>PS：进程相关联ID</p>
-<img src="/1f3f638f/image-20240626092456008.png" class="">
-
-<h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p>修改时间属性utime, utimes(精度区别)</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> {</span></span><br><span class="line">	<span class="type">time_t</span> actime; <span class="comment">/* 访问时间 */</span></span><br><span class="line">	<span class="type">time_t</span> modtime; <span class="comment">/* 内容修改时间 */</span></span><br><span class="line">};</span><br><span class="line"><span class="type">int</span> <span class="title function_">utimes</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> {</span></span><br><span class="line"> <span class="type">long</span> tv_sec; <span class="comment">/* 秒 */</span></span><br><span class="line"> <span class="type">long</span> tv_usec; <span class="comment">/* 微秒 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<p>还有futimens()和 utimensat()，区别是：</p>
-<ul>
-<li>可按纳秒级精度设置时间戳。</li>
-<li>可单独设置某一时间戳。</li>
-<li>可独立将任一时间戳设置为当前时间。</li>
-</ul>
-<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>通过<code>link</code>设置硬连接，<code>symlink</code>设置软连接，<code>readlink</code>读取链接文件</p>
-<h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><p><code>unlink</code>删除文件</p>
-<p><code>man 2</code>查看</p>
-<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>存储形式</p>
-<img src="/1f3f638f/image-20240626105646448.png" class="">
-
-<p>常用操作：mkdir, rmdir, opendir, readdir, rewinddir, closedir, getcwd, chdir, fchdir</p>
-<p><code>man 2</code>查看</p>
-]]></content>
-      <categories>
-        <category>Linux应用</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>C</tag>
       </tags>
   </entry>
   <entry>
@@ -615,8 +500,312 @@
         <category>Linux应用</category>
       </categories>
       <tags>
-        <tag>Linux</tag>
         <tag>C</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LinuxIO操作</title>
+    <url>/1f3f638f.html</url>
+    <content><![CDATA[<p>在Linux中，对文件进行I/O操作是指对文件执行输入（Input）和输出（Output）操作。这些操作包括打开文件、读取文件内容、写入数据到文件、关闭文件等。文件I/O操作是通过系统调用实现的，这些系统调用提供了一组标准接口，使得程序可以与操作系统交互，进行文件操作。</p>
+<span id="more"></span>
+
+<h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><p>read, write, lseek, perror, strerror, truncate(截断), ftruncate(截断), fcntl(文件描述符操作)</p>
+<p>ioctl(一般用于操作特殊文件或硬件外设，后期介绍)</p>
+<p>linux中0，1，2表示标准输入、标准输出和标准错误，文件分配符fd不会取到这三个值</p>
+<p>详情可使用<code>man 2 read/write/lseek...</code>查看</p>
+<h2 id="错误返回"><a href="#错误返回" class="headerlink" title="错误返回"></a>错误返回</h2><p><code>errno</code>表示错误对应的标号需要<code>#include &lt;errno.h&gt;</code></p>
+<p><code>strerr(errno)</code>打印出错误信息</p>
+<p><code>perror()</code>直接打印</p>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>多次open()和dup()复制的区别</p>
+<ol>
+<li><p>多次open()</p>
+<img src="/1f3f638f/image-20240624230432725.png" class="">
+</li>
+<li><p>dup(), dup2()复制</p>
+<img src="/1f3f638f/image-20240624230350781.png" class=""></li>
+</ol>
+<p>可以看出多次open()的fd会指向不同的文件表，不同文件表指向同一个inode节点，而dup(), dup2()指向一个文件表</p>
+<h3 id="三种实现方法"><a href="#三种实现方法" class="headerlink" title="三种实现方法"></a>三种实现方法</h3><ol>
+<li><p>同一个进程中多次调用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231735907.png" class="" title="image-20240624231735907">
+</li>
+<li><p>不同进程中分别使用 open 函数打开同一个文件</p>
+<img src="/1f3f638f/image-20240624231752361.png" class="" title="image-20240624231752361">
+</li>
+<li><p>同一个进程中通过 dup(dup2)函数对文件描述符进行复制</p>
+<img src="/1f3f638f/image-20240624231804747.png" class="" title="image-20240624231804747"></li>
+</ol>
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><ol>
+<li><p><strong>O_APPEND</strong></p>
+<p>open时加入该标志</p>
+</li>
+<li><p><strong>pread()<strong>和</strong>pwrite()</strong></p>
+<p><code>man 2 pread</code>查看</p>
+</li>
+<li><p><strong>O_EXCL</strong></p>
+<p>避免创建文件出现问题</p>
+</li>
+</ol>
+<h1 id="标准IO"><a href="#标准IO" class="headerlink" title="标准IO"></a>标准IO</h1><p>标准 I/O 是对文件 I/O 进行了封装。标准 I/O 会处理很多细节，譬如分配 stdio 缓冲区、以优</p>
+<p>化的块长度执行 I/O 等，这些处理使用户不必担心如何选择使用正确的块长度。</p>
+<h2 id="常用函数-1"><a href="#常用函数-1" class="headerlink" title="常用函数"></a>常用函数</h2><p>文件：fopen, fclose, fseek, fread, fwrite</p>
+<p>错误：feof, ferror, clearerr</p>
+<p>详情使用<code>man 3 fopen/fclose...</code>来查看</p>
+<h1 id="格式化IO"><a href="#格式化IO" class="headerlink" title="格式化IO"></a>格式化IO</h1><h2 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">printf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：write(1, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fprintf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">dprintf</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">snprintf</span><span class="params">(<span class="type">char</span> *buf, <span class="type">size_t</span> size, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">scanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *format, ...)</span>; <span class="comment">// 本质：read(0, format, size)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fscanf</span><span class="params">(FILE *stream, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">sscanf</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, <span class="type">const</span> <span class="type">char</span> *format, ...)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="文件描述符和FILE指针相互转换"><a href="#文件描述符和FILE指针相互转换" class="headerlink" title="文件描述符和FILE指针相互转换"></a>文件描述符和FILE指针相互转换</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fileno</span><span class="params">(FILE *stream)</span>; <span class="comment">// FILE* -&gt; fd</span></span><br><span class="line">FILE *<span class="title function_">fdopen</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *mode)</span>; <span class="comment">// fd -&gt; FILE*</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h1 id="IO缓冲"><a href="#IO缓冲" class="headerlink" title="IO缓冲"></a>IO缓冲</h1><img src="/1f3f638f/image-20240625115550593.png" class="" title="image-20240625115550593">
+
+<p>可以看出：文件IO比标准IO要快</p>
+<h2 id="文件IO缓冲"><a href="#文件IO缓冲" class="headerlink" title="文件IO缓冲"></a>文件IO缓冲</h2><p>刷新缓冲区：fsync, fdatasync, sync</p>
+<p><code>man 3 sync</code>查看</p>
+<p>fsync: 文件内数据和元数据</p>
+<p>fdatasync: 文件内容数据</p>
+<p>sync: 所有</p>
+<h3 id="绕过IO缓冲"><a href="#绕过IO缓冲" class="headerlink" title="绕过IO缓冲"></a>绕过IO缓冲</h3><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE <span class="comment">// 需要定义宏</span></span></span><br><span class="line">fd = open(filepath, O_WRONLY | O_DIRECT);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>限制：</p>
+<ul>
+<li>应用程序中用于存放数据的缓冲区，其内存起始地址必须以块大小的整数倍进行对齐；</li>
+<li>写文件时，文件的位置偏移量必须是块大小的整数倍；</li>
+<li>写入到文件的数据大小必须是块大小的整数倍。</li>
+</ul>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 查看blocksize</span></span><br><span class="line"><span class="built_in">df</span> -h <span class="comment"># 查看根目录在哪</span></span><br><span class="line">tune2fs -l /dev/sda? | grep <span class="string">"Block size"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>内存起始地址对齐</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> buf[<span class="number">8192</span>] __attribute__((aligned(<span class="number">4096</span>)));</span><br></pre></td></tr></tbody></table></figure>
+
+<p>写入块大小整数倍</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> ret = write(fd, buf, <span class="number">4096</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="标准IO缓冲"><a href="#标准IO缓冲" class="headerlink" title="标准IO缓冲"></a>标准IO缓冲</h2><p>对stdio缓冲设置</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setvbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">int</span> mode, <span class="type">size_t</span> size)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuf</span><span class="params">(FILE *stream, <span class="type">char</span> *buf)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">setbuffer</span><span class="params">(FILE *stream, <span class="type">char</span> *buf, <span class="type">size_t</span> size)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>man 3</code>查看文档</p>
+<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>使用stat，fstat, lstat查看文件（目录）属性，stat返回一个<code>struct stat</code>结构体</p>
+<p>可使用<code>man 2</code>查看，fstat可通过fd来查看属性，lstat可以看链接文件属性</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">{</span></span><br><span class="line"> <span class="type">dev_t</span> st_dev; <span class="comment">/* 文件所在设备的 ID */</span></span><br><span class="line"> <span class="type">ino_t</span> st_ino; <span class="comment">/* 文件对应 inode 节点编号 */</span></span><br><span class="line"> <span class="type">mode_t</span> st_mode; <span class="comment">/* 文件对应的模式 */</span></span><br><span class="line"> <span class="type">nlink_t</span> st_nlink; <span class="comment">/* 文件的链接数 */</span></span><br><span class="line"> <span class="type">uid_t</span> st_uid; <span class="comment">/* 文件所有者的用户 ID */</span></span><br><span class="line"> <span class="type">gid_t</span> st_gid; <span class="comment">/* 文件所有者的组 ID */</span></span><br><span class="line"> <span class="type">dev_t</span> st_rdev; <span class="comment">/* 设备号（指针对设备文件） */</span></span><br><span class="line"> <span class="type">off_t</span> st_size; <span class="comment">/* 文件大小（以字节为单位） */</span></span><br><span class="line"> <span class="type">blksize_t</span> st_blksize; <span class="comment">/* 文件内容存储的块大小 */</span></span><br><span class="line"> <span class="type">blkcnt_t</span> st_blocks; <span class="comment">/* 文件内容所占块数 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span> <span class="comment">/* 文件最后被访问的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span> <span class="comment">/* 文件内容最后被修改的时间 */</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span> <span class="comment">/* 文件状态最后被改变的时间 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="归属"><a href="#归属" class="headerlink" title="归属"></a>归属</h2><p>使用chown, fchown, lchown来更改文件所属，三者区别上同</p>
+<p>PS：进程相关联ID</p>
+<img src="/1f3f638f/image-20240626092456008.png" class="">
+
+<h2 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h2><p>修改时间属性utime, utimes(精度区别)</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">utime</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> utimbuf *times)</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">utimbuf</span> {</span></span><br><span class="line">	<span class="type">time_t</span> actime; <span class="comment">/* 访问时间 */</span></span><br><span class="line">	<span class="type">time_t</span> modtime; <span class="comment">/* 内容修改时间 */</span></span><br><span class="line">};</span><br><span class="line"><span class="type">int</span> <span class="title function_">utimes</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> {</span></span><br><span class="line"> <span class="type">long</span> tv_sec; <span class="comment">/* 秒 */</span></span><br><span class="line"> <span class="type">long</span> tv_usec; <span class="comment">/* 微秒 */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>还有futimens()和 utimensat()，区别是：</p>
+<ul>
+<li>可按纳秒级精度设置时间戳。</li>
+<li>可单独设置某一时间戳。</li>
+<li>可独立将任一时间戳设置为当前时间。</li>
+</ul>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>通过<code>link</code>设置硬连接，<code>symlink</code>设置软连接，<code>readlink</code>读取链接文件</p>
+<h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><p><code>unlink</code>删除文件</p>
+<p><code>man 2</code>查看</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>存储形式</p>
+<img src="/1f3f638f/image-20240626105646448.png" class="">
+
+<p>常用操作：mkdir, rmdir, opendir, readdir, rewinddir, closedir, getcwd, chdir, fchdir</p>
+<p><code>man 2</code>查看</p>
+<h1 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h1><p>在调用 open()函数打开文件时，为参数 flags 指定 O_NONBLOCK 标志，open()调用成功后，后续的 I/O 操作将以非阻塞式方式进行；这就是非阻塞 I/O 的打开方式，如果未指定 O_NONBLOCK 标志，则默认使用阻塞式 I/O 进行操作。</p>
+<p>当对文件进行读取操作时，如果文件当前无数据可读，那么阻塞式 I/O 会将调用者应用程序挂起、进入休眠阻塞状态，直到有数据可读时才会解除阻塞；而对于非阻塞 I/O，应用程序不会被挂起，而是会立即返回，它要么一直轮训等待，直到数据可读，要么直接放弃！</p>
+<p>阻塞式 I/O 的优点在于能够提升 CPU 的处理效率，当自身条件不满足时，进入阻塞状态，交出 CPU资源，将 CPU 资源让给别人使用；而非阻塞式则是抓紧利用 CPU 资源，譬如不断地去轮训，这样就会导致该程序占用了非常高的 CPU 使用率！</p>
+<h1 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h1><p>I/O 多路复用（IO multiplexing）它通过一种机制，可以监视多个文件描述符，一旦某个文件描述符（也就是某个文件）可以执行 I/O 操作时，能够通知应用程序进行相应的读写操作。</p>
+<h2 id="select"><a href="#select" class="headerlink" title="select"></a>select</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 调用 select()会一直阻塞，直到某一个或多个文件描述符成为就绪态（可以读或写）</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>对于fds，都是 fd_set 类型指针，指向一个 fd_set 类型对象，fd_set 数据类型是一个文件描述符的集合体。本质是bitmap</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>缺点：</p>
+<ol>
+<li>bitmap位数有限</li>
+<li>fd_set不可重用</li>
+<li>用户态到内核态切换有开销</li>
+<li>O(n)遍历哪一个被置位</li>
+</ol>
+<h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> {</span></span><br><span class="line"> <span class="type">int</span> fd; <span class="comment">/* file descriptor */</span></span><br><span class="line"> <span class="type">short</span> events; <span class="comment">/* requested events */</span></span><br><span class="line"> <span class="type">short</span> revents; <span class="comment">/* returned events */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p>每次恢复revents就行了，不需要重置整个bitmap</p>
+<h2 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">新建epoll描述符==epoll_create()</span><br><span class="line">epoll_ctrl(epoll描述符，添加或者删除所有待监控的连接)</span><br><span class="line">返回的活跃连接 ==epoll_wait（ epoll描述符 ）</span><br></pre></td></tr></tbody></table></figure>
+
+<p>epoll是通过内核与用户空间mmap同一块内存实现的。mmap将用户空间的一块地址和内核空间的一块地址同时映射到相同的一块物理内存地址，减少了用户态和内核态之间的数据交换。</p>
+<p>epoll_wait会返回改动文件的数，并将其置于epoll的前列（红黑树），所以只需遍历前几个就行了</p>
+<h1 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h1><p>O_ASYNC 标志可用于使能文件描述符的异步 I/O 事件，当文件描述符可执行 I/O 操作时，内核会向异步 I/O 事件的接收进程发送 SIGIO 信号。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 只能使用fcntl设置异步IO</span></span><br><span class="line"><span class="type">int</span> flag;</span><br><span class="line">flag = fcntl(fd, F_GETFL); <span class="comment">//先获取原来的 flag</span></span><br><span class="line">flag |= O_ASYNC; <span class="comment">//将 O_ASYNC 标志添加到 flag</span></span><br><span class="line">fcntl(fd, F_SETFL, flag); <span class="comment">//重新设置 flag</span></span><br><span class="line"><span class="comment">// 设置异步 I/O 事件的接收进程</span></span><br><span class="line">fcntl(fd, F_SETOWN, getpid());</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>优化</strong></p>
+<p>默认的SIGIO是非可靠信号，使用</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">fcntl(fd, F_SETSIG, SIGRTMIN);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>将其设为可靠信号。</p>
+<h1 id="存储映射IO"><a href="#存储映射IO" class="headerlink" title="存储映射IO"></a>存储映射IO</h1><p>存储映射 I/O（memory-mapped I/O）是一种基于内存区域的高级 I/O 操作，它能将一个文件映射到进程地址空间中的一块内存区域中，当从这段内存中读数据时，就相当于读文件中的数据（对文件进行 read 操作），将数据写入这段内存时，则相当于将数据直接写入文件中（对文件进行 write 操作）。</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<img src="/1f3f638f/image-20240715222704115.png" class="">
+
+<h1 id="文件锁"><a href="#文件锁" class="headerlink" title="文件锁"></a>文件锁</h1><ol>
+<li><p>建议性锁</p>
+<p>建议性锁本质上是一种协议，程序访问文件之前，先对文件上锁，上锁成功之后再访问文件，这是建议性锁的一种用法；但是如果你的程序不管三七二十一，在没有对文件上锁的情况下直接访问文件，也是可以访问的，并非无法访问文件；如果是这样，那么建议性锁就没有起到任何作用，如果要使得建议性锁起作用，那么大家就要遵守协议，访问文件之前先对文件上锁。</p>
+</li>
+<li><p>强制性锁</p>
+<p>如果进程对文件上了强制性锁，其它的进程在没有获取到文件锁的情况下是无法对文件进行访问的。其本质原因在于，强制性锁会让内核检查每一个 I/O 操作（譬如 read()、write()），验证调用进程是否是该文件锁的拥有者，如果不是将无法访问文件。</p>
+</li>
+</ol>
+<p><strong>flock</strong></p>
+<ol>
+<li>同一进程对文件多次加锁不会导致死锁。</li>
+<li>文件关闭的时候，会自动解锁。</li>
+<li>一个进程不可以对另一个进程持有的文件锁进行解锁。</li>
+<li>由 fork()创建的子进程不会继承父进程所创建的锁。</li>
+</ol>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 建议性锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">flock</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> operation)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>fcntl</strong></p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 功能很强大，目前只谈论文件锁功能</span></span><br><span class="line"><span class="comment">// cmd: F_GETLK, F_SETLK, F_SETLKW(阻塞版)</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">struct flock {</span></span><br><span class="line"><span class="comment"> ...</span></span><br><span class="line"><span class="comment"> short l_type; // Type of lock: F_RDLCK,F_WRLCK, F_UNLCK</span></span><br><span class="line"><span class="comment"> short l_whence; // How to interpret l_start: SEEK_SET, SEEK_CUR, SEEK_END</span></span><br><span class="line"><span class="comment"> off_t l_start; // Starting offset for lock</span></span><br><span class="line"><span class="comment"> off_t l_len; // Number of bytes to lock</span></span><br><span class="line"><span class="comment"> pid_t l_pid; // PID of process blocking our lock(set by F_GETLK and F_OFD_GETLK)</span></span><br><span class="line"><span class="comment">};</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fcntl</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> cmd, ... <span class="comment">/* struct flock *flockptr */</span> )</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>fcntl()可以对文件的某个区域（某部分内容）进行加锁解锁，可以精确到某一个字节数据。</li>
+<li>fcntl()可支持建议性锁和强制性锁两种类型</li>
+</ul>
+<img src="/1f3f638f/image-20240715225728423.png" class="">
+
+<p>如果要开启强制性锁机制，需要设置文件的 Set-GroupID（S_ISGID）位为 1，并且禁止文件的组用户执行权限（S_IXGRP），也就是将其设置为 0。</p>
+<p>有些发行版不支持。</p>
+<p><strong>lockf</strong>：对fcntl的封装</p>
+]]></content>
+      <categories>
+        <category>Linux应用</category>
+      </categories>
+      <tags>
+        <tag>C</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux进程</title>
+    <url>/87698413.html</url>
+    <content><![CDATA[<p>进程在Linux系统中扮演着至关重要的角色。它不仅是系统资源管理和任务调度的基本单位，还直接影响着系统的性能和稳定性。本文将详细探讨Linux中的进程，包括其概念、生命周期、内核数据结构、以及与进程管理相关的常用API函数，以便读者更深入地理解进程在Linux中的重要性和实现机制。</p>
+<span id="more"></span>
+
+<h1 id="进程概念"><a href="#进程概念" class="headerlink" title="进程概念"></a>进程概念</h1><p>进程是一个动态过程，而非静态文件，它是程序的一次运行过程，当应用程序被加载到内存中运行之后，它就称为了一个进程，当程序运行结束后也就意味着进程终止，这就是进程的一个生命周期。</p>
+<p>Linux系统下的所有进程都是由其父进程创建而来，譬如在 shell 终端通过命令的方式执行一个程序./app，那么 app进程就是由 shell 终端进程创建出来的，shell 终端就是该进程的父进程。init 进程，它是 Linux 系统启动之后运行的第一个进程，它管理着系统上所有其它进程，init 进程是由内核启动，因此理论上说它没有父进程。</p>
+<p>程序结束其实就是进程终止，进程终止的方式通常有多种，大体上分为正常终止和异常终止，正常终止</p>
+<p>包括：</p>
+<ul>
+<li><p>main()函数中通过 return 语句返回来终止进程；</p>
+</li>
+<li><p>应用程序中调用 exit()函数终止进程；</p>
+</li>
+<li><p>应用程序中调用<code>_exit()</code>终止进程；</p>
+</li>
+</ul>
+<p>异常终止包括：</p>
+<ul>
+<li>应用程序中调用 abort()函数终止进程；</li>
+<li>进程接收到一个信号，譬如 SIGKILL 信号。</li>
+</ul>
+<p><strong>exit和_exit的区别：</strong></p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">exit</span> = atexit + _exit;</span><br><span class="line"><span class="comment">// atexit: 调用终止处理+刷新IO（注册,最后exit执行按先进后出顺序来）</span></span><br><span class="line"><span class="comment">// _exit: 进入内核执行清理工作</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>exit和return的区别：</strong></p>
+<p>exit会进入内核，而return只是一个返回，把指挥权交给上层调用，return也会调用终止处理函数并刷新缓冲</p>
+<h1 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h1><img src="/87698413/image-20240702212909754.png" class="">
+
+<p>进程中相关属性</p>
+<ol>
+<li><p>pid</p>
+<p>每个进程都有自己唯一的标识：进程号（进程 ID、PID）。</p>
+</li>
+<li><p>pgid</p>
+<p>每个进程除了有一个进程 ID、父进程 ID 之外，还有一个进程组 ID，用于标识该进程属于哪一个进程组，进程组是一个或多个进程的集合。每一个进程组有一个组长进程，组长进程的 ID 就等于进程组 ID；组长进程不能再创建新的进程组；只要进程组中还存在一个进程，则该进程组就存在，这与其组长进程是否终止无关。</p>
+</li>
+<li><p>sid</p>
+<p>会话是一个或多个进程组的集合，其与进程组、进程之间的关系如</p>
+<p>下图所示：</p>
+<img src="/87698413/image-20240702213346684.png" class="">
+
+<p>一个会话可以有控制终端、也可没有控制终端，在有控制终端的情况下也只能连接一个控制终端。</p>
+<p>对于会话来说，会话的首领进程的进程组 ID 将作为该会话的标识，也就是会话 ID（sid），在默认情况下，新创建的进程会继承父进程的会话 ID。</p>
+</li>
+</ol>
+<p>相关操作</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">getpid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getppid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getsid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">setsid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h1 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h1><p>获取进程中的环境变量</p>
+<ol>
+<li><p>environ变量</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 代码中使用</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ; <span class="comment">// 申明外部全局变量 environ</span></span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>getenv()函数</p>
+<p><code>man 3</code> 查看使用</p>
+</li>
+<li><p>通过main函数参数获取</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *env[])</span> <span class="comment">// 不推荐，有些系统不支持</span></span><br></pre></td></tr></tbody></table></figure></li>
+</ol>
+<p>程序启动时可设置环境变量<code>NAME=value ./app</code></p>
+<p>常用操作</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// man 3 查看使用</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 设置环境变量</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">putenv</span><span class="params">(<span class="type">char</span> *<span class="built_in">string</span>)</span>; <span class="comment">// 修改string会修改环境变量</span></span><br><span class="line"><span class="comment">// 修改name和value不会修改环境变量，创建了一个缓冲区指向他们</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="type">const</span> <span class="type">char</span> *value, <span class="type">int</span> overwrite)</span>; </span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unsetenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 清空</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">clearenv</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">clearenv()函数内部的做法其实就是将environ赋值为NULL。在某些情况下，使用setenv()函数和clearenv()</span></span><br><span class="line"><span class="comment">函数可能会导致程序内存泄漏。setenv()函数会为环境变量分配一块内存缓冲区，随之称为进程的一部分；而调用 clearenv()函数时没有释放该缓冲区（clearenv()调用并不知晓该缓冲区的存在，故而也无法将其释放）</span></span><br><span class="line"><span class="comment">反复调用者两个函数的程序，会不断产生内存泄漏。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="内存布局"><a href="#内存布局" class="headerlink" title="内存布局"></a>内存布局</h1><img src="/87698413/image-20240701181207013.png" class="">
+
+<h1 id="父子进程"><a href="#父子进程" class="headerlink" title="父子进程"></a>父子进程</h1><p><code>fork</code>函数</p>
+<ol>
+<li>一次fork两个返回值，0为子进程，大于0为父进程</li>
+<li>fork进程创建了与原来进程几乎完全相同的进程（复制父进程的代码段，堆，栈）</li>
+<li>子进程从fork调用后开始执行</li>
+</ol>
+<p><code>vfork</code>函数：与父进程共有代码段，堆，栈</p>
+<p>ps: 创建的子进程退出需要使用_exit而不是exit</p>
+<p>对文件的共享</p>
+<img src="/87698413/image-20240701202424640.png" class="">
+
+<p>父子进程fd指向同一个文件表</p>
+<p>fork 后子进程会继承父进程绑定的信号处理函数，若调用 exec 加载新程序后，就不会在继承这个信号处理函数了fork 后子进程会继承父进程的信号掩码，执行 exec 后仍会继承这个信号掩码</p>
+<h1 id="监视子进程"><a href="#监视子进程" class="headerlink" title="监视子进程"></a>监视子进程</h1><p><strong>孤儿进程：</strong>父进程先死且未回收子进程，子进程的父进程会交给init进程（图形化界面不一样）</p>
+<p><strong>僵尸进程：</strong>子进程先死但父进程未回收，此时使用kill也无法杀死</p>
+<p>SIGCHLD 信号发送条件：</p>
+<ul>
+<li>当父进程的某个子进程终止时，父进程会收到 SIGCHLD 信号；</li>
+<li>当父进程的某个子进程因收到信号而停止（暂停运行）或恢复时，内核也可能向父进程发送该信号。</li>
+</ul>
+<p>监视子进程函数</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 返回值是回收的子进程的pid号, man查看</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>; <span class="comment">// 只能阻塞等待</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>; <span class="comment">// 可非阻塞</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="执行程序"><a href="#执行程序" class="headerlink" title="执行程序"></a>执行程序</h1><p><code>man</code>进行查看</p>
+<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="comment">// 以下都是对execve的封装，path表示路径，file表示若本目录没找到会在PATH里找</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/* (char *) NULL */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/* (char *) NULL */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execle</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/*, (char *) NULL, char * const envp[] */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvpe</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h1><p>守护进程（Daemon）也称为精灵进程，是运行在后台的一种特殊进程，它独立于控制终端并且周期性地执行某种任务或等待处理某些事情的发生，主要表现为以下两个特点：</p>
+<ol>
+<li>长期运行</li>
+<li>与控制终端分离</li>
+</ol>
+<h1 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h1><img src="/87698413/image-20240702222117113.png" class="">
+
+<ul>
+<li><p>UNIX IPC：管道、FIFO、信号；</p>
+</li>
+<li><p>System V IPC：信号量、消息队列、共享内存；</p>
+</li>
+<li><p>POSIX IPC：信号量、消息队列、共享内存（最快）；</p>
+</li>
+<li><p>Socket IPC：基于 Socket 进程间通信。（网络）</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Linux应用</category>
+      </categories>
+      <tags>
+        <tag>C</tag>
+        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
@@ -743,209 +932,8 @@
         <category>Linux应用</category>
       </categories>
       <tags>
-        <tag>Linux</tag>
         <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux进程</title>
-    <url>/87698413.html</url>
-    <content><![CDATA[<p>进程在Linux系统中扮演着至关重要的角色。它不仅是系统资源管理和任务调度的基本单位，还直接影响着系统的性能和稳定性。本文将详细探讨Linux中的进程，包括其概念、生命周期、内核数据结构、以及与进程管理相关的常用API函数，以便读者更深入地理解进程在Linux中的重要性和实现机制。</p>
-<span id="more"></span>
-
-<h1 id="进程概念"><a href="#进程概念" class="headerlink" title="进程概念"></a>进程概念</h1><p>进程是一个动态过程，而非静态文件，它是程序的一次运行过程，当应用程序被加载到内存中运行之后，它就称为了一个进程，当程序运行结束后也就意味着进程终止，这就是进程的一个生命周期。</p>
-<p>Linux系统下的所有进程都是由其父进程创建而来，譬如在 shell 终端通过命令的方式执行一个程序./app，那么 app进程就是由 shell 终端进程创建出来的，shell 终端就是该进程的父进程。init 进程，它是 Linux 系统启动之后运行的第一个进程，它管理着系统上所有其它进程，init 进程是由内核启动，因此理论上说它没有父进程。</p>
-<p>程序结束其实就是进程终止，进程终止的方式通常有多种，大体上分为正常终止和异常终止，正常终止</p>
-<p>包括：</p>
-<ul>
-<li><p>main()函数中通过 return 语句返回来终止进程；</p>
-</li>
-<li><p>应用程序中调用 exit()函数终止进程；</p>
-</li>
-<li><p>应用程序中调用<code>_exit()</code>终止进程；</p>
-</li>
-</ul>
-<p>异常终止包括：</p>
-<ul>
-<li>应用程序中调用 abort()函数终止进程；</li>
-<li>进程接收到一个信号，譬如 SIGKILL 信号。</li>
-</ul>
-<p><strong>exit和_exit的区别：</strong></p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">exit</span> = atexit + _exit;</span><br><span class="line"><span class="comment">// atexit: 调用终止处理+刷新IO（注册,最后exit执行按先进后出顺序来）</span></span><br><span class="line"><span class="comment">// _exit: 进入内核执行清理工作</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>exit和return的区别：</strong></p>
-<p>exit会进入内核，而return只是一个返回，把指挥权交给上层调用，return也会调用终止处理函数并刷新缓冲</p>
-<h1 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h1><img src="/87698413/image-20240702212909754.png" class="">
-
-<p>进程中相关属性</p>
-<ol>
-<li><p>pid</p>
-<p>每个进程都有自己唯一的标识：进程号（进程 ID、PID）。</p>
-</li>
-<li><p>pgid</p>
-<p>每个进程除了有一个进程 ID、父进程 ID 之外，还有一个进程组 ID，用于标识该进程属于哪一个进程组，进程组是一个或多个进程的集合。每一个进程组有一个组长进程，组长进程的 ID 就等于进程组 ID；组长进程不能再创建新的进程组；只要进程组中还存在一个进程，则该进程组就存在，这与其组长进程是否终止无关。</p>
-</li>
-<li><p>sid</p>
-<p>会话是一个或多个进程组的集合，其与进程组、进程之间的关系如</p>
-<p>下图所示：</p>
-<img src="/87698413/image-20240702213346684.png" class="">
-
-<p>一个会话可以有控制终端、也可没有控制终端，在有控制终端的情况下也只能连接一个控制终端。</p>
-<p>对于会话来说，会话的首领进程的进程组 ID 将作为该会话的标识，也就是会话 ID（sid），在默认情况下，新创建的进程会继承父进程的会话 ID。</p>
-</li>
-</ol>
-<p>相关操作</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">pid_t</span> <span class="title function_">getpid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getppid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getpgrp</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">pid_t</span> pgid)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setpgrp</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">getsid</span><span class="params">(<span class="type">pid_t</span> pid)</span>;</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">setsid</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-<h1 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h1><p>获取进程中的环境变量</p>
-<ol>
-<li><p>environ变量</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 代码中使用</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">char</span> **environ; <span class="comment">// 申明外部全局变量 environ</span></span><br></pre></td></tr></tbody></table></figure>
-</li>
-<li><p>getenv()函数</p>
-<p><code>man 3</code> 查看使用</p>
-</li>
-<li><p>通过main函数参数获取</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *env[])</span> <span class="comment">// 不推荐，有些系统不支持</span></span><br></pre></td></tr></tbody></table></figure></li>
-</ol>
-<p>程序启动时可设置环境变量<code>NAME=value ./app</code></p>
-<p>常用操作</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// man 3 查看使用</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">getenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 设置环境变量</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">putenv</span><span class="params">(<span class="type">char</span> *<span class="built_in">string</span>)</span>; <span class="comment">// 修改string会修改环境变量</span></span><br><span class="line"><span class="comment">// 修改name和value不会修改环境变量，创建了一个缓冲区指向他们</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name, <span class="type">const</span> <span class="type">char</span> *value, <span class="type">int</span> overwrite)</span>; </span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unsetenv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span>;</span><br><span class="line"><span class="comment">// 清空</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">clearenv</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">clearenv()函数内部的做法其实就是将environ赋值为NULL。在某些情况下，使用setenv()函数和clearenv()</span></span><br><span class="line"><span class="comment">函数可能会导致程序内存泄漏。setenv()函数会为环境变量分配一块内存缓冲区，随之称为进程的一部分；而调用 clearenv()函数时没有释放该缓冲区（clearenv()调用并不知晓该缓冲区的存在，故而也无法将其释放）</span></span><br><span class="line"><span class="comment">反复调用者两个函数的程序，会不断产生内存泄漏。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="内存布局"><a href="#内存布局" class="headerlink" title="内存布局"></a>内存布局</h1><img src="/87698413/image-20240701181207013.png" class="">
-
-<h1 id="父子进程"><a href="#父子进程" class="headerlink" title="父子进程"></a>父子进程</h1><p><code>fork</code>函数</p>
-<ol>
-<li>一次fork两个返回值，0为子进程，大于0为父进程</li>
-<li>fork进程创建了与原来进程几乎完全相同的进程（复制父进程的代码段，堆，栈）</li>
-<li>子进程从fork调用后开始执行</li>
-</ol>
-<p><code>vfork</code>函数：与父进程共有代码段，堆，栈</p>
-<p>ps: 创建的子进程退出需要使用_exit而不是exit</p>
-<p>对文件的共享</p>
-<img src="/87698413/image-20240701202424640.png" class="">
-
-<p>父子进程fd指向同一个文件表</p>
-<p>fork 后子进程会继承父进程绑定的信号处理函数，若调用 exec 加载新程序后，就不会在继承这个信号处理函数了fork 后子进程会继承父进程的信号掩码，执行 exec 后仍会继承这个信号掩码</p>
-<h1 id="监视子进程"><a href="#监视子进程" class="headerlink" title="监视子进程"></a>监视子进程</h1><p><strong>孤儿进程：</strong>父进程先死且未回收子进程，子进程的父进程会交给init进程（图形化界面不一样）</p>
-<p><strong>僵尸进程：</strong>子进程先死但父进程未回收，此时使用kill也无法杀死</p>
-<p>SIGCHLD 信号发送条件：</p>
-<ul>
-<li>当父进程的某个子进程终止时，父进程会收到 SIGCHLD 信号；</li>
-<li>当父进程的某个子进程因收到信号而停止（暂停运行）或恢复时，内核也可能向父进程发送该信号。</li>
-</ul>
-<p>监视子进程函数</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 返回值是回收的子进程的pid号, man查看</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span>; <span class="comment">// 只能阻塞等待</span></span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>; <span class="comment">// 可非阻塞</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="执行程序"><a href="#执行程序" class="headerlink" title="执行程序"></a>执行程序</h1><p><code>man</code>进行查看</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *filename, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br><span class="line"><span class="comment">// 以下都是对execve的封装，path表示路径，file表示若本目录没找到会在PATH里找</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/* (char *) NULL */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/* (char *) NULL */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execle</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">const</span> <span class="type">char</span> *arg, ... <span class="comment">/*, (char *) NULL, char * const envp[] */</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execv</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvp</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">execvpe</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *file, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h1><p>守护进程（Daemon）也称为精灵进程，是运行在后台的一种特殊进程，它独立于控制终端并且周期性地执行某种任务或等待处理某些事情的发生，主要表现为以下两个特点：</p>
-<ol>
-<li>长期运行</li>
-<li>与控制终端分离</li>
-</ol>
-<h1 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h1><img src="/87698413/image-20240702222117113.png" class="">
-
-<ul>
-<li><p>UNIX IPC：管道、FIFO、信号；</p>
-</li>
-<li><p>System V IPC：信号量、消息队列、共享内存；</p>
-</li>
-<li><p>POSIX IPC：信号量、消息队列、共享内存（最快）；</p>
-</li>
-<li><p>Socket IPC：基于 Socket 进程间通信。（网络）</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Linux应用</category>
-      </categories>
-      <tags>
         <tag>Linux</tag>
-        <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Linux高级IO</title>
-    <url>/1fd3d10d.html</url>
-    <content><![CDATA[<p>本文再次回到文件 I/O 相关话题的讨论，将会介绍文件 I/O 当中的一些高级用法，以应对不同应用场合的需求，主要包括：非阻塞 I/O、I/O 多路复用、异步 I/O、存储映射 I/O 以及文件锁，</p>
-<span id="more"></span>
-
-<h1 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h1><p>本小节我们将分别演示使用阻塞式 I/O 和非阻塞式 I/O 对文件进行读操作，在调用 open()函数打开文件时，为参数 flags 指定 O_NONBLOCK 标志，open()调用成功后，后续的 I/O 操作将以非阻塞式方式进行；这就是非阻塞 I/O 的打开方式，如果未指定 O_NONBLOCK 标志，则默认使用阻塞式 I/O 进行操作。</p>
-<p>当对文件进行读取操作时，如果文件当前无数据可读，那么阻塞式 I/O 会将调用者应用程序挂起、进入休眠阻塞状态，直到有数据可读时才会解除阻塞；而对于非阻塞 I/O，应用程序不会被挂起，而是会立即返回，它要么一直轮训等待，直到数据可读，要么直接放弃！</p>
-<p>所以阻塞式 I/O 的优点在于能够提升 CPU 的处理效率，当自身条件不满足时，进入阻塞状态，交出 CPU资源，将 CPU 资源让给别人使用；而非阻塞式则是抓紧利用 CPU 资源，譬如不断地去轮训，这样就会导致该程序占用了非常高的 CPU 使用率！</p>
-<h1 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h1><p>I/O 多路复用（IO multiplexing）它通过一种机制，可以监视多个文件描述符，一旦某个文件描述符（也就是某个文件）可以执行 I/O 操作时，能够通知应用程序进行相应的读写操作。</p>
-<h2 id="select"><a href="#select" class="headerlink" title="select"></a>select</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 调用 select()会一直阻塞，直到某一个或多个文件描述符成为就绪态（可以读或写）</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>对于fds，都是 fd_set 类型指针，指向一个 fd_set 类型对象，fd_set 数据类型是一个文件描述符的集合体。本质是bitmap</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p>缺点：</p>
-<ol>
-<li>bitmap位数有限</li>
-<li>fd_set不可重用</li>
-<li>用户态到内核态切换有开销</li>
-<li>O(n)遍历哪一个被置位</li>
-</ol>
-<h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> {</span></span><br><span class="line"> <span class="type">int</span> fd; <span class="comment">/* file descriptor */</span></span><br><span class="line"> <span class="type">short</span> events; <span class="comment">/* requested events */</span></span><br><span class="line"> <span class="type">short</span> revents; <span class="comment">/* returned events */</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<p>每次恢复revents就行了，不需要重置整个bitmap</p>
-<h2 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h2><figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">新建epoll描述符==epoll_create()</span><br><span class="line">epoll_ctrl(epoll描述符，添加或者删除所有待监控的连接)</span><br><span class="line">返回的活跃连接 ==epoll_wait（ epoll描述符 ）</span><br></pre></td></tr></tbody></table></figure>
-
-<p>epoll是通过内核与用户空间mmap同一块内存实现的。mmap将用户空间的一块地址和内核空间的一块地址同时映射到相同的一块物理内存地址，减少了用户态和内核态之间的数据交换。</p>
-<p>epoll_wait会返回改动文件的数，并将其置于epoll的前列（红黑树），所以只需遍历前几个就行了</p>
-<h1 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h1><p>O_ASYNC 标志可用于使能文件描述符的异步 I/O 事件，当文件描述符可执行 I/O 操作时，内核会向异步 I/O 事件的接收进程发送 SIGIO 信号。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 只能使用fcntl设置异步IO</span></span><br><span class="line"><span class="type">int</span> flag;</span><br><span class="line">flag = fcntl(fd, F_GETFL); <span class="comment">//先获取原来的 flag</span></span><br><span class="line">flag |= O_ASYNC; <span class="comment">//将 O_ASYNC 标志添加到 flag</span></span><br><span class="line">fcntl(fd, F_SETFL, flag); <span class="comment">//重新设置 flag</span></span><br><span class="line"><span class="comment">// 设置异步 I/O 事件的接收进程</span></span><br><span class="line">fcntl(fd, F_SETOWN, getpid());</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>优化</strong></p>
-<p>默认的SIGIO是非可靠信号，使用</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line">fcntl(fd, F_SETSIG, SIGRTMIN);</span><br></pre></td></tr></tbody></table></figure>
-
-<p>将其设为可靠信号。</p>
-<h1 id="存储映射IO"><a href="#存储映射IO" class="headerlink" title="存储映射IO"></a>存储映射IO</h1><p>存储映射 I/O（memory-mapped I/O）是一种基于内存区域的高级 I/O 操作，它能将一个文件映射到进程地址空间中的一块内存区域中，当从这段内存中读数据时，就相当于读文件中的数据（对文件进行 read 操作），将数据写入这段内存时，则相当于将数据直接写入文件中（对文件进行 write 操作）。</p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<img src="/1fd3d10d/image-20240715222704115.png" class="">
-
-<h1 id="文件锁"><a href="#文件锁" class="headerlink" title="文件锁"></a>文件锁</h1><ol>
-<li><p>建议性锁</p>
-<p>建议性锁本质上是一种协议，程序访问文件之前，先对文件上锁，上锁成功之后再访问文件，这是建议性锁的一种用法；但是如果你的程序不管三七二十一，在没有对文件上锁的情况下直接访问文件，也是可以访问的，并非无法访问文件；如果是这样，那么建议性锁就没有起到任何作用，如果要使得建议性锁起作用，那么大家就要遵守协议，访问文件之前先对文件上锁。</p>
-</li>
-<li><p>强制性锁</p>
-<p>如果进程对文件上了强制性锁，其它的进程在没有获取到文件锁的情况下是无法对文件进行访问的。其本质原因在于，强制性锁会让内核检查每一个 I/O 操作（譬如 read()、write()），验证调用进程是否是该文件锁的拥有者，如果不是将无法访问文件。</p>
-</li>
-</ol>
-<p><strong>flock</strong></p>
-<ol>
-<li>同一进程对文件多次加锁不会导致死锁。</li>
-<li>文件关闭的时候，会自动解锁。</li>
-<li>一个进程不可以对另一个进程持有的文件锁进行解锁。</li>
-<li>由 fork()创建的子进程不会继承父进程所创建的锁。</li>
-</ol>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 建议性锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">flock</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> operation)</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>fcntl</strong></p>
-<figure class="highlight c"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// 功能很强大，目前只谈论文件锁功能</span></span><br><span class="line"><span class="comment">// cmd: F_GETLK, F_SETLK, F_SETLKW(阻塞版)</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">struct flock {</span></span><br><span class="line"><span class="comment"> ...</span></span><br><span class="line"><span class="comment"> short l_type; // Type of lock: F_RDLCK,F_WRLCK, F_UNLCK</span></span><br><span class="line"><span class="comment"> short l_whence; // How to interpret l_start: SEEK_SET, SEEK_CUR, SEEK_END</span></span><br><span class="line"><span class="comment"> off_t l_start; // Starting offset for lock</span></span><br><span class="line"><span class="comment"> off_t l_len; // Number of bytes to lock</span></span><br><span class="line"><span class="comment"> pid_t l_pid; // PID of process blocking our lock(set by F_GETLK and F_OFD_GETLK)</span></span><br><span class="line"><span class="comment">};</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fcntl</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> cmd, ... <span class="comment">/* struct flock *flockptr */</span> )</span>;</span><br></pre></td></tr></tbody></table></figure>
-
-<ul>
-<li>fcntl()可以对文件的某个区域（某部分内容）进行加锁解锁，可以精确到某一个字节数据。</li>
-<li>fcntl()可支持建议性锁和强制性锁两种类型</li>
-</ul>
-<img src="/1fd3d10d/image-20240715225728423.png" class="">
-
-<p>如果要开启强制性锁机制，需要设置文件的 Set-GroupID（S_ISGID）位为 1，并且禁止文件的组用户执行权限（S_IXGRP），也就是将其设置为 0。</p>
-<p>有些发行版不支持。</p>
-<p><strong>lockf</strong>：对fcntl的封装</p>
-]]></content>
-      <categories>
-        <category>Linux应用</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>C</tag>
       </tags>
   </entry>
   <entry>
@@ -1093,6 +1081,97 @@
       </tags>
   </entry>
   <entry>
+    <title>嵌入式软件基础知识</title>
+    <url>/51d11c96.html</url>
+    <content><![CDATA[<p>本文介绍常用的嵌入式软件的基础知识，并进行总结，方便日后复习查看</p>
+<span id="more"></span>
+
+<h1 id="STM32启动"><a href="#STM32启动" class="headerlink" title="STM32启动"></a>STM32启动</h1><h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><ol>
+<li><strong>从Flash启动</strong>，将Flash地址0x0800 0000映射到0x00000000，这样启动以后就相当于从0x08000000开始的，这是我们最常用的模式；</li>
+<li><strong>从SRAM启动</strong>，将SRAM地址0x20000000映射到0x00000000，这样启动以后就相当于从0x20000000开始的，用于调试。</li>
+<li><strong>从系统存储器启动(System memory)，</strong>将系统存储器地址0x1FFFF000映射到0x00000000，提供了可以通过UART1接口将用户的代码下载到Flash中的功能。</li>
+</ol>
+<img src="/51d11c96/image-20240910205430419.png" class="" title="启动模式配置">
+
+<h2 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h2><ol>
+<li><p>初始化堆栈指针SP=_initial_sp</p>
+</li>
+<li><p>初始化PC 指针=Reset_Handler</p>
+</li>
+<li><p>初始化中断向量表</p>
+</li>
+<li><p>配置系统时钟</p>
+</li>
+<li><p>调用C 库函数_main 初始化用户堆栈，从而最终调用main 函数</p>
+</li>
+</ol>
+<h1 id="STM32-GPIO"><a href="#STM32-GPIO" class="headerlink" title="STM32 GPIO"></a>STM32 GPIO</h1><ol>
+<li><strong>推挽输出(Push-Pull Output)：</strong>推挽输出模式是最常见的GPIO输出模式。在该模式下，引脚可以输出高电平或低电平，同时具有一定的驱动能力。引脚在输出低电平时形成低阻抗，输出高电平时形成高阻抗，可以驱动外部电路。</li>
+<li><strong>开漏输出(Open-Drain Output)：</strong>开漏输出模式是一种能够输出低电平和高阻抗的GPIO模式。在该模式下，引脚只能输出低电平，要输出高电平需要通过外部上拉电阻或其他方式。通常用于与外部器件连接，例如与开漏输出的I2C总线器件进行通信。</li>
+<li><strong>复用推挽输出(AF Push-Pull Output)：</strong>复用推挽输出模式允许将GPIO引脚用作特定外设功能。在该模式下，引脚可以输出高电平或低电平，并具有一定的驱动能力。</li>
+<li><strong>复用开漏输出(AF Open-Drain Output)：</strong>复用开漏输出模式允许将GPIO引脚用作特定外设功能。在该模式下，引脚只能输出低电平，要输出高电平需要通过外部上拉电阻或其他方式。</li>
+<li><strong>浮空输入(Floating Input)：</strong>浮空输入模式是一种高阻抗输入模式。在该模式下，引脚不连接到外部电路，处于高阻抗状态。可以通过读取引脚电平来检测外部信号。</li>
+<li><strong>上拉输入(Pull-up Input)：</strong>上拉输入模式是一种具有内部上拉电阻的GPIO输入模式。在该模式下，引脚连接到外部电路，通过内部上拉电阻来维持默认电平为高电平。</li>
+<li><strong>下拉输入(Pull-down Input)：</strong>下拉输入模式是一种具有内部下拉电阻的GPIO输入模式。在该模式下，引脚连接到外部电路，通过内部下拉电阻来维持默认电平为低电平。</li>
+<li><strong>模拟输入(Analog Input)：</strong>模拟输入模式是一种用于ADC（模数转换器）输入的特殊模式。在该模式下，引脚可以接收连续变化的模拟信号。</li>
+</ol>
+<h1 id="UART"><a href="#UART" class="headerlink" title="UART"></a>UART</h1><p><strong>UART</strong>全称是通用<strong>异步收发传输器</strong>（Universal Asynchronous Receiver/Transmitter)，它通常称作UART，是一种异步收发传输器, 是设备间进行异步通信的关键模块。UART负责处理数据总线和串行口之间的串/并、并/串转换，并规定了帧格式；通信双方只要采用相同的帧格式和波特率，就能在未共享时钟信号的情况下，仅用<strong>两根信号线（RX 和TX）就可以完成通信过程，因此也称为异步串行通信</strong>。</p>
+<img src="/51d11c96/image-20240910210746279.png" class="" title="UART帧格式">
+
+<p><strong>起始位：</strong>先发出一个逻辑”0”信号，表示传输字符的开始；</p>
+<p><strong>数据位：</strong>可以是5~8位逻辑”0”或”1”；如ASCII码（7位），扩展BCD码（8位）；小端传输，即LSB先发，MSB后发；</p>
+<p><strong>校验位：</strong>数据位加上这一位后，使得“1”的位数应为偶数(偶校验)或奇数(奇校验)；</p>
+<p><strong>停止位：</strong>它是一个字符数据的结束标志。可以是1位、1.5位、2位的高电平（用于双方同步，<strong>停止位时间间隔越长，容错能力越强</strong>）；</p>
+<p><strong>空闲位：</strong>处于逻辑“1”状态，表示当前线路上没有数据传送；</p>
+<h1 id="IIC"><a href="#IIC" class="headerlink" title="IIC"></a>IIC</h1><p><strong>IIC</strong>（Inter-Integrated Circuit）也称I2C，中文叫<strong>集成电路总线</strong>。是一个<strong>多主从</strong>的<strong>串行</strong>总线，由飞利浦公司发明的通讯总线，属于<strong>半双工</strong>同步<strong>传输类总线，</strong>仅由两条线就能完成多机通讯<strong>，一条</strong>SCL时钟线<strong>，另外一条</strong>双向数据线<strong>SDA</strong>，IIC总线要求每个设备SCL/SDA线都是漏极开路模式，因此必须带上拉电阻才能正常工作。I2C协议占用引脚少，硬件实现简单，可扩展性强，I2C数据传输速率有标准模式(100kbps)、快速模式(400kbps)和高速模式(3.4Mbps)。</p>
+<img src="/51d11c96/image-20240911201001466.png" class="" title="I2C常用连接方式">
+
+<h2 id="起始位"><a href="#起始位" class="headerlink" title="起始位"></a>起始位</h2><p>   SCL处于高电平，SDA出现下降沿</p>
+   <img src="/51d11c96/image-20240911201126943.png" class="" title="I2C起始位">
+
+<h2 id="停止位"><a href="#停止位" class="headerlink" title="停止位"></a>停止位</h2><p>  SCL处于高电平，SDA出现上升沿</p>
+   <img src="/51d11c96/image-20240911201220301.png" class="" title="I2C停止位">
+
+<h2 id="数据传输"><a href="#数据传输" class="headerlink" title="数据传输"></a>数据传输</h2><p>  I2C 总线在数据传输的时候要保证在 SCL 高电平期间，SDA 上的数据稳定，因此 SDA 上的数据变化只能在 SCL 低电平期间发生。</p>
+   <img src="/51d11c96/image-20240911201320902.png" class="" title="I2C数据传输">
+
+<h2 id="应答信号"><a href="#应答信号" class="headerlink" title="应答信号"></a>应答信号</h2><p>  当 I2C 主机发送完 8 位数据以后会将 SDA 设置为输入状态，等待 I2C 从机应答，也就是等到 I2C 从机告诉主机它接收到数据了。应答信号是由从机发出的，主机需要提供应答信号所需的时钟，主机发送完 8 位数据以后紧跟着的一个时钟信号就是给应答信号使用的。从机通过将 SDA 拉低来表示发出应答信号，表示通信成功，否则表示通信失败。</p>
+<h2 id="I2C写时序"><a href="#I2C写时序" class="headerlink" title="I2C写时序"></a>I2C写时序</h2>   <img src="/51d11c96/image-20240911202050048.png" class="" title="I2C写时序">
+
+<h2 id="I2C读时序"><a href="#I2C读时序" class="headerlink" title="I2C读时序"></a>I2C读时序</h2>   <img src="/51d11c96/image-20240911202117761.png" class="" title="I2C读时序">
+
+<h1 id="SPI"><a href="#SPI" class="headerlink" title="SPI"></a>SPI</h1><p><strong>SPI是串行外设接口</strong>（Serial Peripheral Interface）的缩写。是美国摩托罗拉公司（Motorola）最先推出的一种同步串行传输规范，也是一种单片机外设芯片串行扩展接口，<strong>是一种高速、全双工、同步通信总线</strong>，所以可以在同一时间发送和接收数据，SPI没有定义速度限制，通常能达到甚至超过10M/bps。</p>
+<p>SPI通信原理很简单，需要至少4根线，单向传输时3根线，它们是MISO（主设备数据输入）、MOSI（主设备数据输出）、SCLK（时钟）和CS/SS（片选）。</p>
+<ul>
+<li><strong>MISO</strong>（ Master Input Slave Output）<strong>简称主入从出信号线</strong>：主设备数据输入，从设备数据输出；</li>
+<li><strong>MOSI</strong>（Master Output Slave Input）<strong>简称主出从入信号线</strong>：主设备数据输出，从设备数据输入；</li>
+<li><strong>SCLK</strong>（Serial Clock）<strong>串行时钟</strong>：为 SPI 通信提供时钟；时钟信号，由主设备产生；</li>
+<li><strong>CS/SS</strong>（Chip Select/Slave Select）为<strong>片选信号线</strong>：为 SPI 通信提供时钟；从设备使能信号，由主设备控制，一主多从时，CS/SS是从芯片是否被主芯片选中的控制信号，只有片选信号为预先规定的使能信号时（高电位或低电位），主芯片对此从芯片的操作才有效。</li>
+</ul>
+<p>SPI只有主模式和从模式之分，没有读和写的说法，<strong>外设的写操作和读操作是同步完成的。</strong>如果只进行写操作，主机只需忽略接收到的字节；反之，若主机要读取从机的一个字节，就必须发送一个空字节来引发从机的传输。换句话理解就是，你发一个数据必然会收到一个数据；你要收一个数据必须也要先发一个数据。</p>
+<img src="/51d11c96/image-20240911203329960.png" class="" title="SPI时序图">
+
+<p><strong>时钟极性和时钟相位</strong></p>
+<p><strong>CPOL</strong>控制时钟极性</p>
+<ul>
+<li>CPOL = 0：时钟空闲IDLE为低电平 0；</li>
+<li>CPOL = 1：时钟空闲IDLE为高电平1。</li>
+</ul>
+<p><strong>CPHA</strong>控制时钟相位</p>
+<ul>
+<li>CPHA = 0：在时钟信号SCK的第一个跳变沿采样；</li>
+<li>CPHA = 1：在时钟信号SCK的第二个跳变沿采样。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>嵌入式</category>
+      </categories>
+      <tags>
+        <tag>C</tag>
+        <tag>嵌入式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/4a17b156.html</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -1213,94 +1292,53 @@
       </tags>
   </entry>
   <entry>
-    <title>嵌入式软件基础知识</title>
-    <url>/51d11c96.html</url>
-    <content><![CDATA[<p>本文介绍常用的嵌入式软件的基础知识，并进行总结，方便日后复习查看</p>
+    <title>常用设计模式</title>
+    <url>/1e80ad29.html</url>
+    <content><![CDATA[<p>设计模式提供了经过验证的解决方案，可以帮助开发者写出更优雅、可维护性更高的代码。它们能够减少代码中的重复、增强代码的灵活性和可扩展性。设计模式总共有23种，本文只介绍常用的几种</p>
 <span id="more"></span>
 
-<h1 id="STM32启动"><a href="#STM32启动" class="headerlink" title="STM32启动"></a>STM32启动</h1><h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><ol>
-<li><strong>从Flash启动</strong>，将Flash地址0x0800 0000映射到0x00000000，这样启动以后就相当于从0x08000000开始的，这是我们最常用的模式；</li>
-<li><strong>从SRAM启动</strong>，将SRAM地址0x20000000映射到0x00000000，这样启动以后就相当于从0x20000000开始的，用于调试。</li>
-<li><strong>从系统存储器启动(System memory)，</strong>将系统存储器地址0x1FFFF000映射到0x00000000，提供了可以通过UART1接口将用户的代码下载到Flash中的功能。</li>
+<p>设计模式六大原则</p>
+<ol>
+<li><strong>单一职责原则：</strong>一个类只提供一种功能和仅有一个引起它变化的因素。</li>
+<li><strong>开放封闭原则：</strong>对一个类来说，对它的内部修改是封闭的，对它的扩展是开放的。</li>
+<li><strong>依赖倒置原则：</strong>就是程序依赖于抽象，而不依赖于实现。</li>
+<li><strong>里氏替换原则：</strong>基类出现的地方，通过它的子类也完全可以实现这个功能</li>
+<li><strong>接口隔离原则：</strong>建立单一接口，不要建立庞大臃肿的接口，尽量细化接口，接口中的方法尽量少。也就是说，我们要为各个类建立专用的接口，而不要试图去建立一个很庞大的接口供所有依赖它的类去调用。</li>
+<li><strong>合成复用原则：</strong>多用组合设计类，少用继承。</li>
 </ol>
-<img src="/51d11c96/image-20240910205430419.png" class="" title="启动模式配置">
+<h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><p>只允许创建一个活动的对象（实例），提供了对唯一实例的受控访问。</p>
+<p>单线程</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SingleInstance</span>{</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">SingleInstance</span>() {}</span><br><span class="line">    <span class="built_in">SingleInstance</span>(<span class="type">const</span> SingleInstance&amp; other) {}</span><br><span class="line">    SingleInstance&amp; <span class="keyword">operator</span>=(<span class="type">const</span> SingleInstance&amp; other) {<span class="keyword">return</span> *<span class="keyword">this</span>;}</span><br><span class="line">    <span class="type">static</span> SingleInstance* instance;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">SingleInstance* <span class="title">globalInstance</span><span class="params">()</span></span>{</span><br><span class="line">        <span class="keyword">if</span>(instance == <span class="literal">nullptr</span>){</span><br><span class="line">            instance = <span class="keyword">new</span> <span class="built_in">SingleInstance</span>();</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="启动流程"><a href="#启动流程" class="headerlink" title="启动流程"></a>启动流程</h2><ol>
-<li><p>初始化堆栈指针SP=_initial_sp</p>
-</li>
-<li><p>初始化PC 指针=Reset_Handler</p>
-</li>
-<li><p>初始化中断向量表</p>
-</li>
-<li><p>配置系统时钟</p>
-</li>
-<li><p>调用C 库函数_main 初始化用户堆栈，从而最终调用main 函数</p>
-</li>
-</ol>
-<h1 id="STM32-GPIO"><a href="#STM32-GPIO" class="headerlink" title="STM32 GPIO"></a>STM32 GPIO</h1><ol>
-<li><strong>推挽输出(Push-Pull Output)：</strong>推挽输出模式是最常见的GPIO输出模式。在该模式下，引脚可以输出高电平或低电平，同时具有一定的驱动能力。引脚在输出低电平时形成低阻抗，输出高电平时形成高阻抗，可以驱动外部电路。</li>
-<li><strong>开漏输出(Open-Drain Output)：</strong>开漏输出模式是一种能够输出低电平和高阻抗的GPIO模式。在该模式下，引脚只能输出低电平，要输出高电平需要通过外部上拉电阻或其他方式。通常用于与外部器件连接，例如与开漏输出的I2C总线器件进行通信。</li>
-<li><strong>复用推挽输出(AF Push-Pull Output)：</strong>复用推挽输出模式允许将GPIO引脚用作特定外设功能。在该模式下，引脚可以输出高电平或低电平，并具有一定的驱动能力。</li>
-<li><strong>复用开漏输出(AF Open-Drain Output)：</strong>复用开漏输出模式允许将GPIO引脚用作特定外设功能。在该模式下，引脚只能输出低电平，要输出高电平需要通过外部上拉电阻或其他方式。</li>
-<li><strong>浮空输入(Floating Input)：</strong>浮空输入模式是一种高阻抗输入模式。在该模式下，引脚不连接到外部电路，处于高阻抗状态。可以通过读取引脚电平来检测外部信号。</li>
-<li><strong>上拉输入(Pull-up Input)：</strong>上拉输入模式是一种具有内部上拉电阻的GPIO输入模式。在该模式下，引脚连接到外部电路，通过内部上拉电阻来维持默认电平为高电平。</li>
-<li><strong>下拉输入(Pull-down Input)：</strong>下拉输入模式是一种具有内部下拉电阻的GPIO输入模式。在该模式下，引脚连接到外部电路，通过内部下拉电阻来维持默认电平为低电平。</li>
-<li><strong>模拟输入(Analog Input)：</strong>模拟输入模式是一种用于ADC（模数转换器）输入的特殊模式。在该模式下，引脚可以接收连续变化的模拟信号。</li>
-</ol>
-<h1 id="UART"><a href="#UART" class="headerlink" title="UART"></a>UART</h1><p><strong>UART</strong>全称是通用<strong>异步收发传输器</strong>（Universal Asynchronous Receiver/Transmitter)，它通常称作UART，是一种异步收发传输器, 是设备间进行异步通信的关键模块。UART负责处理数据总线和串行口之间的串/并、并/串转换，并规定了帧格式；通信双方只要采用相同的帧格式和波特率，就能在未共享时钟信号的情况下，仅用<strong>两根信号线（RX 和TX）就可以完成通信过程，因此也称为异步串行通信</strong>。</p>
-<img src="/51d11c96/image-20240910210746279.png" class="" title="UART帧格式">
+<p>线程安全（懒汉式）</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SingleInstance</span>{</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">SingleInstance</span>() {}</span><br><span class="line">    <span class="built_in">SingleInstance</span>(<span class="type">const</span> SingleInstance&amp; other) {}</span><br><span class="line">    SingleInstance&amp; <span class="keyword">operator</span>=(<span class="type">const</span> SingleInstance&amp; other) {<span class="keyword">return</span> *<span class="keyword">this</span>;}</span><br><span class="line">    <span class="type">static</span> std::mutex mtx;</span><br><span class="line">    <span class="type">static</span> SingleInstance* instance;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 还是会出现一定的问题，具体表现为reorder, 可以通过原子操作+内存屏障实现</span></span><br><span class="line">    <span class="function">SingleInstance* <span class="title">globalInstance</span><span class="params">()</span></span>{</span><br><span class="line">        <span class="keyword">if</span>(instance == <span class="literal">nullptr</span>){</span><br><span class="line">            <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mtx)</span></span>;</span><br><span class="line">            <span class="keyword">if</span>(instance == <span class="literal">nullptr</span>){</span><br><span class="line">                instance = <span class="keyword">new</span> <span class="built_in">SingleInstance</span>();</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>起始位：</strong>先发出一个逻辑”0”信号，表示传输字符的开始；</p>
-<p><strong>数据位：</strong>可以是5~8位逻辑”0”或”1”；如ASCII码（7位），扩展BCD码（8位）；小端传输，即LSB先发，MSB后发；</p>
-<p><strong>校验位：</strong>数据位加上这一位后，使得“1”的位数应为偶数(偶校验)或奇数(奇校验)；</p>
-<p><strong>停止位：</strong>它是一个字符数据的结束标志。可以是1位、1.5位、2位的高电平（用于双方同步，<strong>停止位时间间隔越长，容错能力越强</strong>）；</p>
-<p><strong>空闲位：</strong>处于逻辑“1”状态，表示当前线路上没有数据传送；</p>
-<h1 id="IIC"><a href="#IIC" class="headerlink" title="IIC"></a>IIC</h1><p><strong>IIC</strong>（Inter-Integrated Circuit）也称I2C，中文叫<strong>集成电路总线</strong>。是一个<strong>多主从</strong>的<strong>串行</strong>总线，由飞利浦公司发明的通讯总线，属于<strong>半双工</strong>同步<strong>传输类总线，</strong>仅由两条线就能完成多机通讯<strong>，一条</strong>SCL时钟线<strong>，另外一条</strong>双向数据线<strong>SDA</strong>，IIC总线要求每个设备SCL/SDA线都是漏极开路模式，因此必须带上拉电阻才能正常工作。I2C协议占用引脚少，硬件实现简单，可扩展性强，I2C数据传输速率有标准模式(100kbps)、快速模式(400kbps)和高速模式(3.4Mbps)。</p>
-<img src="/51d11c96/image-20240911201001466.png" class="" title="I2C常用连接方式">
+<p>线程安全（饿汉式）</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SingleInstance</span>{</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">SingleInstance</span>() {}</span><br><span class="line">    <span class="built_in">SingleInstance</span>(<span class="type">const</span> SingleInstance&amp; other) {}</span><br><span class="line">    SingleInstance&amp; <span class="keyword">operator</span>=(<span class="type">const</span> SingleInstance&amp; other) {<span class="keyword">return</span> *<span class="keyword">this</span>;}</span><br><span class="line">    <span class="type">static</span> SingleInstance instance;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">SingleInstance* <span class="title">globalInstance</span><span class="params">()</span></span>{</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line">SingleInstance* SingleInstance::instance = <span class="keyword">new</span> <span class="built_in">SingleInstance</span>();</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="起始位"><a href="#起始位" class="headerlink" title="起始位"></a>起始位</h2><p>   SCL处于高电平，SDA出现下降沿</p>
-   <img src="/51d11c96/image-20240911201126943.png" class="" title="I2C起始位">
+<h1 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h1><p>实现了同一接口的一些类进行实例的创建。简单工厂模式的实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类（这些产品类继承自一个父类或接口）的实例。</p>
+<h2 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h2><figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">//产品类（抽象类，不能实例化）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Product</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Product</span>(){};</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>=<span class="number">0</span>;  <span class="comment">//纯虚函数</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">productA</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">productA</span>(){};</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout &lt;&lt; <span class="string">"product A create!"</span> &lt;&lt; endl; };</span><br><span class="line">    ~<span class="built_in">productA</span>(){};</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">productB</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">productB</span>(){};</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout &lt;&lt; <span class="string">"product B create!"</span> &lt;&lt; endl; };</span><br><span class="line">    ~<span class="built_in">productB</span>(){};</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">simpleFactory</span>{ <span class="comment">// 工厂类</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Product* m;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">simpleFactory</span>(){};</span><br><span class="line">    <span class="function">Product* <span class="title">product</span><span class="params">(<span class="type">const</span> string str)</span></span>{</span><br><span class="line">        <span class="keyword">if</span> (str == <span class="string">"productA"</span>) m = <span class="keyword">new</span> <span class="built_in">productA</span>();</span><br><span class="line">        <span class="keyword">if</span> (str == <span class="string">"productB"</span>) m = <span class="keyword">new</span> <span class="built_in">productB</span>();</span><br><span class="line">        <span class="comment">//... 不符合开放封闭原则，抽象工厂类解决</span></span><br><span class="line">        <span class="keyword">return</span> m;</span><br><span class="line">    };</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="停止位"><a href="#停止位" class="headerlink" title="停止位"></a>停止位</h2><p>  SCL处于高电平，SDA出现上升沿</p>
-   <img src="/51d11c96/image-20240911201220301.png" class="" title="I2C停止位">
+<h2 id="抽象工厂"><a href="#抽象工厂" class="headerlink" title="抽象工厂"></a>抽象工厂</h2><figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">//产品类（抽象类，不能实例化）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Product</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Product</span>(){}</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>=<span class="number">0</span>;  <span class="comment">//纯虚函数</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//产品A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProductA</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">ProductA</span>(){}</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout&lt;&lt;<span class="string">"product A create!"</span>&lt;&lt;endl; };</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//产品B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProductB</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">ProductB</span>(){}</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout&lt;&lt;<span class="string">"product B create!"</span>&lt;&lt;endl; };</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Factory</span>{<span class="comment">//抽象类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Product* <span class="title">CreateProduct</span><span class="params">()</span></span>=<span class="number">0</span>;</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FactorA</span>:<span class="keyword">public</span> Factory{<span class="comment">//工厂类A，只生产A产品</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Product* <span class="title">CreateProduct</span><span class="params">()</span></span>{</span><br><span class="line">        Product* _Product = <span class="literal">nullptr</span>;</span><br><span class="line">        _Product = <span class="keyword">new</span> <span class="built_in">ProductA</span>();</span><br><span class="line">        <span class="keyword">return</span> _Product;</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FactorB</span>:<span class="keyword">public</span> Factory{<span class="comment">//工厂类B，只生产B产品</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Product* <span class="title">CreateProduct</span><span class="params">()</span></span>{</span><br><span class="line">        Product* _Product = <span class="literal">nullptr</span>;</span><br><span class="line">        _Product = <span class="keyword">new</span> <span class="built_in">ProductB</span>();</span><br><span class="line">        <span class="keyword">return</span> _Product;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="数据传输"><a href="#数据传输" class="headerlink" title="数据传输"></a>数据传输</h2><p>  I2C 总线在数据传输的时候要保证在 SCL 高电平期间，SDA 上的数据稳定，因此 SDA 上的数据变化只能在 SCL 低电平期间发生。</p>
-   <img src="/51d11c96/image-20240911201320902.png" class="" title="I2C数据传输">
+<h1 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h1><p>当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。（例如：进度条）</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">IProgress</span> <span class="comment">// 进度条基类</span></span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">DoProgress</span><span class="params">(<span class="type">float</span> value)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">IProgress</span>() {}</span><br><span class="line">};</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileSplitter</span></span><br><span class="line">{</span><br><span class="line">    string m_filePath;</span><br><span class="line">    <span class="type">int</span> m_fileNumber;</span><br><span class="line">    List&lt;IProgress *&gt; m_iprogressList; <span class="comment">//抽象通知机制，观察者的核心</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">FileSplitter</span>(<span class="type">const</span> string &amp;filePath, <span class="type">int</span> fileNumber) : <span class="built_in">m_filePath</span>(filePath),</span><br><span class="line">                                                           <span class="built_in">m_fileNumber</span>(fileNumber)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">split</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_fileNumber; i++)</span><br><span class="line">        {</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">            <span class="type">float</span> progressValue = m_fileNumber;</span><br><span class="line">            progressValue = (i + <span class="number">1</span>) / progressValue;</span><br><span class="line">            <span class="built_in">onProgress</span>(progressValue); <span class="comment">//更新进度</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">addIProgress</span><span class="params">(IProgress *iprogress)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        m_iprogressList.<span class="built_in">push_back</span>(iprogress);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">removeIProgress</span><span class="params">(IProgress *iprogress)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        m_iprogressList.<span class="built_in">remove</span>(iprogress);</span><br><span class="line">    }</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onProgress</span><span class="params">(<span class="type">float</span> value)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        List&lt;IProgress *&gt;::iterator itor = m_iprogressList.<span class="built_in">begin</span>();</span><br><span class="line">        <span class="keyword">while</span> (itor != m_iprogressList.<span class="built_in">end</span>())</span><br><span class="line">        {</span><br><span class="line">            (*itor)-&gt;<span class="built_in">DoProgress</span>(value); <span class="comment">//更新所有的进度条</span></span><br><span class="line">            itor++;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="应答信号"><a href="#应答信号" class="headerlink" title="应答信号"></a>应答信号</h2><p>  当 I2C 主机发送完 8 位数据以后会将 SDA 设置为输入状态，等待 I2C 从机应答，也就是等到 I2C 从机告诉主机它接收到数据了。应答信号是由从机发出的，主机需要提供应答信号所需的时钟，主机发送完 8 位数据以后紧跟着的一个时钟信号就是给应答信号使用的。从机通过将 SDA 拉低来表示发出应答信号，表示通信成功，否则表示通信失败。</p>
-<h2 id="I2C写时序"><a href="#I2C写时序" class="headerlink" title="I2C写时序"></a>I2C写时序</h2>   <img src="/51d11c96/image-20240911202050048.png" class="" title="I2C写时序">
+<h1 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h1><p>定义一系列的算法，把它们一个个封装起来，并且使它们可相互替换。该模式使得算法可独立于使用它的客户而变化。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// The abstract strategy</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Strategy</span>{ <span class="comment">// 策略抽象</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStrategyA</span> : <span class="keyword">public</span> Strategy{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span></span>{</span><br><span class="line">          cout&lt;&lt;<span class="string">"I am from ConcreteStrategyA."</span>&lt;&lt;endl;</span><br><span class="line">     }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStrategyB</span> : <span class="keyword">public</span> Strategy{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span></span>{</span><br><span class="line">          cout&lt;&lt;<span class="string">"I am from ConcreteStrategyB."</span>&lt;&lt;endl;</span><br><span class="line">     }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStrategyC</span> : <span class="keyword">public</span> Strategy{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span></span>{</span><br><span class="line">          cout&lt;&lt;<span class="string">"I am from ConcreteStrategyC."</span>&lt;&lt;endl;</span><br><span class="line">     }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="built_in">Context</span>(Strategy *pStrategyArg) : <span class="built_in">pStrategy</span>(pStrategyArg){};</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">ContextInterface</span><span class="params">()</span></span>{</span><br><span class="line">          pStrategy-&gt;<span class="built_in">AlgorithmInterface</span>();</span><br><span class="line">     }</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">     Strategy *pStrategy;</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
 
-<h2 id="I2C读时序"><a href="#I2C读时序" class="headerlink" title="I2C读时序"></a>I2C读时序</h2>   <img src="/51d11c96/image-20240911202117761.png" class="" title="I2C读时序">
+<h1 id="装饰器模式"><a href="#装饰器模式" class="headerlink" title="装饰器模式"></a>装饰器模式</h1><p>装饰器模式（Decorator Pattern）允许向一个现有的对象添加新的功能，<strong>同时又不改变其结构</strong>。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">//业务操作</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Stream</span></span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">char</span> <span class="title">Read</span><span class="params">(<span class="type">int</span> number)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Seek</span><span class="params">(<span class="type">int</span> position)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Write</span><span class="params">(<span class="type">char</span> data)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Stream</span>() {}</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//主体类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileStream</span> : <span class="keyword">public</span> Stream</span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">char</span> <span class="title">Read</span><span class="params">(<span class="type">int</span> number)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//读文件流</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Seek</span><span class="params">(<span class="type">int</span> position)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//定位文件流</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Write</span><span class="params">(<span class="type">char</span> data)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//写文件流</span></span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//扩展操作</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DecoratorStream</span> : <span class="keyword">public</span> Stream <span class="comment">//装饰器基类</span></span><br><span class="line">{</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Stream *stream; <span class="comment">//组合代替继承</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">DecoratorStream</span>(Stream *stm) : <span class="built_in">stream</span>(stm)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CryptoStream</span> : <span class="keyword">public</span> DecoratorStream</span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CryptoStream</span>(Stream *stm) : <span class="built_in">DecoratorStream</span>(stm)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">char</span> <span class="title">Read</span><span class="params">(<span class="type">int</span> number)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line"></span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">        stream-&gt;<span class="built_in">Read</span>(number); <span class="comment">//读文件流</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Seek</span><span class="params">(<span class="type">int</span> position)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">        stream-&gt;<span class="built_in">Seek</span>(position); <span class="comment">//定位文件流</span></span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Write</span><span class="params">(byte data)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">        stream-&gt;<span class="built_in">Write</span>(data); <span class="comment">//写文件流</span></span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BufferedStream</span> : <span class="keyword">public</span> DecoratorStream</span><br><span class="line">{</span><br><span class="line">    Stream *stream; <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">BufferedStream</span>(Stream *stm) : <span class="built_in">DecoratorStream</span>(stm)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Process</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="comment">//运行时装配</span></span><br><span class="line">    FileStream *s1 = <span class="keyword">new</span> <span class="built_in">FileStream</span>();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<h1 id="SPI"><a href="#SPI" class="headerlink" title="SPI"></a>SPI</h1><p><strong>SPI是串行外设接口</strong>（Serial Peripheral Interface）的缩写。是美国摩托罗拉公司（Motorola）最先推出的一种同步串行传输规范，也是一种单片机外设芯片串行扩展接口，<strong>是一种高速、全双工、同步通信总线</strong>，所以可以在同一时间发送和接收数据，SPI没有定义速度限制，通常能达到甚至超过10M/bps。</p>
-<p>SPI通信原理很简单，需要至少4根线，单向传输时3根线，它们是MISO（主设备数据输入）、MOSI（主设备数据输出）、SCLK（时钟）和CS/SS（片选）。</p>
-<ul>
-<li><strong>MISO</strong>（ Master Input Slave Output）<strong>简称主入从出信号线</strong>：主设备数据输入，从设备数据输出；</li>
-<li><strong>MOSI</strong>（Master Output Slave Input）<strong>简称主出从入信号线</strong>：主设备数据输出，从设备数据输入；</li>
-<li><strong>SCLK</strong>（Serial Clock）<strong>串行时钟</strong>：为 SPI 通信提供时钟；时钟信号，由主设备产生；</li>
-<li><strong>CS/SS</strong>（Chip Select/Slave Select）为<strong>片选信号线</strong>：为 SPI 通信提供时钟；从设备使能信号，由主设备控制，一主多从时，CS/SS是从芯片是否被主芯片选中的控制信号，只有片选信号为预先规定的使能信号时（高电位或低电位），主芯片对此从芯片的操作才有效。</li>
-</ul>
-<p>SPI只有主模式和从模式之分，没有读和写的说法，<strong>外设的写操作和读操作是同步完成的。</strong>如果只进行写操作，主机只需忽略接收到的字节；反之，若主机要读取从机的一个字节，就必须发送一个空字节来引发从机的传输。换句话理解就是，你发一个数据必然会收到一个数据；你要收一个数据必须也要先发一个数据。</p>
-<img src="/51d11c96/image-20240911203329960.png" class="" title="SPI时序图">
-
-<p><strong>时钟极性和时钟相位</strong></p>
-<p><strong>CPOL</strong>控制时钟极性</p>
-<ul>
-<li>CPOL = 0：时钟空闲IDLE为低电平 0；</li>
-<li>CPOL = 1：时钟空闲IDLE为高电平1。</li>
-</ul>
-<p><strong>CPHA</strong>控制时钟相位</p>
-<ul>
-<li>CPHA = 0：在时钟信号SCK的第一个跳变沿采样；</li>
-<li>CPHA = 1：在时钟信号SCK的第二个跳变沿采样。</li>
-</ul>
+<h1 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h1><p>使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;list&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">//目标抽象类Robot（机器人接口）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Robot</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">eat</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">sleep</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">}; </span><br><span class="line"></span><br><span class="line"><span class="comment">//适配者类Douya（Douya类）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Douya</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">eat</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"豆芽吃饭"</span> &lt;&lt; endl;    </span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sleep</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"豆芽睡觉"</span> &lt;&lt; endl;    </span><br><span class="line">    }</span><br><span class="line">}; </span><br><span class="line"></span><br><span class="line"><span class="comment">//适配器类DouyaAdapter（DouyaAdapter类） </span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DouyaAdapter</span> : <span class="keyword">public</span> Robot, <span class="keyword">public</span> Douya{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">eat</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"机器人模仿："</span> ;</span><br><span class="line">        Douya::<span class="built_in">eat</span>();</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sleep</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"机器人模仿："</span> ;</span><br><span class="line">        Douya::<span class="built_in">sleep</span>(); </span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//客户端测试类Client </span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span></span>{</span><br><span class="line">    Robot *robot = (Robot*)<span class="keyword">new</span> <span class="built_in">DouyaAdapter</span>();</span><br><span class="line">    robot-&gt;<span class="built_in">eat</span>(); <span class="comment">// 机器人模仿：豆芽吃饭</span></span><br><span class="line">    robot-&gt;<span class="built_in">sleep</span>(); <span class="comment">// 机器人模仿：豆芽睡觉</span></span><br><span class="line">    <span class="keyword">delete</span> robot;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
 ]]></content>
       <categories>
-        <category>嵌入式</category>
+        <category>设计模式</category>
       </categories>
       <tags>
-        <tag>C</tag>
-        <tag>嵌入式</tag>
+        <tag>C++</tag>
+        <tag>设计模式</tag>
       </tags>
   </entry>
   <entry>
@@ -1413,56 +1451,6 @@
       <tags>
         <tag>C++</tag>
         <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>常用设计模式</title>
-    <url>/1e80ad29.html</url>
-    <content><![CDATA[<p>设计模式提供了经过验证的解决方案，可以帮助开发者写出更优雅、可维护性更高的代码。它们能够减少代码中的重复、增强代码的灵活性和可扩展性。设计模式总共有23种，本文只介绍常用的几种</p>
-<span id="more"></span>
-
-<p>设计模式六大原则</p>
-<ol>
-<li><strong>单一职责原则：</strong>一个类只提供一种功能和仅有一个引起它变化的因素。</li>
-<li><strong>开放封闭原则：</strong>对一个类来说，对它的内部修改是封闭的，对它的扩展是开放的。</li>
-<li><strong>依赖倒置原则：</strong>就是程序依赖于抽象，而不依赖于实现。</li>
-<li><strong>里氏替换原则：</strong>基类出现的地方，通过它的子类也完全可以实现这个功能</li>
-<li><strong>接口隔离原则：</strong>建立单一接口，不要建立庞大臃肿的接口，尽量细化接口，接口中的方法尽量少。也就是说，我们要为各个类建立专用的接口，而不要试图去建立一个很庞大的接口供所有依赖它的类去调用。</li>
-<li><strong>合成复用原则：</strong>多用组合设计类，少用继承。</li>
-</ol>
-<h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h1><p>只允许创建一个活动的对象（实例），提供了对唯一实例的受控访问。</p>
-<p>单线程</p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SingleInstance</span>{</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">SingleInstance</span>() {}</span><br><span class="line">    <span class="built_in">SingleInstance</span>(<span class="type">const</span> SingleInstance&amp; other) {}</span><br><span class="line">    SingleInstance&amp; <span class="keyword">operator</span>=(<span class="type">const</span> SingleInstance&amp; other) {<span class="keyword">return</span> *<span class="keyword">this</span>;}</span><br><span class="line">    <span class="type">static</span> SingleInstance* instance;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">SingleInstance* <span class="title">globalInstance</span><span class="params">()</span></span>{</span><br><span class="line">        <span class="keyword">if</span>(instance == <span class="literal">nullptr</span>){</span><br><span class="line">            instance = <span class="keyword">new</span> <span class="built_in">SingleInstance</span>();</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<p>线程安全（懒汉式）</p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SingleInstance</span>{</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">SingleInstance</span>() {}</span><br><span class="line">    <span class="built_in">SingleInstance</span>(<span class="type">const</span> SingleInstance&amp; other) {}</span><br><span class="line">    SingleInstance&amp; <span class="keyword">operator</span>=(<span class="type">const</span> SingleInstance&amp; other) {<span class="keyword">return</span> *<span class="keyword">this</span>;}</span><br><span class="line">    <span class="type">static</span> std::mutex mtx;</span><br><span class="line">    <span class="type">static</span> SingleInstance* instance;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 还是会出现一定的问题，具体表现为reorder, 可以通过原子操作+内存屏障实现</span></span><br><span class="line">    <span class="function">SingleInstance* <span class="title">globalInstance</span><span class="params">()</span></span>{</span><br><span class="line">        <span class="keyword">if</span>(instance == <span class="literal">nullptr</span>){</span><br><span class="line">            <span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mtx)</span></span>;</span><br><span class="line">            <span class="keyword">if</span>(instance == <span class="literal">nullptr</span>){</span><br><span class="line">                instance = <span class="keyword">new</span> <span class="built_in">SingleInstance</span>();</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<p>线程安全（饿汉式）</p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SingleInstance</span>{</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">SingleInstance</span>() {}</span><br><span class="line">    <span class="built_in">SingleInstance</span>(<span class="type">const</span> SingleInstance&amp; other) {}</span><br><span class="line">    SingleInstance&amp; <span class="keyword">operator</span>=(<span class="type">const</span> SingleInstance&amp; other) {<span class="keyword">return</span> *<span class="keyword">this</span>;}</span><br><span class="line">    <span class="type">static</span> SingleInstance instance;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">SingleInstance* <span class="title">globalInstance</span><span class="params">()</span></span>{</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line">SingleInstance* SingleInstance::instance = <span class="keyword">new</span> <span class="built_in">SingleInstance</span>();</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h1><p>实现了同一接口的一些类进行实例的创建。简单工厂模式的实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类（这些产品类继承自一个父类或接口）的实例。</p>
-<h2 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h2><figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">//产品类（抽象类，不能实例化）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Product</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Product</span>(){};</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>=<span class="number">0</span>;  <span class="comment">//纯虚函数</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">productA</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">productA</span>(){};</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout &lt;&lt; <span class="string">"product A create!"</span> &lt;&lt; endl; };</span><br><span class="line">    ~<span class="built_in">productA</span>(){};</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">productB</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">productB</span>(){};</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout &lt;&lt; <span class="string">"product B create!"</span> &lt;&lt; endl; };</span><br><span class="line">    ~<span class="built_in">productB</span>(){};</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">simpleFactory</span>{ <span class="comment">// 工厂类</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Product* m;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">simpleFactory</span>(){};</span><br><span class="line">    <span class="function">Product* <span class="title">product</span><span class="params">(<span class="type">const</span> string str)</span></span>{</span><br><span class="line">        <span class="keyword">if</span> (str == <span class="string">"productA"</span>) m = <span class="keyword">new</span> <span class="built_in">productA</span>();</span><br><span class="line">        <span class="keyword">if</span> (str == <span class="string">"productB"</span>) m = <span class="keyword">new</span> <span class="built_in">productB</span>();</span><br><span class="line">        <span class="comment">//... 不符合开放封闭原则，抽象工厂类解决</span></span><br><span class="line">        <span class="keyword">return</span> m;</span><br><span class="line">    };</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="抽象工厂"><a href="#抽象工厂" class="headerlink" title="抽象工厂"></a>抽象工厂</h2><figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">//产品类（抽象类，不能实例化）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Product</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Product</span>(){}</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>=<span class="number">0</span>;  <span class="comment">//纯虚函数</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//产品A</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProductA</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">ProductA</span>(){}</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout&lt;&lt;<span class="string">"product A create!"</span>&lt;&lt;endl; };</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//产品B</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProductB</span>:<span class="keyword">public</span> Product{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">ProductB</span>(){}</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span></span>{ cout&lt;&lt;<span class="string">"product B create!"</span>&lt;&lt;endl; };</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Factory</span>{<span class="comment">//抽象类</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Product* <span class="title">CreateProduct</span><span class="params">()</span></span>=<span class="number">0</span>;</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FactorA</span>:<span class="keyword">public</span> Factory{<span class="comment">//工厂类A，只生产A产品</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Product* <span class="title">CreateProduct</span><span class="params">()</span></span>{</span><br><span class="line">        Product* _Product = <span class="literal">nullptr</span>;</span><br><span class="line">        _Product = <span class="keyword">new</span> <span class="built_in">ProductA</span>();</span><br><span class="line">        <span class="keyword">return</span> _Product;</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FactorB</span>:<span class="keyword">public</span> Factory{<span class="comment">//工厂类B，只生产B产品</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Product* <span class="title">CreateProduct</span><span class="params">()</span></span>{</span><br><span class="line">        Product* _Product = <span class="literal">nullptr</span>;</span><br><span class="line">        _Product = <span class="keyword">new</span> <span class="built_in">ProductB</span>();</span><br><span class="line">        <span class="keyword">return</span> _Product;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h1><p>当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。（例如：进度条）</p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">IProgress</span> <span class="comment">// 进度条基类</span></span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">DoProgress</span><span class="params">(<span class="type">float</span> value)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">IProgress</span>() {}</span><br><span class="line">};</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileSplitter</span></span><br><span class="line">{</span><br><span class="line">    string m_filePath;</span><br><span class="line">    <span class="type">int</span> m_fileNumber;</span><br><span class="line">    List&lt;IProgress *&gt; m_iprogressList; <span class="comment">//抽象通知机制，观察者的核心</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">FileSplitter</span>(<span class="type">const</span> string &amp;filePath, <span class="type">int</span> fileNumber) : <span class="built_in">m_filePath</span>(filePath),</span><br><span class="line">                                                           <span class="built_in">m_fileNumber</span>(fileNumber)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">split</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_fileNumber; i++)</span><br><span class="line">        {</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">            <span class="type">float</span> progressValue = m_fileNumber;</span><br><span class="line">            progressValue = (i + <span class="number">1</span>) / progressValue;</span><br><span class="line">            <span class="built_in">onProgress</span>(progressValue); <span class="comment">//更新进度</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">addIProgress</span><span class="params">(IProgress *iprogress)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        m_iprogressList.<span class="built_in">push_back</span>(iprogress);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">removeIProgress</span><span class="params">(IProgress *iprogress)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        m_iprogressList.<span class="built_in">remove</span>(iprogress);</span><br><span class="line">    }</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onProgress</span><span class="params">(<span class="type">float</span> value)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        List&lt;IProgress *&gt;::iterator itor = m_iprogressList.<span class="built_in">begin</span>();</span><br><span class="line">        <span class="keyword">while</span> (itor != m_iprogressList.<span class="built_in">end</span>())</span><br><span class="line">        {</span><br><span class="line">            (*itor)-&gt;<span class="built_in">DoProgress</span>(value); <span class="comment">//更新所有的进度条</span></span><br><span class="line">            itor++;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h1><p>定义一系列的算法，把它们一个个封装起来，并且使它们可相互替换。该模式使得算法可独立于使用它的客户而变化。</p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// The abstract strategy</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Strategy</span>{ <span class="comment">// 策略抽象</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStrategyA</span> : <span class="keyword">public</span> Strategy{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span></span>{</span><br><span class="line">          cout&lt;&lt;<span class="string">"I am from ConcreteStrategyA."</span>&lt;&lt;endl;</span><br><span class="line">     }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStrategyB</span> : <span class="keyword">public</span> Strategy{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span></span>{</span><br><span class="line">          cout&lt;&lt;<span class="string">"I am from ConcreteStrategyB."</span>&lt;&lt;endl;</span><br><span class="line">     }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ConcreteStrategyC</span> : <span class="keyword">public</span> Strategy{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">AlgorithmInterface</span><span class="params">()</span></span>{</span><br><span class="line">          cout&lt;&lt;<span class="string">"I am from ConcreteStrategyC."</span>&lt;&lt;endl;</span><br><span class="line">     }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">     <span class="built_in">Context</span>(Strategy *pStrategyArg) : <span class="built_in">pStrategy</span>(pStrategyArg){};</span><br><span class="line">     <span class="function"><span class="type">void</span> <span class="title">ContextInterface</span><span class="params">()</span></span>{</span><br><span class="line">          pStrategy-&gt;<span class="built_in">AlgorithmInterface</span>();</span><br><span class="line">     }</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">     Strategy *pStrategy;</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="装饰器模式"><a href="#装饰器模式" class="headerlink" title="装饰器模式"></a>装饰器模式</h1><p>装饰器模式（Decorator Pattern）允许向一个现有的对象添加新的功能，<strong>同时又不改变其结构</strong>。</p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">//业务操作</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Stream</span></span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">char</span> <span class="title">Read</span><span class="params">(<span class="type">int</span> number)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Seek</span><span class="params">(<span class="type">int</span> position)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Write</span><span class="params">(<span class="type">char</span> data)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Stream</span>() {}</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//主体类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileStream</span> : <span class="keyword">public</span> Stream</span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">char</span> <span class="title">Read</span><span class="params">(<span class="type">int</span> number)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//读文件流</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Seek</span><span class="params">(<span class="type">int</span> position)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//定位文件流</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Write</span><span class="params">(<span class="type">char</span> data)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//写文件流</span></span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//扩展操作</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DecoratorStream</span> : <span class="keyword">public</span> Stream <span class="comment">//装饰器基类</span></span><br><span class="line">{</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Stream *stream; <span class="comment">//组合代替继承</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">DecoratorStream</span>(Stream *stm) : <span class="built_in">stream</span>(stm)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CryptoStream</span> : <span class="keyword">public</span> DecoratorStream</span><br><span class="line">{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CryptoStream</span>(Stream *stm) : <span class="built_in">DecoratorStream</span>(stm)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">char</span> <span class="title">Read</span><span class="params">(<span class="type">int</span> number)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line"></span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">        stream-&gt;<span class="built_in">Read</span>(number); <span class="comment">//读文件流</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Seek</span><span class="params">(<span class="type">int</span> position)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">        stream-&gt;<span class="built_in">Seek</span>(position); <span class="comment">//定位文件流</span></span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">    }</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Write</span><span class="params">(byte data)</span></span></span><br><span class="line"><span class="function">    </span>{</span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">        stream-&gt;<span class="built_in">Write</span>(data); <span class="comment">//写文件流</span></span><br><span class="line">        <span class="comment">//额外的加密操作...</span></span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BufferedStream</span> : <span class="keyword">public</span> DecoratorStream</span><br><span class="line">{</span><br><span class="line">    Stream *stream; <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">BufferedStream</span>(Stream *stm) : <span class="built_in">DecoratorStream</span>(stm)</span><br><span class="line">    {</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Process</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="comment">//运行时装配</span></span><br><span class="line">    FileStream *s1 = <span class="keyword">new</span> <span class="built_in">FileStream</span>();</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h1><p>使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。</p>
-<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;list&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">//目标抽象类Robot（机器人接口）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Robot</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">eat</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">sleep</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">}; </span><br><span class="line"></span><br><span class="line"><span class="comment">//适配者类Douya（Douya类）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Douya</span>{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">eat</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"豆芽吃饭"</span> &lt;&lt; endl;    </span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sleep</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"豆芽睡觉"</span> &lt;&lt; endl;    </span><br><span class="line">    }</span><br><span class="line">}; </span><br><span class="line"></span><br><span class="line"><span class="comment">//适配器类DouyaAdapter（DouyaAdapter类） </span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DouyaAdapter</span> : <span class="keyword">public</span> Robot, <span class="keyword">public</span> Douya{</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">eat</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"机器人模仿："</span> ;</span><br><span class="line">        Douya::<span class="built_in">eat</span>();</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">sleep</span><span class="params">()</span></span>{</span><br><span class="line">        cout &lt;&lt; <span class="string">"机器人模仿："</span> ;</span><br><span class="line">        Douya::<span class="built_in">sleep</span>(); </span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="comment">//客户端测试类Client </span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span></span>{</span><br><span class="line">    Robot *robot = (Robot*)<span class="keyword">new</span> <span class="built_in">DouyaAdapter</span>();</span><br><span class="line">    robot-&gt;<span class="built_in">eat</span>(); <span class="comment">// 机器人模仿：豆芽吃饭</span></span><br><span class="line">    robot-&gt;<span class="built_in">sleep</span>(); <span class="comment">// 机器人模仿：豆芽睡觉</span></span><br><span class="line">    <span class="keyword">delete</span> robot;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-]]></content>
-      <categories>
-        <category>设计模式</category>
-      </categories>
-      <tags>
-        <tag>C++</tag>
-        <tag>设计模式</tag>
       </tags>
   </entry>
   <entry>
@@ -1579,39 +1567,6 @@
       </tags>
   </entry>
   <entry>
-    <title>树论</title>
-    <url>/b8c50a86.html</url>
-    <content><![CDATA[<p>最难的一集…..</p>
-<span id="more"></span>
-
-<h1 id="树状数组"><a href="#树状数组" class="headerlink" title="树状数组"></a>树状数组</h1><p><a href="https://www.luogu.com.cn/problem/P3374">模板1</a></p>
-<p><a href="https://www.luogu.com.cn/problem/P3368">模板2</a></p>
-<p><strong>对于单点改变的题目，求动态区间和</strong></p>
-<p><strong>Template</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int n, m, tree[N];</span><br><span class="line"></span><br><span class="line">int lowbit(int x){</span><br><span class="line">	return x &amp; (-x);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">void update(int loc, int k){</span><br><span class="line">	while(loc &lt;= n){</span><br><span class="line">		tree[loc] += k;</span><br><span class="line">		loc += lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int query(int loc){</span><br><span class="line">	int ans = 0;</span><br><span class="line">	while(loc){</span><br><span class="line">		ans += tree[loc];</span><br><span class="line">		loc -= lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">	return ans;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>实现差分数组</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; arr[i];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		int a;</span><br><span class="line">		cin &gt;&gt; a;</span><br><span class="line">		if(a == 1){</span><br><span class="line">			int x, y, k;</span><br><span class="line">			cin &gt;&gt; x &gt;&gt; y &gt;&gt; k;</span><br><span class="line">			update(x, k);</span><br><span class="line">			update(y + 1, -k);</span><br><span class="line">		}</span><br><span class="line">		if(a == 2){</span><br><span class="line">			int x;</span><br><span class="line">			cin &gt;&gt; x;</span><br><span class="line">			cout &lt;&lt; arr[x] + query(x) &lt;&lt; '\n';</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="LCA"><a href="#LCA" class="headerlink" title="LCA"></a>LCA</h1><p><a href="https://www.luogu.com.cn/problem/P3379">模板</a></p>
-<p><strong>Template</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">const int N = 5e5 + 5;</span><br><span class="line">int n, m, s;</span><br><span class="line"></span><br><span class="line">int dep[N];</span><br><span class="line">int jump[N][20];</span><br><span class="line">vector&lt;int&gt; G[N];</span><br><span class="line">void dfs(int x, int fa)</span><br><span class="line">{</span><br><span class="line">	jump[x][0] = fa;</span><br><span class="line">	dep[x] = dep[fa] + 1;</span><br><span class="line">	for(int i = 1; i &lt; 20; i++){</span><br><span class="line">		jump[x][i] = jump[jump[x][i - 1]][i - 1];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 0; i &lt; G[x].size(); i++){</span><br><span class="line">		int y = G[x][i];</span><br><span class="line">		if(y != fa){</span><br><span class="line">			dfs(y, x);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int LCA(int x, int y){</span><br><span class="line">	if(dep[x] &lt; dep[y]) swap(x, y);</span><br><span class="line">	while(dep[x] &gt; dep[y]){</span><br><span class="line">		x = jump[x][(int)log2(dep[x] - dep[y])];</span><br><span class="line">	}</span><br><span class="line">	if(x == y) return x;</span><br><span class="line">	for(int i = log2(dep[x]); i &gt;= 0; i--){</span><br><span class="line">		if(jump[x][i] != jump[y][i]){</span><br><span class="line">			x = jump[x][i];</span><br><span class="line">			y = jump[y][i];</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	return jump[x][0];</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;</span><br><span class="line">	int x, y;</span><br><span class="line">	for(int i = 0; i &lt; n - 1; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		G[x].push_back(y);</span><br><span class="line">		G[y].push_back(x);</span><br><span class="line">	}</span><br><span class="line">	dfs(s, 0);</span><br><span class="line">	for(int i = 0; i &lt; m; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		int ans = LCA(x, y);</span><br><span class="line">		cout &lt;&lt; ans &lt;&lt; '\n';</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
-
-<h1 id="树的直径"><a href="#树的直径" class="headerlink" title="树的直径"></a>树的直径</h1><p><strong>两次dfs，但是好像还是有点问题，待更正……</strong></p>
-<p><strong>Template</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">typedef long long ll;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int N = 2e5 + 5;</span><br><span class="line">struct Edge{</span><br><span class="line">	int v, w, next;</span><br><span class="line">}edge[N];</span><br><span class="line"></span><br><span class="line">// 链式前向星 </span><br><span class="line">int head[N];</span><br><span class="line">int cnt;</span><br><span class="line">void add_edge(int u, int v, int w){</span><br><span class="line">	edge[++cnt].v = v;</span><br><span class="line">	edge[cnt].w = w;</span><br><span class="line">	edge[cnt].next = head[u];</span><br><span class="line">	head[u] = cnt;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int n, vis[N], fa[N];</span><br><span class="line">ll dis[N];</span><br><span class="line">void dfs(int x, int d, int&amp; fnode){</span><br><span class="line">	vis[x] = 1;</span><br><span class="line">	dis[x] = d;</span><br><span class="line">	for(int i = head[x]; i; i = edge[i].next){</span><br><span class="line">		int y = edge[i].v;</span><br><span class="line">		int w = edge[i].w;</span><br><span class="line">		if(!vis[y]){</span><br><span class="line">			fa[y] = x;</span><br><span class="line">			dfs(y, d + w, fnode);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	if(d &gt; dis[fnode]){</span><br><span class="line">		fnode = x;</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n;</span><br><span class="line">	int u, v, w;</span><br><span class="line">	for(int i = 1; i &lt;= n - 1; i++){</span><br><span class="line">		cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;</span><br><span class="line">		add_edge(u, v, w);</span><br><span class="line">		add_edge(v, u, w);</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	int fnode = 1;</span><br><span class="line">	dfs(1, 0, fnode);</span><br><span class="line"></span><br><span class="line">	int o_fnode = fnode;</span><br><span class="line">	memset(vis, 0, sizeof(vis));</span><br><span class="line">	dfs(fnode, 0, o_fnode);</span><br><span class="line"></span><br><span class="line">	ll diameter = dis[o_fnode];</span><br><span class="line">	cout &lt;&lt; diameter &lt;&lt; '\n';</span><br><span class="line"></span><br><span class="line">	// 记录路径上的边</span><br><span class="line">    int cnt = 0;</span><br><span class="line">    int node = o_fnode;</span><br><span class="line">    while (node != fnode) {</span><br><span class="line">        node = fa[node];</span><br><span class="line">        cnt++;</span><br><span class="line">    }</span><br><span class="line">    cout &lt;&lt; cnt - 1;</span><br><span class="line"></span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p>update….</p>
-]]></content>
-      <categories>
-        <category>算法</category>
-      </categories>
-      <tags>
-        <tag>C++</tag>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>背包问题</title>
     <url>/b2626942.html</url>
     <content><![CDATA[<p>背包九讲经典问题！！！</p>
@@ -1657,6 +1612,39 @@
 <h2 id="二维费用背包"><a href="#二维费用背包" class="headerlink" title="二维费用背包"></a>二维费用背包</h2><p><a href="https://www.acwing.com/problem/content/8/">模板</a></p>
 <p><strong>Template</strong></p>
 <figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">1005</span>, V = <span class="number">105</span>, M = <span class="number">105</span>;</span><br><span class="line"><span class="type">int</span> v[N], m[N], w[N];</span><br><span class="line"><span class="type">int</span> dp[V][M];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	<span class="type">int</span> a, b, c;</span><br><span class="line">	cin &gt;&gt; a &gt;&gt; b &gt;&gt; c;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= a; i++){</span><br><span class="line">		cin &gt;&gt; v[i] &gt;&gt; m[i] &gt;&gt; w[i];</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">1</span>; i &lt;= a; i++){</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j = b; j &gt;= v[i]; j--){</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k = c; k &gt;= m[i]; k--){</span><br><span class="line">				dp[j][k] = <span class="built_in">max</span>(dp[j][k], dp[j - v[i]][k - m[i]] + w[i]);</span><br><span class="line">			}</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	cout &lt;&lt; dp[b][c];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树论</title>
+    <url>/b8c50a86.html</url>
+    <content><![CDATA[<p>最难的一集…..</p>
+<span id="more"></span>
+
+<h1 id="树状数组"><a href="#树状数组" class="headerlink" title="树状数组"></a>树状数组</h1><p><a href="https://www.luogu.com.cn/problem/P3374">模板1</a></p>
+<p><a href="https://www.luogu.com.cn/problem/P3368">模板2</a></p>
+<p><strong>对于单点改变的题目，求动态区间和</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int n, m, tree[N];</span><br><span class="line"></span><br><span class="line">int lowbit(int x){</span><br><span class="line">	return x &amp; (-x);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">void update(int loc, int k){</span><br><span class="line">	while(loc &lt;= n){</span><br><span class="line">		tree[loc] += k;</span><br><span class="line">		loc += lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int query(int loc){</span><br><span class="line">	int ans = 0;</span><br><span class="line">	while(loc){</span><br><span class="line">		ans += tree[loc];</span><br><span class="line">		loc -= lowbit(loc);</span><br><span class="line">	}</span><br><span class="line">	return ans;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>实现差分数组</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">	for(int i = 1; i &lt;= n; i++){</span><br><span class="line">		cin &gt;&gt; arr[i];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 1; i &lt;= m; i++){</span><br><span class="line">		int a;</span><br><span class="line">		cin &gt;&gt; a;</span><br><span class="line">		if(a == 1){</span><br><span class="line">			int x, y, k;</span><br><span class="line">			cin &gt;&gt; x &gt;&gt; y &gt;&gt; k;</span><br><span class="line">			update(x, k);</span><br><span class="line">			update(y + 1, -k);</span><br><span class="line">		}</span><br><span class="line">		if(a == 2){</span><br><span class="line">			int x;</span><br><span class="line">			cin &gt;&gt; x;</span><br><span class="line">			cout &lt;&lt; arr[x] + query(x) &lt;&lt; '\n';</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="LCA"><a href="#LCA" class="headerlink" title="LCA"></a>LCA</h1><p><a href="https://www.luogu.com.cn/problem/P3379">模板</a></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">const int N = 5e5 + 5;</span><br><span class="line">int n, m, s;</span><br><span class="line"></span><br><span class="line">int dep[N];</span><br><span class="line">int jump[N][20];</span><br><span class="line">vector&lt;int&gt; G[N];</span><br><span class="line">void dfs(int x, int fa)</span><br><span class="line">{</span><br><span class="line">	jump[x][0] = fa;</span><br><span class="line">	dep[x] = dep[fa] + 1;</span><br><span class="line">	for(int i = 1; i &lt; 20; i++){</span><br><span class="line">		jump[x][i] = jump[jump[x][i - 1]][i - 1];</span><br><span class="line">	}</span><br><span class="line">	for(int i = 0; i &lt; G[x].size(); i++){</span><br><span class="line">		int y = G[x][i];</span><br><span class="line">		if(y != fa){</span><br><span class="line">			dfs(y, x);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int LCA(int x, int y){</span><br><span class="line">	if(dep[x] &lt; dep[y]) swap(x, y);</span><br><span class="line">	while(dep[x] &gt; dep[y]){</span><br><span class="line">		x = jump[x][(int)log2(dep[x] - dep[y])];</span><br><span class="line">	}</span><br><span class="line">	if(x == y) return x;</span><br><span class="line">	for(int i = log2(dep[x]); i &gt;= 0; i--){</span><br><span class="line">		if(jump[x][i] != jump[y][i]){</span><br><span class="line">			x = jump[x][i];</span><br><span class="line">			y = jump[y][i];</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	return jump[x][0];</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;</span><br><span class="line">	int x, y;</span><br><span class="line">	for(int i = 0; i &lt; n - 1; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		G[x].push_back(y);</span><br><span class="line">		G[y].push_back(x);</span><br><span class="line">	}</span><br><span class="line">	dfs(s, 0);</span><br><span class="line">	for(int i = 0; i &lt; m; i++){</span><br><span class="line">		cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">		int ans = LCA(x, y);</span><br><span class="line">		cout &lt;&lt; ans &lt;&lt; '\n';</span><br><span class="line">	}</span><br><span class="line">	return 0;</span><br><span class="line">} </span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="树的直径"><a href="#树的直径" class="headerlink" title="树的直径"></a>树的直径</h1><p><strong>两次dfs，但是好像还是有点问题，待更正……</strong></p>
+<p><strong>Template</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="code"><pre><span class="line">#include &lt;bits/stdc++.h&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">typedef long long ll;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">const int N = 2e5 + 5;</span><br><span class="line">struct Edge{</span><br><span class="line">	int v, w, next;</span><br><span class="line">}edge[N];</span><br><span class="line"></span><br><span class="line">// 链式前向星 </span><br><span class="line">int head[N];</span><br><span class="line">int cnt;</span><br><span class="line">void add_edge(int u, int v, int w){</span><br><span class="line">	edge[++cnt].v = v;</span><br><span class="line">	edge[cnt].w = w;</span><br><span class="line">	edge[cnt].next = head[u];</span><br><span class="line">	head[u] = cnt;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">int n, vis[N], fa[N];</span><br><span class="line">ll dis[N];</span><br><span class="line">void dfs(int x, int d, int&amp; fnode){</span><br><span class="line">	vis[x] = 1;</span><br><span class="line">	dis[x] = d;</span><br><span class="line">	for(int i = head[x]; i; i = edge[i].next){</span><br><span class="line">		int y = edge[i].v;</span><br><span class="line">		int w = edge[i].w;</span><br><span class="line">		if(!vis[y]){</span><br><span class="line">			fa[y] = x;</span><br><span class="line">			dfs(y, d + w, fnode);</span><br><span class="line">		}</span><br><span class="line">	}</span><br><span class="line">	if(d &gt; dis[fnode]){</span><br><span class="line">		fnode = x;</span><br><span class="line">	}</span><br><span class="line">}</span><br><span class="line">int main()</span><br><span class="line">{</span><br><span class="line">	cin &gt;&gt; n;</span><br><span class="line">	int u, v, w;</span><br><span class="line">	for(int i = 1; i &lt;= n - 1; i++){</span><br><span class="line">		cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;</span><br><span class="line">		add_edge(u, v, w);</span><br><span class="line">		add_edge(v, u, w);</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">	int fnode = 1;</span><br><span class="line">	dfs(1, 0, fnode);</span><br><span class="line"></span><br><span class="line">	int o_fnode = fnode;</span><br><span class="line">	memset(vis, 0, sizeof(vis));</span><br><span class="line">	dfs(fnode, 0, o_fnode);</span><br><span class="line"></span><br><span class="line">	ll diameter = dis[o_fnode];</span><br><span class="line">	cout &lt;&lt; diameter &lt;&lt; '\n';</span><br><span class="line"></span><br><span class="line">	// 记录路径上的边</span><br><span class="line">    int cnt = 0;</span><br><span class="line">    int node = o_fnode;</span><br><span class="line">    while (node != fnode) {</span><br><span class="line">        node = fa[node];</span><br><span class="line">        cnt++;</span><br><span class="line">    }</span><br><span class="line">    cout &lt;&lt; cnt - 1;</span><br><span class="line"></span><br><span class="line">	return 0;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>update….</p>
 ]]></content>
       <categories>
         <category>算法</category>

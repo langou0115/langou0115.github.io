@@ -37,8 +37,11 @@
 <meta property="og:image" content="https://langou0115.github.io/51d11c96/image-20240911202050048.png">
 <meta property="og:image" content="https://langou0115.github.io/51d11c96/image-20240911202117761.png">
 <meta property="og:image" content="https://langou0115.github.io/51d11c96/image-20240911203329960.png">
+<meta property="og:image" content="https://langou0115.github.io/51d11c96/image-20240925092855338.png">
+<meta property="og:image" content="https://langou0115.github.io/51d11c96/image-20240925094048800.png">
+<meta property="og:image" content="https://langou0115.github.io/51d11c96/image-20240925094423089.png">
 <meta property="article:published_time" content="2024-09-09T13:07:43.000Z">
-<meta property="article:modified_time" content="2024-09-19T12:35:13.869Z">
+<meta property="article:modified_time" content="2024-10-11T16:37:52.456Z">
 <meta property="article:author" content="Langou">
 <meta property="article:tag" content="C">
 <meta property="article:tag" content="嵌入式">
@@ -235,7 +238,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-09-19 20:35:13" itemprop="dateModified" datetime="2024-09-19T20:35:13+08:00">2024-09-19</time>
+                <time title="修改时间：2024-10-12 00:37:52" itemprop="dateModified" datetime="2024-10-12T00:37:52+08:00">2024-10-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -253,14 +256,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.3k</span>
+              <span>5.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>5 分钟</span>
             </span>
 
         </div>
@@ -312,6 +315,9 @@
 <li><strong>LSE</strong>是低速外部时钟，接频率为32.768kHz的石英晶体。</li>
 <li><strong>PLL</strong>是锁相环倍频器，可以将HSI或HSE时钟倍频后输出，最大输出频率为72MHz。</li>
 </ol>
+<h1 id="大小端"><a href="#大小端" class="headerlink" title="大小端"></a>大小端</h1><p><strong>大小端</strong>是指在多字节数据的存储时，高字节和低字节的存储顺序。在<strong>小端模式</strong>下，低字节存储在低地址，高字节存储在高地址；在<strong>大端模式</strong>下，高字节存储在低地址，低字节存储在高地址。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LittleEndtoBigEnd</span><span class="params">(<span class="type">int</span> a)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="type">char</span> *p = (<span class="type">char</span> *)&amp;a;</span><br><span class="line">    <span class="keyword">return</span> ((p[<span class="number">0</span>] &lt;&lt; <span class="number">24</span>) | (p[<span class="number">1</span>] &lt;&lt; <span class="number">16</span>) | (p[<span class="number">2</span>] &lt;&lt; <span class="number">8</span>) | p[<span class="number">3</span>]);</span><br><span class="line">}</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="type">int</span> a = <span class="number">0x12345678</span>;</span><br><span class="line">    <span class="type">char</span> *p = (<span class="type">char</span> *)&amp;a;</span><br><span class="line">    <span class="keyword">if</span> (*p == <span class="number">0x78</span>)</span><br><span class="line">    {</span><br><span class="line">        cout &lt;&lt; <span class="string">"Little Endian"</span> &lt;&lt; endl;</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    {</span><br><span class="line">        cout &lt;&lt; <span class="string">"Big Endian"</span> &lt;&lt; endl;</span><br><span class="line">    }</span><br><span class="line">    cout &lt;&lt; hex &lt;&lt; <span class="built_in">LittleEndtoBigEnd</span>(a) &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
 <h1 id="UART"><a href="#UART" class="headerlink" title="UART"></a>UART</h1><p><strong>UART</strong>全称是通用<strong>异步收发传输器</strong>（Universal Asynchronous Receiver/Transmitter)，它通常称作UART，是一种异步收发传输器, 是设备间进行异步通信的关键模块。UART负责处理数据总线和串行口之间的串/并、并/串转换，并规定了帧格式；通信双方只要采用相同的帧格式和波特率，就能在未共享时钟信号的情况下，仅用<strong>两根信号线（RX 和TX）就可以完成通信过程，因此也称为异步串行通信</strong>。</p>
 <img src="/51d11c96/image-20240910210746279.png" class="" title="UART帧格式">
 
@@ -359,7 +365,39 @@
 <li>CPHA = 0：在时钟信号SCK的第一个跳变沿采样；</li>
 <li>CPHA = 1：在时钟信号SCK的第二个跳变沿采样。</li>
 </ul>
+<h1 id="MQTT"><a href="#MQTT" class="headerlink" title="MQTT"></a>MQTT</h1><p>MQTT是一种一种基于<strong>客户端-服务端</strong>架构的消息传输协议，所以在 MQTT 协议通信中，有两个最为重要的角色，它们便是服务端和客户端。</p>
+<p>MQTT 服务端通常是一台服务器（broker），它是 MQTT 信息传输的枢纽，负责将 MQTT 客户端发送来的信息传递给 MQTT 客户端；MQTT 服务端还负责管理 MQTT 客户端，以确保客户端之间的通讯顺畅，保证 MQTT 信息得以正确接收和准确投递。</p>
+<p><strong>MQTT主题</strong></p>
+<p>MQTT 通信中，消息的传递是通过主题（topic）来进行的。主题是消息的分类标识，客户端可以订阅（subscribe）一个或多个主题，也可以发布（publish）消息到一个或多个主题。当客户端发布消息到某个主题时，订阅了这个主题的客户端就会收到这个消息。</p>
+<h2 id="MQTT客户端连接"><a href="#MQTT客户端连接" class="headerlink" title="MQTT客户端连接"></a>MQTT客户端连接</h2><ol>
+<li>客户端向服务端发送 CONNECT 报文，连接到服务端。</li>
+<li>服务端向客户端发送 CONNACK 报文，确认连接建立。</li>
+</ol>
+<p>MQTT 报文组成分为三个部分：固定头（Fixed header）、可变头（Variable header）以及有效载荷（Payload，消息体）。</p>
+<p><strong>固定头</strong>：固定头部分包含了报文类型（Connect 报文的报文类型是 1）、标志位（Connect 报文的标志位是 0000 0000）、剩余长度（Remaining Length）。</p>
+<p><strong>可变头</strong>：可变头部分包含了协议名（Protocol Name）、协议版本号（Protocol Version Number）、连接标志（Connect Flags）、保持连接时间（Keep Alive）、有效载荷（Payload）。</p>
+<p><strong>有效载荷</strong>：有效载荷部分包含了客户端标识符（Client Identifier）、遗嘱主题（Will Topic）、遗嘱消息（Will Message）、用户名（User Name）、密码（Password）。</p>
+<h3 id="Connect-报文"><a href="#Connect-报文" class="headerlink" title="Connect 报文"></a>Connect 报文</h3><img src="/51d11c96/image-20240925092855338.png" class="" title="Connect报文">
 
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">clientId <span class="comment">// 客户端 id</span></span><br><span class="line">keepAlive <span class="comment">// 心跳时间间隔</span></span><br><span class="line"><span class="comment">/* cleanSession=1，当 MQTT 客户端由离线（与服务端断开连接）再次上线时，离线期间发</span></span><br><span class="line"><span class="comment">送给客户端的消息会被清除，客户端不会收到这些消息；cleanSession=0，当 MQTT 客户端由</span></span><br><span class="line"><span class="comment">离线再次上线时，离线期间发送给客户端的消息会被保留，客户端会收到这些消息。 */</span></span><br><span class="line">cleanSession <span class="comment">// 是否清除会话</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="ConnectAck-报文"><a href="#ConnectAck-报文" class="headerlink" title="ConnectAck 报文"></a>ConnectAck 报文</h3><img src="/51d11c96/image-20240925094048800.png" class="" title="CONNACK">
+
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">returnCode <span class="comment">//连接返回码</span></span><br><span class="line"><span class="comment">/*与CONNECT报文clearSession有关*/</span></span><br><span class="line">sessionPresent <span class="comment">//会话状态</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="MQTT客户端断开连接"><a href="#MQTT客户端断开连接" class="headerlink" title="MQTT客户端断开连接"></a>MQTT客户端断开连接</h2><p>如果客户端想要断开与服务端的连接，此时客户端可以主动向服务端发送一个 DISCONNECT 报文来断开与服务端的连接</p>
+<h2 id="发布消息、订阅主题、取消订阅主题"><a href="#发布消息、订阅主题、取消订阅主题" class="headerlink" title="发布消息、订阅主题、取消订阅主题"></a>发布消息、订阅主题、取消订阅主题</h2><p>MQTT 客户端向服务端发布消息其实就是向服务端发送一个 PUBLISH 报文，服务端收到客户端发送过来的 PUBLISH 报文之后，会向发送发回复一个报文。</p>
+<img src="/51d11c96/image-20240925094423089.png" class="" title="PUBLISH报文">
+
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">packetId <span class="comment">// 报文标识符</span></span><br><span class="line">topicName <span class="comment">// 主题名</span></span><br><span class="line">payload <span class="comment">// 消息内容</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">QoS=0，最多一次传输，消息发布者只发布一次消息，不关心消息是否被接收；</span></span><br><span class="line"><span class="comment">QoS=1，至少一次传输，消息发布者至少发布一次消息，确保消息至少被接收一次；</span></span><br><span class="line"><span class="comment">QoS=2，恰好一次传输，消息发布者只发布一次消息，确保消息只被接收一次。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">qos <span class="comment">// 服务质量</span></span><br><span class="line">retain <span class="comment">// 保留标志</span></span><br><span class="line"><span class="comment">/*dup 标志指示此消息是否重复。只在 QoS 1 和 QoS 2 级别中使用。*/</span></span><br><span class="line">dup <span class="comment">// 重发标志</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>主题名称要求</strong></p>
+<ul>
+<li>主题名称必须是 UTF-8 编码的字符串</li>
+<li>主题名称可以包含通配符 (+ 和 #)</li>
+<li>主题名称可以包含多级目录（eg: a/b/c）</li>
+</ul>
+<h1 id="OTA升级"><a href="#OTA升级" class="headerlink" title="OTA升级"></a>OTA升级</h1>
     </div>
 
     
@@ -463,7 +501,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#STM32%E5%90%AF%E5%8A%A8"><span class="nav-number">1.</span> <span class="nav-text">STM32启动</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">启动方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">启动流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#STM32-GPIO"><span class="nav-number">2.</span> <span class="nav-text">STM32 GPIO</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#STM32%E6%97%B6%E9%92%9F"><span class="nav-number">3.</span> <span class="nav-text">STM32时钟</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UART"><span class="nav-number">4.</span> <span class="nav-text">UART</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IIC"><span class="nav-number">5.</span> <span class="nav-text">IIC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B7%E5%A7%8B%E4%BD%8D"><span class="nav-number">5.1.</span> <span class="nav-text">起始位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E4%BD%8D"><span class="nav-number">5.2.</span> <span class="nav-text">停止位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="nav-number">5.3.</span> <span class="nav-text">数据传输</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%AD%94%E4%BF%A1%E5%8F%B7"><span class="nav-number">5.4.</span> <span class="nav-text">应答信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I2C%E5%86%99%E6%97%B6%E5%BA%8F"><span class="nav-number">5.5.</span> <span class="nav-text">I2C写时序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I2C%E8%AF%BB%E6%97%B6%E5%BA%8F"><span class="nav-number">5.6.</span> <span class="nav-text">I2C读时序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SPI"><span class="nav-number">6.</span> <span class="nav-text">SPI</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#STM32%E5%90%AF%E5%8A%A8"><span class="nav-number">1.</span> <span class="nav-text">STM32启动</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">启动方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">启动流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#STM32-GPIO"><span class="nav-number">2.</span> <span class="nav-text">STM32 GPIO</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#STM32%E6%97%B6%E9%92%9F"><span class="nav-number">3.</span> <span class="nav-text">STM32时钟</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E5%B0%8F%E7%AB%AF"><span class="nav-number">4.</span> <span class="nav-text">大小端</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UART"><span class="nav-number">5.</span> <span class="nav-text">UART</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IIC"><span class="nav-number">6.</span> <span class="nav-text">IIC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B7%E5%A7%8B%E4%BD%8D"><span class="nav-number">6.1.</span> <span class="nav-text">起始位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E4%BD%8D"><span class="nav-number">6.2.</span> <span class="nav-text">停止位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="nav-number">6.3.</span> <span class="nav-text">数据传输</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%AD%94%E4%BF%A1%E5%8F%B7"><span class="nav-number">6.4.</span> <span class="nav-text">应答信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I2C%E5%86%99%E6%97%B6%E5%BA%8F"><span class="nav-number">6.5.</span> <span class="nav-text">I2C写时序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I2C%E8%AF%BB%E6%97%B6%E5%BA%8F"><span class="nav-number">6.6.</span> <span class="nav-text">I2C读时序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SPI"><span class="nav-number">7.</span> <span class="nav-text">SPI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MQTT"><span class="nav-number">8.</span> <span class="nav-text">MQTT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MQTT%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%BF%9E%E6%8E%A5"><span class="nav-number">8.1.</span> <span class="nav-text">MQTT客户端连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Connect-%E6%8A%A5%E6%96%87"><span class="nav-number">8.1.1.</span> <span class="nav-text">Connect 报文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ConnectAck-%E6%8A%A5%E6%96%87"><span class="nav-number">8.1.2.</span> <span class="nav-text">ConnectAck 报文</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MQTT%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%96%AD%E5%BC%80%E8%BF%9E%E6%8E%A5"><span class="nav-number">8.2.</span> <span class="nav-text">MQTT客户端断开连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E5%B8%83%E6%B6%88%E6%81%AF%E3%80%81%E8%AE%A2%E9%98%85%E4%B8%BB%E9%A2%98%E3%80%81%E5%8F%96%E6%B6%88%E8%AE%A2%E9%98%85%E4%B8%BB%E9%A2%98"><span class="nav-number">8.3.</span> <span class="nav-text">发布消息、订阅主题、取消订阅主题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OTA%E5%8D%87%E7%BA%A7"><span class="nav-number">9.</span> <span class="nav-text">OTA升级</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -479,20 +517,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -537,13 +575,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">100k</span>
+    <span title="站点总字数">105k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">1:31</span>
+    <span title="站点阅读时长">1:36</span>
 </div>
 
         

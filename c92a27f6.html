@@ -21,17 +21,22 @@
     var CONFIG = {"hostname":"langou0115.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Talk is cheap, show me the code">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Langou的窝">
-<meta property="og:url" content="https://langou0115.github.io/categories/Linux%E5%BA%94%E7%94%A8/index.html">
+  <meta name="description" content="本文介绍FFpeg命令的使用方法，包括常用的音视频处理命令，例如转码、剪切、合并等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FFmpeg命令使用">
+<meta property="og:url" content="https://langou0115.github.io/c92a27f6.html">
 <meta property="og:site_name" content="Langou的窝">
-<meta property="og:description" content="Talk is cheap, show me the code">
+<meta property="og:description" content="本文介绍FFpeg命令的使用方法，包括常用的音视频处理命令，例如转码、剪切、合并等。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://langou0115.github.io/undefined/image-20241116232713175.png">
+<meta property="article:published_time" content="2024-11-16T15:21:50.000Z">
+<meta property="article:modified_time" content="2024-11-18T15:09:58.123Z">
 <meta property="article:author" content="Langou">
+<meta property="article:tag" content="音视频">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://langou0115.github.io/undefined/image-20241116232713175.png">
 
-<link rel="canonical" href="https://langou0115.github.io/categories/Linux%E5%BA%94%E7%94%A8/">
+<link rel="canonical" href="https://langou0115.github.io/c92a27f6.html">
 
 
 <script id="page-configurations">
@@ -39,12 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>分类: Linux应用 | Langou的窝</title>
+  <title>FFmpeg命令使用 | Langou的窝</title>
   
 
 
@@ -184,111 +189,199 @@
         <div class="content-wrap">
           
 
-          <div class="content category">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">Linux应用
-          <small>分类</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://langou0115.github.io/c92a27f6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Langou">
+      <meta itemprop="description" content="Talk is cheap, show me the code">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Langou的窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          FFmpeg命令使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-11-16 23:21:50" itemprop="dateCreated datePublished" datetime="2024-11-16T23:21:50+08:00">2024-11-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-11-18 23:09:58" itemprop="dateModified" datetime="2024-11-18T23:09:58+08:00">2024-11-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">音视频开发</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2024</span>
-    </div>
+        <p>本文介绍FFpeg命令的使用方法，包括常用的音视频处理命令，例如转码、剪切、合并等。</p>
+<span id="more"></span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+<h1 id="FFmpeg、ffplay、ffprobe介绍"><a href="#FFmpeg、ffplay、ffprobe介绍" class="headerlink" title="FFmpeg、ffplay、ffprobe介绍"></a>FFmpeg、ffplay、ffprobe介绍</h1><p><strong><code>ffmpeg</code></strong>: 主工具，用于转换、处理音视频。</p>
+<img src="/undefined/image-20241116232713175.png" class="">
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-09-16T23:18:37+08:00"
-              content="2024-09-16">
-          09-16
-        </time>
-      </div>
+<p><strong><code>ffplay</code></strong>: 播放器，用于查看和测试音视频文件。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 播放本地文件</span></span><br><span class="line">ffplay -window_title <span class="string">"test time"</span> -ss 2 -t 10 -autoexit test.mp4</span><br><span class="line"><span class="comment"># 播放网络流</span></span><br><span class="line">ffplay -window_title <span class="string">"rtmp stream"</span> rtmp://202.69.69.180:443/webcast/bshdlive-pc</span><br><span class="line"><span class="comment"># 强制解码器</span></span><br><span class="line">mpeg4解码器：ffplay -vcodec mpeg4 test.mp4</span><br><span class="line">h264解码器：ffplay -vcodec h264 test.mp4</span><br><span class="line"><span class="comment"># 禁用音频或视频</span></span><br><span class="line">禁用音频：ffplay test.mp4 -an</span><br><span class="line">禁用视频：ffplay test.mp4 -vn</span><br><span class="line"><span class="comment"># 播放YUV数据</span></span><br><span class="line">ffplay -pixel_format yuv420p -video_size 320x240 -framerate 5 yuv420p_320x240.yuv</span><br><span class="line"><span class="comment"># 播放RGB数据</span></span><br><span class="line">ffplay -pixel_format rgb24 -video_size 320x240 -framerate 5 -i</span><br><span class="line">rgb24_320x240.rgb</span><br><span class="line"><span class="comment"># 播放PCM数据 ar:采样率 ac:声道数 f:采样格式</span></span><br><span class="line">ffplay -ar 48000 -ac 2 -f f32le 48000_2_f32le.pcm</span><br><span class="line"><span class="comment"># 视频旋转</span></span><br><span class="line">ffplay -i test.mp4 -vf transpose=1</span><br><span class="line"><span class="comment"># 视频反转</span></span><br><span class="line">ffplay test.mp4 -vf hflip</span><br><span class="line">ffplay test.mp4 -vf vflip</span><br><span class="line"><span class="comment"># 视频旋转和反转</span></span><br><span class="line">ffplay test.mp4 -vf hflip,transpose=1</span><br><span class="line"><span class="comment"># 音频变速播放</span></span><br><span class="line">ffplay -i test.mp4 -af atempo=2</span><br><span class="line"><span class="comment"># 视频变速播放</span></span><br><span class="line">ffplay -i test.mp4 -vf setpts=PTS/2</span><br><span class="line"><span class="comment"># 音视频同时变速</span></span><br><span class="line">ffplay -i test.mp4 -vf setpts=PTS/2 -af atempo=2</span><br></pre></td></tr></tbody></table></figure>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/df38ad26.html" itemprop="url">
-            <span itemprop="name">Socket网络编程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-06-30T21:40:36+08:00"
-              content="2024-06-30">
-          06-30
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/87698413.html" itemprop="url">
-            <span itemprop="name">Linux进程与线程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-06-26T13:39:28+08:00"
-              content="2024-06-26">
-          06-26
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/8c131bee.html" itemprop="url">
-            <span itemprop="name">Linux系统信息与资源</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-06-26T10:56:19+08:00"
-              content="2024-06-26">
-          06-26
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/1f3f638f.html" itemprop="url">
-            <span itemprop="name">LinuxIO操作</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
+<p><strong><code>ffprobe</code></strong>: 分析工具，用于检查音视频文件的详细信息</p>
+<h1 id="命令分类"><a href="#命令分类" class="headerlink" title="命令分类"></a>命令分类</h1><table>
+<thead>
+<tr>
+<th>命令参数</th>
+<th>内容</th>
+<th>命令参数</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-version</td>
+<td>显示版本</td>
+<td>-bsfs</td>
+<td>显示可用比特流 filter</td>
+</tr>
+<tr>
+<td>-buildconf</td>
+<td>显示编译配置</td>
+<td>-protocols</td>
+<td>显示可用的协议</td>
+</tr>
+<tr>
+<td>-formats</td>
+<td>显示可用格式 (muxers+demuxers)</td>
+<td>-filters</td>
+<td>显示可用的过滤器</td>
+</tr>
+<tr>
+<td>-muxers</td>
+<td>显示可用复用器</td>
+<td>-pix_fmts</td>
+<td>显示可用的像素格式</td>
+</tr>
+<tr>
+<td>-demuxers</td>
+<td>显示可用解复用器</td>
+<td>-layouts</td>
+<td>显示标准声道名称</td>
+</tr>
+<tr>
+<td>-codecs</td>
+<td>显示可用编解码器 (decoders+encoders)</td>
+<td>-sample_fmts</td>
+<td>显示可用的音频采样格式</td>
+</tr>
+<tr>
+<td>-decoders</td>
+<td>显示可用解码器</td>
+<td>-colors</td>
+<td>显示可用的颜色名称</td>
+</tr>
+<tr>
+<td>-encoders</td>
+<td>显示可用编码器</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
 
     </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechat.jpg" alt="Langou 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Langou 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
-  
-  
-  
+</div>
 
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9F%B3%E8%A7%86%E9%A2%91/" rel="tag"># 音视频</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/df0b37af.html" rel="prev" title="音视频基础">
+      <i class="fa fa-chevron-left"></i> 音视频基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/69f22936.html" rel="next" title="FFmpeg编程入门">
+      FFmpeg编程入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -341,6 +434,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FFmpeg%E3%80%81ffplay%E3%80%81ffprobe%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">FFmpeg、ffplay、ffprobe介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E5%88%86%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">命令分类</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

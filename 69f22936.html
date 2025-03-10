@@ -21,17 +21,25 @@
     var CONFIG = {"hostname":"langou0115.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Talk is cheap, show me the code">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Langou的窝">
-<meta property="og:url" content="https://langou0115.github.io/categories/Linux%E5%BA%94%E7%94%A8/index.html">
+  <meta name="description" content="本文主要介绍FFmpeg的编程入门，包括FFmpeg的基本概念、FFmpeg的基本使用、FFmpeg的编程接口、FFmpeg内存模型等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FFmpeg编程入门">
+<meta property="og:url" content="https://langou0115.github.io/69f22936.html">
 <meta property="og:site_name" content="Langou的窝">
-<meta property="og:description" content="Talk is cheap, show me the code">
+<meta property="og:description" content="本文主要介绍FFmpeg的编程入门，包括FFmpeg的基本概念、FFmpeg的基本使用、FFmpeg的编程接口、FFmpeg内存模型等。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://langou0115.github.io/undefined/image-20241118233205175.png">
+<meta property="og:image" content="https://langou0115.github.io/undefined/image-20241118233807220.png">
+<meta property="og:image" content="https://langou0115.github.io/undefined/image-20241118233848413.png">
+<meta property="og:image" content="https://langou0115.github.io/undefined/image-20241118234059857.png">
+<meta property="article:published_time" content="2024-11-18T15:23:30.000Z">
+<meta property="article:modified_time" content="2024-11-21T03:00:40.412Z">
 <meta property="article:author" content="Langou">
+<meta property="article:tag" content="音视频">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://langou0115.github.io/undefined/image-20241118233205175.png">
 
-<link rel="canonical" href="https://langou0115.github.io/categories/Linux%E5%BA%94%E7%94%A8/">
+<link rel="canonical" href="https://langou0115.github.io/69f22936.html">
 
 
 <script id="page-configurations">
@@ -39,12 +47,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>分类: Linux应用 | Langou的窝</title>
+  <title>FFmpeg编程入门 | Langou的窝</title>
   
 
 
@@ -184,111 +192,162 @@
         <div class="content-wrap">
           
 
-          <div class="content category">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">Linux应用
-          <small>分类</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://langou0115.github.io/69f22936.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Langou">
+      <meta itemprop="description" content="Talk is cheap, show me the code">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Langou的窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          FFmpeg编程入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-11-18 23:23:30" itemprop="dateCreated datePublished" datetime="2024-11-18T23:23:30+08:00">2024-11-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-11-21 11:00:40" itemprop="dateModified" datetime="2024-11-21T11:00:40+08:00">2024-11-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">音视频开发</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>367</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2024</span>
-    </div>
+        <p>本文主要介绍FFmpeg的编程入门，包括FFmpeg的基本概念、FFmpeg的基本使用、FFmpeg的编程接口、FFmpeg内存模型等。</p>
+<span id="more"></span>
+<h1 id="播放器框架"><a href="#播放器框架" class="headerlink" title="播放器框架"></a>播放器框架</h1><img src="/undefined/image-20241118233205175.png" class="">
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+<p><strong>常用音视频术语：</strong></p>
+<ul>
+<li><strong>容器／文件（Conainer/File）：</strong>即特定格式的多媒体文件，</li>
+</ul>
+<p>比如mp4、flv、mkv等。</p>
+<ul>
+<li><strong>媒体流（Stream）：</strong>表示时间轴上的一段连续数据，如一</li>
+</ul>
+<p>段<strong>声音数据</strong>、一段<strong>视频数据</strong>或一段<strong>字幕数据</strong>，可以是压缩</p>
+<p>的，也可以是非压缩的，压缩的数据需要关联特定的编解</p>
+<p>码器（有些码流音频他是纯PCM）。</p>
+<ul>
+<li><strong>数据帧／数据包（Frame/Packet）：</strong>通常，一个媒体流是</li>
+</ul>
+<p>由大量的数据帧组成的，对于压缩数据，帧对应着编解码</p>
+<p>器的最小处理单元，分属于不同媒体流的数据帧交错存储</p>
+<p>于容器之中。</p>
+<ul>
+<li><strong>编解码器：</strong>编解码器是以帧为单位实现压缩数据和原始数</li>
+</ul>
+<p>据之间的相互转换的。</p>
+<img src="/undefined/image-20241118233807220.png" class="" title="复用器">
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-09-16T23:18:37+08:00"
-              content="2024-09-16">
-          09-16
-        </time>
-      </div>
+<img src="/undefined/image-20241118233848413.png" class="" title="编解码器">
 
-      <div class="post-title">
-          <a class="post-title-link" href="/df38ad26.html" itemprop="url">
-            <span itemprop="name">Socket网络编程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-06-30T21:40:36+08:00"
-              content="2024-06-30">
-          06-30
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/87698413.html" itemprop="url">
-            <span itemprop="name">Linux进程与线程</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-06-26T13:39:28+08:00"
-              content="2024-06-26">
-          06-26
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/8c131bee.html" itemprop="url">
-            <span itemprop="name">Linux系统信息与资源</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2024-06-26T10:56:19+08:00"
-              content="2024-06-26">
-          06-26
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/1f3f638f.html" itemprop="url">
-            <span itemprop="name">LinuxIO操作</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
+<h1 id="FFmpeg库"><a href="#FFmpeg库" class="headerlink" title="FFmpeg库"></a>FFmpeg库</h1><p>整体结构</p>
+<img src="/undefined/image-20241118234059857.png" class="">
 
     </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechat.jpg" alt="Langou 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Langou 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
-  
-  
-  
+</div>
 
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9F%B3%E8%A7%86%E9%A2%91/" rel="tag"># 音视频</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/c92a27f6.html" rel="prev" title="FFmpeg命令使用">
+      <i class="fa fa-chevron-left"></i> FFmpeg命令使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/4e514a02.html" rel="next" title="P2P通信">
+      P2P通信 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -341,6 +400,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%92%AD%E6%94%BE%E5%99%A8%E6%A1%86%E6%9E%B6"><span class="nav-number">1.</span> <span class="nav-text">播放器框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FFmpeg%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">FFmpeg库</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -1879,7 +1879,7 @@
 <li>非交错方式：LLLLRRRR</li>
 </ol>
 <p>数字音频压缩编码在保证信号在听觉方面不产生失真的前提下，对音频数据信号进行尽可能大的压缩，降低数据量。数字音频压缩编码采取去除声音信号中冗余成分的方法来实现。所谓冗余成分指的是音频中不能被人耳感知到的信号，它们对确定声音的音色，音调等信息没有任何的帮助。</p>
-<p>此外，根据人耳听觉的生理和心理声学现象，当一个强音信号与一个弱音信号同时存在时，弱音信号将被强音信号所掩蔽而听不见，这样弱音信号就可以视为冗余信号而不用传送。这就是人耳听觉的掩蔽效应，主要表现在频谱掩蔽效应和时域掩蔽效应。</p>
+<p>此外，根据人耳听觉的生理和心理声学现象，当一个强音信号与一个弱音信号同时存在时，弱音信号将被强音信号所掩蔽而听不见，这样弱音信号就可以视为冗余信号而不用传送。这就是人耳听觉的掩蔽效应，主要表现在<strong>频谱掩蔽效应</strong>和<strong>时域掩蔽效应</strong>。</p>
 <img src="/df0b37af/01aff35e61f9ad42d9fd21d31809072f.png" class="" title="频谱掩蔽效应">
 
 <img src="/df0b37af/image-20241114130255095.png" class="" title="时域掩蔽效应">
@@ -1910,7 +1910,179 @@
         <category>音视频开发</category>
       </categories>
       <tags>
-        <tag>-音视频</tag>
+        <tag>音视频</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>FFmpeg命令使用</title>
+    <url>/c92a27f6.html</url>
+    <content><![CDATA[<p>本文介绍FFpeg命令的使用方法，包括常用的音视频处理命令，例如转码、剪切、合并等。</p>
+<span id="more"></span>
+
+<h1 id="FFmpeg、ffplay、ffprobe介绍"><a href="#FFmpeg、ffplay、ffprobe介绍" class="headerlink" title="FFmpeg、ffplay、ffprobe介绍"></a>FFmpeg、ffplay、ffprobe介绍</h1><p><strong><code>ffmpeg</code></strong>: 主工具，用于转换、处理音视频。</p>
+<img src="/undefined/image-20241116232713175.png" class="">
+
+<p><strong><code>ffplay</code></strong>: 播放器，用于查看和测试音视频文件。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 播放本地文件</span></span><br><span class="line">ffplay -window_title <span class="string">"test time"</span> -ss 2 -t 10 -autoexit test.mp4</span><br><span class="line"><span class="comment"># 播放网络流</span></span><br><span class="line">ffplay -window_title <span class="string">"rtmp stream"</span> rtmp://202.69.69.180:443/webcast/bshdlive-pc</span><br><span class="line"><span class="comment"># 强制解码器</span></span><br><span class="line">mpeg4解码器：ffplay -vcodec mpeg4 test.mp4</span><br><span class="line">h264解码器：ffplay -vcodec h264 test.mp4</span><br><span class="line"><span class="comment"># 禁用音频或视频</span></span><br><span class="line">禁用音频：ffplay test.mp4 -an</span><br><span class="line">禁用视频：ffplay test.mp4 -vn</span><br><span class="line"><span class="comment"># 播放YUV数据</span></span><br><span class="line">ffplay -pixel_format yuv420p -video_size 320x240 -framerate 5 yuv420p_320x240.yuv</span><br><span class="line"><span class="comment"># 播放RGB数据</span></span><br><span class="line">ffplay -pixel_format rgb24 -video_size 320x240 -framerate 5 -i</span><br><span class="line">rgb24_320x240.rgb</span><br><span class="line"><span class="comment"># 播放PCM数据 ar:采样率 ac:声道数 f:采样格式</span></span><br><span class="line">ffplay -ar 48000 -ac 2 -f f32le 48000_2_f32le.pcm</span><br><span class="line"><span class="comment"># 视频旋转</span></span><br><span class="line">ffplay -i test.mp4 -vf transpose=1</span><br><span class="line"><span class="comment"># 视频反转</span></span><br><span class="line">ffplay test.mp4 -vf hflip</span><br><span class="line">ffplay test.mp4 -vf vflip</span><br><span class="line"><span class="comment"># 视频旋转和反转</span></span><br><span class="line">ffplay test.mp4 -vf hflip,transpose=1</span><br><span class="line"><span class="comment"># 音频变速播放</span></span><br><span class="line">ffplay -i test.mp4 -af atempo=2</span><br><span class="line"><span class="comment"># 视频变速播放</span></span><br><span class="line">ffplay -i test.mp4 -vf setpts=PTS/2</span><br><span class="line"><span class="comment"># 音视频同时变速</span></span><br><span class="line">ffplay -i test.mp4 -vf setpts=PTS/2 -af atempo=2</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong><code>ffprobe</code></strong>: 分析工具，用于检查音视频文件的详细信息</p>
+<h1 id="命令分类"><a href="#命令分类" class="headerlink" title="命令分类"></a>命令分类</h1><table>
+<thead>
+<tr>
+<th>命令参数</th>
+<th>内容</th>
+<th>命令参数</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-version</td>
+<td>显示版本</td>
+<td>-bsfs</td>
+<td>显示可用比特流 filter</td>
+</tr>
+<tr>
+<td>-buildconf</td>
+<td>显示编译配置</td>
+<td>-protocols</td>
+<td>显示可用的协议</td>
+</tr>
+<tr>
+<td>-formats</td>
+<td>显示可用格式 (muxers+demuxers)</td>
+<td>-filters</td>
+<td>显示可用的过滤器</td>
+</tr>
+<tr>
+<td>-muxers</td>
+<td>显示可用复用器</td>
+<td>-pix_fmts</td>
+<td>显示可用的像素格式</td>
+</tr>
+<tr>
+<td>-demuxers</td>
+<td>显示可用解复用器</td>
+<td>-layouts</td>
+<td>显示标准声道名称</td>
+</tr>
+<tr>
+<td>-codecs</td>
+<td>显示可用编解码器 (decoders+encoders)</td>
+<td>-sample_fmts</td>
+<td>显示可用的音频采样格式</td>
+</tr>
+<tr>
+<td>-decoders</td>
+<td>显示可用解码器</td>
+<td>-colors</td>
+<td>显示可用的颜色名称</td>
+</tr>
+<tr>
+<td>-encoders</td>
+<td>显示可用编码器</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+]]></content>
+      <categories>
+        <category>音视频开发</category>
+      </categories>
+      <tags>
+        <tag>音视频</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>FFmpeg编程入门</title>
+    <url>/69f22936.html</url>
+    <content><![CDATA[<p>本文主要介绍FFmpeg的编程入门，包括FFmpeg的基本概念、FFmpeg的基本使用、FFmpeg的编程接口、FFmpeg内存模型等。</p>
+<span id="more"></span>
+<h1 id="播放器框架"><a href="#播放器框架" class="headerlink" title="播放器框架"></a>播放器框架</h1><img src="/undefined/image-20241118233205175.png" class="">
+
+<p><strong>常用音视频术语：</strong></p>
+<ul>
+<li><strong>容器／文件（Conainer/File）：</strong>即特定格式的多媒体文件，</li>
+</ul>
+<p>比如mp4、flv、mkv等。</p>
+<ul>
+<li><strong>媒体流（Stream）：</strong>表示时间轴上的一段连续数据，如一</li>
+</ul>
+<p>段<strong>声音数据</strong>、一段<strong>视频数据</strong>或一段<strong>字幕数据</strong>，可以是压缩</p>
+<p>的，也可以是非压缩的，压缩的数据需要关联特定的编解</p>
+<p>码器（有些码流音频他是纯PCM）。</p>
+<ul>
+<li><strong>数据帧／数据包（Frame/Packet）：</strong>通常，一个媒体流是</li>
+</ul>
+<p>由大量的数据帧组成的，对于压缩数据，帧对应着编解码</p>
+<p>器的最小处理单元，分属于不同媒体流的数据帧交错存储</p>
+<p>于容器之中。</p>
+<ul>
+<li><strong>编解码器：</strong>编解码器是以帧为单位实现压缩数据和原始数</li>
+</ul>
+<p>据之间的相互转换的。</p>
+<img src="/undefined/image-20241118233807220.png" class="" title="复用器">
+
+<img src="/undefined/image-20241118233848413.png" class="" title="编解码器">
+
+<h1 id="FFmpeg库"><a href="#FFmpeg库" class="headerlink" title="FFmpeg库"></a>FFmpeg库</h1><p>整体结构</p>
+<img src="/undefined/image-20241118234059857.png" class="">
+]]></content>
+      <categories>
+        <category>音视频开发</category>
+      </categories>
+      <tags>
+        <tag>音视频</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>P2P通信</title>
+    <url>/4e514a02.html</url>
+    <content><![CDATA[<h1 id="P2P通信原理"><a href="#P2P通信原理" class="headerlink" title="P2P通信原理"></a>P2P通信原理</h1><p>p2p通信是指点对点通信，即两个节点之间直接通信，不需要经过服务器。p2p通信的优点是可以提高通信效率，减少服务器的负担，缺点是需要解决节点之间的寻址问题。</p>
+<p>由于IPV4地址的资源有限，IPV6地址的部署较慢，所以p2p通信的寻址问题是一个比较重要的问题。p2p通信的寻址问题可以通过NAT穿透技术来解决。</p>
+<span id="more"></span>
+
+<p><strong>NAT</strong>的类型主要有四种</p>
+<ol>
+<li>Full Cone NAT：一旦内网设备 A 通过某个公网 IP 和端口与外部服务器通信，<strong>所有</strong>外部设备 都可以通过这个公网 IP+端口访问 A。</li>
+<li>Restricted Cone NAT：<strong>只允许</strong>被 A 访问过的外部 IP 访问 A。</li>
+<li>Port Restricted Cone NAT：<strong>只有被 A 访问过的外部 IP+端口</strong> 可以与A通信。</li>
+<li>Symmetric NAT：每次 A 访问外部设备 B，都会分配一个新的公网端口。</li>
+</ol>
+<p>对于Symmetric类型，无法使用NAT穿透，我们主要解决Port Restricted Cone NAT的穿透问题。</p>
+<p>查看自己的NAT类型，可以使用<a href="https://mao.fan/mynat">网站</a></p>
+<p>本项目使用的方法</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">        给服务器打招呼</span><br><span class="line">client1 -----------------&gt; Server----&gt;存储client1 NAT转换后的IP和端口</span><br><span class="line">        给服务器打招呼</span><br><span class="line">client2 -----------------&gt; Server----&gt;存储client2 NAT转换后的IP和端口</span><br><span class="line"><span class="comment"># 当Server检测到两个Client的时候, Server会告诉client1,client2对方的IP和端口</span></span><br><span class="line">         发送client2信息</span><br><span class="line">Server ------------------&gt; client1</span><br><span class="line">         发送client1信息</span><br><span class="line">Server ------------------&gt; client2</span><br><span class="line">         随便发送一个信息</span><br><span class="line">Client1 -----------------&gt; client2 <span class="comment"># 隧道打通</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>对于最后一个Client1为什么需要发送给Client2信息呢？因为Client2的NAT转换后的IP和端口是Server存储的，Client1是无法直接访问的，所以需要Client1主动访问Client2，这样Client1的NAT就接收Client2发送来的信息，当Client2发送信息给Client1的时候，就能实现P2P通信。</p>
+<h1 id="代码具体实现"><a href="#代码具体实现" class="headerlink" title="代码具体实现"></a>代码具体实现</h1><figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment">// P2P消息头</span></span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">P2PMsgType</span> {</span><br><span class="line">    UNKONWN = <span class="number">-1</span>,</span><br><span class="line">    CONNECT_SERVER = <span class="number">0</span>,</span><br><span class="line">    CONNECT_PEER = <span class="number">1</span>,</span><br><span class="line">    P2P_DATA = <span class="number">2</span></span><br><span class="line">};</span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> pack(1)</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">P2PMsgHeader</span> {</span><br><span class="line">    P2PMsgType msgType; <span class="comment">// 0: connect to signal server, 1: connect to peer, 2: data</span></span><br><span class="line">    <span class="type">uint32_t</span> msgLen;</span><br><span class="line">};</span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> pack()</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>对P2P收发信息进行封装</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="type">int</span> len; <span class="comment">// 接收 发送 数据长度</span></span><br><span class="line"><span class="type">char</span> buffer[BUFFER_SIZE]; <span class="comment">// 数据缓冲区</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sendP2PMsg</span><span class="params">(<span class="type">int</span> sockfd, sockaddr_in to,<span class="type">char</span> *msg, <span class="type">int</span> len,P2PMsgType type)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="keyword">if</span> (len &gt; BUFFER_SIZE - <span class="built_in">sizeof</span>(P2PMsgHeader)) {</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">"Message too large!"</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算总的发送数据大小</span></span><br><span class="line">    <span class="type">size_t</span> totalSize = <span class="built_in">sizeof</span>(P2PMsgHeader) + len;</span><br><span class="line">    <span class="comment">// 清空 buffer</span></span><br><span class="line">    <span class="built_in">memset</span>(buffer, <span class="number">0</span>, BUFFER_SIZE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 组装 P2PMsg 结构体</span></span><br><span class="line">    P2PMsgHeader *pMsg = (P2PMsgHeader *)buffer;</span><br><span class="line">    pMsg-&gt;msgType = type;</span><br><span class="line">    pMsg-&gt;msgLen = <span class="built_in">htonl</span>(len);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 复制数据到 buffer（紧跟在 P2PMsg 之后）</span></span><br><span class="line">    <span class="built_in">memcpy</span>(buffer + <span class="built_in">sizeof</span>(P2PMsgHeader), msg, len);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送数据</span></span><br><span class="line">    <span class="type">int</span> sentBytes = <span class="built_in">sendto</span>(sockfd, buffer, totalSize, <span class="number">0</span>, (<span class="keyword">struct</span> sockaddr *)&amp;to, <span class="built_in">sizeof</span>(to));</span><br><span class="line">    <span class="keyword">if</span> (sentBytes &lt; <span class="number">0</span>) {</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">"sendto failed"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> sentBytes; <span class="comment">// 返回发送的字节数</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">recvP2PMsg</span><span class="params">(<span class="type">int</span> sockfd, sockaddr_in target, <span class="type">char</span> *msg, <span class="type">int</span> len, P2PMsgType &amp;type)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    sockaddr_in from;</span><br><span class="line">    <span class="type">int</span> fromlen = <span class="built_in">sizeof</span>(from);</span><br><span class="line">    <span class="type">int</span> recvBytes = <span class="built_in">recvfrom</span>(sockfd, buffer, BUFFER_SIZE, <span class="number">0</span>, (<span class="keyword">struct</span> sockaddr *)&amp;from, (<span class="type">socklen_t</span> *)&amp;fromlen);</span><br><span class="line">    <span class="keyword">if</span> (recvBytes &lt; <span class="number">0</span>) {</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查是否是目标地址发来的数据</span></span><br><span class="line">    <span class="keyword">if</span> (from.sin_addr.s_addr != target.sin_addr.s_addr || from.sin_port != target.sin_port) {</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 解析 P2PMsg</span></span><br><span class="line">    P2PMsgHeader *pMsg = (P2PMsgHeader *)buffer;</span><br><span class="line">    type = pMsg-&gt;msgType;</span><br><span class="line">    pMsg-&gt;msgLen = <span class="built_in">ntohl</span>(pMsg-&gt;msgLen);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(type == P2P_DATA){</span><br><span class="line">        <span class="comment">// 检查数据长度是否合法</span></span><br><span class="line">        <span class="keyword">if</span> (pMsg-&gt;msgLen &gt; len) {</span><br><span class="line">            std::cerr &lt;&lt; <span class="string">"Buffer too small!"</span> &lt;&lt; std::endl;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        }</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// 复制数据</span></span><br><span class="line">        <span class="built_in">memcpy</span>(msg, buffer + <span class="built_in">sizeof</span>(P2PMsgHeader), pMsg-&gt;msgLen);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> pMsg-&gt;msgLen;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>socket通信设置为非阻塞IO</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">socketBlockDisable</span><span class="params">(<span class="type">int</span> sockfd)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="type">int</span> flags = <span class="built_in">fcntl</span>(sockfd, F_GETFL, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (flags == <span class="number">-1</span>) {</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">"fcntl F_GETFL failed"</span>);</span><br><span class="line">        <span class="built_in">close</span>(sockfd);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">fcntl</span>(sockfd, F_SETFL, flags | O_NONBLOCK) == <span class="number">-1</span>) {</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">"fcntl F_SETFL failed"</span>);</span><br><span class="line">        <span class="built_in">close</span>(sockfd);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>发送信息给Server</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">sendP2PMsg</span>(sockfd, signalServer, <span class="literal">NULL</span>, <span class="number">0</span>, CONNECT_SERVER);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>等待服务器发送回复P2P对方的信息</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">while</span>(<span class="built_in">recvP2PMsg</span>(sockfd, signalServer, (<span class="type">char</span> *)&amp;Peer, <span class="built_in">sizeof</span>(Peer), type) &lt; <span class="number">0</span>) {</span><br><span class="line">    <span class="keyword">if</span>(errno != EAGAIN &amp;&amp; errno != EWOULDBLOCK) {</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">"recvfrom failed"</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line">    std::cout &lt;&lt; <span class="string">"Waiting for peer connection..."</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="built_in">sleep</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">time</span>(<span class="literal">NULL</span>) - startTime &gt; TIMEOUT_SEC) {</span><br><span class="line">        std::cerr &lt;&lt; <span class="string">"Timeout!"</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>接着向对方发送一个udp数据包用于打通隧道</p>
+<figure class="highlight c++"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">sendP2PMsg</span>(sockfd, Peer, <span class="literal">NULL</span>, <span class="number">0</span>, CONNECT_PEER);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>此时两个客户端P2P通信就建立成功了。</p>
+<h1 id="结果显示"><a href="#结果显示" class="headerlink" title="结果显示"></a>结果显示</h1><img src="/undefined/image-20250310190033835.png" class="" title="image-20250310190033835">
+
+<p>完整代码：<a href="https://github.com/langou0115/Port-Restricted-Cone-P2P">https://github.com/langou0115/Port-Restricted-Cone-P2P</a></p>
+]]></content>
+      <categories>
+        <category>网络通信</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+        <tag>C</tag>
+        <tag>网络通信</tag>
       </tags>
   </entry>
 </search>
